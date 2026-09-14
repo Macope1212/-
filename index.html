@@ -16,10 +16,22 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.9); display: flex; justify-content: center;
             align-items: center; z-index: 100; color: white; cursor: pointer;
+            flex-direction: column; gap: 12px; text-align: center;
         }
         .start-text {
             padding: 20px 40px; font-size: 24px; font-weight: bold; background: #d35400;
             border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); text-transform: uppercase;
+        }
+        .start-hint { font-size: 13px; opacity: 0.7; max-width: 320px; }
+        #fallback-badge {
+            position: absolute; top: 10px; left: 10px; z-index: 10; display: none;
+            color: #fff; background: rgba(0,0,0,0.5); padding: 6px 10px; border-radius: 6px;
+            font-size: 12px;
+        }
+        #error-banner {
+            position: absolute; top: 0; left: 0; width: 100%; z-index: 200; display: none;
+            background: #b91c1c; color: #fff; padding: 14px 18px; font-size: 13px;
+            font-family: monospace; white-space: pre-wrap; box-sizing: border-box;
         }
     </style>
 </head>
@@ -27,10 +39,23 @@
 
     <div id="start-overlay">
         <div class="start-text">STARTA ÖKENKRIGET (KLICKA HÄR)</div>
+        <div class="start-hint" id="start-hint"></div>
     </div>
     <div id="crosshair"></div>
+    <div id="fallback-badge">Klicka och dra för att titta (musen är inte låst i denna förhandsvisning)</div>
+    <div id="error-banner"></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Fångar alla JS-fel och visar dem på skärmen, så vi slipper gissa
+        // vad som går fel om spelet inte startar.
+        window.addEventListener('error', (e) => {
+            const banner = document.getElementById('error-banner');
+            banner.style.display = 'block';
+            banner.textContent = 'FEL: ' + e.message + (e.filename ? '\n(' + e.filename + ':' + e.lineno + ')' : '');
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
+            onerror="document.getElementById('error-banner').style.display='block'; document.getElementById('error-banner').textContent='FEL: Kunde inte ladda Three.js från CDN. Kolla din internetanslutning eller om något (brandvägg/adblocker) blockerar cdnjs.cloudflare.com.';"></script>
 
     <script>
         const scene = new THREE.Scene();
@@ -91,22 +116,86 @@
         }
 
         // Kontroller
-        let cameraYAngle = 0, cameraXAngle = 0, isMouseLocked = false;
+        let cameraYAngle = 0, cameraXAngle = 0, isMouseLocked = false, usingFallbackControls = false;
         const startOverlay = document.getElementById('start-overlay');
+        const startHint = document.getElementById('start-hint');
         const crosshair = document.getElementById('crosshair');
+        const fallbackBadge = document.getElementById('fallback-badge');
 
-        startOverlay.addEventListener('click', () => { renderer.domElement.requestPointerLock(); });
+        function beginGame() {
+            // Dölj startskärmen oavsett om pointer lock funkar eller inte,
+            // så spelet alltid går att starta.
+            startOverlay.style.display = 'none';
+            crosshair.style.display = 'block';
+        }
+
+        startOverlay.addEventListener('click', () => {
+            if (!renderer.domElement.requestPointerLock) {
+                // Webbläsaren stödjer inte Pointer Lock alls
+                usingFallbackControls = true;
+                fallbackBadge.style.display = 'block';
+                beginGame();
+                return;
+            }
+
+            const lockPromise = renderer.domElement.requestPointerLock();
+            // Vissa webbläsare returnerar ett Promise, andra inget (äldre API)
+            if (lockPromise && typeof lockPromise.catch === 'function') {
+                lockPromise.catch((err) => {
+                    // Nekad - visa varför, och använd fallback istället så spelet går att spela
+                    const banner = document.getElementById('error-banner');
+                    banner.style.display = 'block';
+                    banner.textContent = 'Pointer lock nekades: ' + (err && err.message ? err.message : err);
+                    usingFallbackControls = true;
+                    fallbackBadge.style.display = 'block';
+                    beginGame();
+                });
+            }
+
+            // Säkerhetsnät: om pointerlockchange inte triggas inom kort, anta att det blockerats
+            setTimeout(() => {
+                if (document.pointerLockElement !== renderer.domElement && startOverlay.style.display !== 'none') {
+                    usingFallbackControls = true;
+                    fallbackBadge.style.display = 'block';
+                    beginGame();
+                }
+            }, 300);
+        });
 
         document.addEventListener('pointerlockchange', () => {
             isMouseLocked = (document.pointerLockElement === renderer.domElement);
-            startOverlay.style.display = isMouseLocked ? 'none' : 'flex';
-            crosshair.style.display = isMouseLocked ? 'block' : 'none';
+            if (isMouseLocked) {
+                usingFallbackControls = false;
+                fallbackBadge.style.display = 'none';
+                beginGame();
+            } else if (!usingFallbackControls) {
+                // Musen släpptes (t.ex. Esc) och vi kör inte fallback - visa startskärmen igen
+                startOverlay.style.display = 'flex';
+                crosshair.style.display = 'none';
+            }
         });
 
         document.addEventListener('mousemove', (e) => {
             if (isMouseLocked) {
                 cameraYAngle -= e.movementX * 0.002;
                 cameraXAngle -= e.movementY * 0.002;
+                cameraXAngle = Math.max(-Math.PI/2.2, Math.min(Math.PI/2.2, cameraXAngle));
+            }
+        });
+
+        // Fallback: klicka och dra i canvasen för att titta runt när Pointer Lock inte fungerar
+        let isDragging = false, lastDragX = 0, lastDragY = 0;
+        renderer.domElement.addEventListener('mousedown', (e) => {
+            if (usingFallbackControls) { isDragging = true; lastDragX = e.clientX; lastDragY = e.clientY; }
+        });
+        window.addEventListener('mouseup', () => { isDragging = false; });
+        window.addEventListener('mousemove', (e) => {
+            if (usingFallbackControls && isDragging) {
+                const dx = e.clientX - lastDragX;
+                const dy = e.clientY - lastDragY;
+                lastDragX = e.clientX; lastDragY = e.clientY;
+                cameraYAngle -= dx * 0.002;
+                cameraXAngle -= dy * 0.002;
                 cameraXAngle = Math.max(-Math.PI/2.2, Math.min(Math.PI/2.2, cameraXAngle));
             }
         });
@@ -132,7 +221,9 @@
             const delta = Math.min((timeNow - lastTime) / 1000, 0.1);
             lastTime = timeNow;
 
-            if (isMouseLocked) {
+            const controlsActive = isMouseLocked || usingFallbackControls;
+
+            if (controlsActive) {
                 let moveX = 0, moveZ = 0;
                 if (keys.w) { moveX += Math.sin(cameraYAngle); moveZ += Math.cos(cameraYAngle); }
                 if (keys.s) { moveX -= Math.sin(cameraYAngle); moveZ -= Math.cos(cameraYAngle); }
@@ -162,3 +253,5 @@
         animate();
     </script>
 
+</body>
+</html>
