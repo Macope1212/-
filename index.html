@@ -624,7 +624,7 @@
                     <span class="ctrl-desc">Hoppa</span>
                 </div>
                 <div class="ctrl">
-                    <span class="ctrl-key">KLICK</span>
+                    <span class="ctrl-key">KLICK / F</span>
                     <span class="ctrl-desc">Skjut</span>
                 </div>
             </div>
@@ -2272,6 +2272,26 @@
 
             group.add(weaponSlot);
 
+            // Osynlig, generös hitbox som täcker hela kroppen (inte bara de
+            // tunna synliga formerna). Den renderas aldrig (opacity 0) men
+            // är fortfarande raycastbar, så träffar registreras mycket mer
+            // tillförlitligt — särskilt viktigt när man siktar med styrplatta
+            // istället för mus, där precisionen är lägre.
+
+            const hitbox = new THREE.Mesh(
+                new THREE.BoxGeometry(1.0, 2.1, 1.0),
+                new THREE.MeshBasicMaterial({
+                    transparent: true,
+                    opacity: 0,
+                    depthWrite: false
+                })
+            );
+
+            hitbox.position.y = 1.3;
+            hitbox.name = 'hitbox';
+
+            group.add(hitbox);
+
             // HP-mätare ovanför huvudet
 
             const barCanvas = document.createElement('canvas');
@@ -3536,7 +3556,7 @@
             weaponUI.textContent =
                 'Vapen: ' +
                 type +
-                ' · VÄNSTERKLICK';
+                ' · VÄNSTERKLICK / F';
 
         }
 
@@ -4057,6 +4077,18 @@
                         chestOpenedThisHold =
                             false;
                     }
+                }
+
+                // Alternativ skjutknapp — så man kan spela på en laptop
+                // utan datormus (t.ex. via styrplatta) och ändå kunna skjuta.
+
+                if (
+                    e.code === 'KeyF' &&
+                    performance.now() >=
+                    nextShotTime
+                ) {
+
+                    shoot();
                 }
 
                 if (
