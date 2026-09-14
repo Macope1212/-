@@ -41,7 +41,7 @@
         // 1. Inställningar för 3D-scen och kamera
         const scene = new THREE.Scene();
         
-        // Öken-atmosfär: Apelsingul/smutsig solnedgång och tung sandstorms-dimma
+        // Öken-atmosfär: Apelsingul solnedgång och tung sandstorms-dimma
         scene.background = new THREE.Color(0xd5a97a); 
         scene.fog = new THREE.FogExp2(0xd5a97a, 0.025); // Tät dimma för war zone-känsla
 
@@ -56,7 +56,7 @@
         const light = new THREE.AmbientLight(0xfff0e0, 0.9);
         scene.add(light);
 
-        // 2. Ökensand (Marken ersätter det gröna gräset)
+        // 2. Ökensand (Marken)
         const floorGeo = new THREE.PlaneGeometry(2000, 2000);
         const floorMat = new THREE.MeshBasicMaterial({ color: 0xc29d70 }); // Sandfärgad mark
         const floor = new THREE.Mesh(floorGeo, floorMat);
@@ -89,22 +89,22 @@
                     buildingGroup.add(roof);
                 }
 
-                // Sönderbammad dörröppning (tomt hål eller bränt mörkt block)
+                // Sönderbammad dörröppning (bränt mörkt block)
                 const doorGeo = new THREE.BoxGeometry(width * 0.25, height * 0.25, 0.1);
-                const doorMat = new THREE.MeshBasicMaterial({ color: 0x1a1a1a }); // Bränd dörr
+                const doorMat = new THREE.MeshBasicMaterial({ color: 0x1a1a1a }); 
                 const door = new THREE.Mesh(doorGeo, doorMat);
                 door.position.set(0, (height * 0.25) / 2, (depth / 2) + 0.01); 
                 buildingGroup.add(door);
 
             } else if (damageType > 0.15) {
-                // Kategori 2: Halvt kollapsat hus som lutar kraftigt
+                // Kategori 2: Halvt kollapsat hus som lutar kraftigt efter en bombträff
                 const wallGeo = new THREE.BoxGeometry(width, height * 0.7, depth);
                 const wallMat = new THREE.MeshBasicMaterial({ color: wallColor });
                 const walls = new THREE.Mesh(wallGeo, wallMat);
                 walls.position.y = (height * 0.7) / 2;
                 buildingGroup.add(walls);
 
-                // Få huset att luta dramatiskt efter en bombträff
+                // Få huset att luta dramatiskt
                 buildingGroup.rotation.z = (Math.random() - 0.5) * 0.3;
                 buildingGroup.rotation.x = (Math.random() - 0.5) * 0.3;
 
@@ -221,3 +221,41 @@
             if (isMouseLocked) {
                 let moveX = 0;
                 let moveZ = 0;
+
+                if (keys.w) { moveX += Math.sin(cameraYAngle); moveZ += Math.cos(cameraYAngle); }
+
+if (keys.s) { moveX -= Math.sin(cameraYAngle); moveZ -= Math.cos(cameraYAngle); }
+if (keys.a) { moveX += Math.cos(cameraYAngle); moveZ -= Math.sin(cameraYAngle); }
+if (keys.d) { moveX -= Math.cos(cameraYAngle); moveZ += Math.sin(cameraYAngle); }
+const speed = 15; // Gånghastighet över sanden
+camera.position.x += moveX * speed * delta;
+camera.position.z += moveZ * speed * delta;
+// Tyngdkraft och Hoppstyrka
+velocityY -= 28 * delta;
+camera.position.y += velocityY * delta;
+if (keys.space && isGrounded) {
+velocityY = 11;
+isGrounded = false;
+}
+// Spärr så man inte faller igenom ökensanden
+if (camera.position.y < 2) {
+camera.position.y = 2;
+velocityY = 0;
+isGrounded = true;
+}
+}
+// Uppdatera vart kameran pekar utifrån musvinklarna
+const target = new THREE.Vector3();
+target.x = camera.position.x + Math.sin(cameraYAngle) * Math.cos(cameraXAngle);
+target.z = camera.position.z + Math.cos(cameraYAngle) * Math.cos(cameraXAngle);
+target.y = camera.position.y + Math.sin(cameraXAngle);
+camera.lookAt(target);
+renderer.render(scene, camera);
+}
+window.addEventListener('resize', () => {
+camera.aspect = window.innerWidth / window.innerHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(window.innerWidth, window.innerHeight);
+});
+animate();
+
