@@ -30,41 +30,35 @@
     </div>
     <div id="crosshair"></div>
 
+    <!-- Säkert och stabilt 3D-bibliotek -->
     <script src="https://cloudflare.com"></script>
 
     <script>
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xd5a97a); 
-        scene.fog = new THREE.FogExp2(0xd5a97a, 0.025); // Snygg sandstorm
+        scene.background = new THREE.Color(0xd5a97a); // Sandfärgad himmel
+        scene.fog = new THREE.FogExp2(0xd5a97a, 0.025); // Tät sandstorm/krigsdimma
 
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 2, 0); 
+        camera.position.set(0, 2, 0); // Spelaren startar i ögonhöjd
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // Vackert ljus som lyser upp öknen
-        const light = new THREE.AmbientLight(0xfff0e0, 0.6);
-        scene.add(light);
-        const dirLight = new THREE.DirectionalLight(0xffe0bd, 1.0);
-        dirLight.position.set(40, 80, 40);
-        scene.add(dirLight);
-
-        // Ökensand (Snyggare material som reagerar på ljus)
+        // Kraschsäker sandmark (MeshBasicMaterial)
         const floor = new THREE.Mesh(
             new THREE.PlaneGeometry(2000, 2000), 
-            new THREE.MeshStandardMaterial({ color: 0xc29d70, roughness: 0.9 })
+            new THREE.MeshBasicMaterial({ color: 0xc29d70 })
         );
         floor.rotation.x = -Math.PI / 2;
         scene.add(floor);
 
-        // Krigshärjade byggnader (MeshStandardMaterial för snygga ytor)
+        // Krigshärjade byggnader (Militärgrön, Aska, Rost, Lera, Mörkröd)
         const colors = [0x555d50, 0x3e3a36, 0x7b3f00, 0x4a4135, 0x8b0000]; 
         for (let i = 0; i < 45; i++) {
             const x = (Math.random() - 0.5) * 160;
             const z = (Math.random() - 0.5) * 160;
-            if (Math.abs(x) < 12 && Math.abs(z) < 12) continue;
+            if (Math.abs(x) < 12 && Math.abs(z) < 12) continue; // Håll startytan fri
 
             const w = 7 + Math.random() * 6;
             const h = 8 + Math.random() * 12;
@@ -73,29 +67,35 @@
 
             const bGroup = new THREE.Group();
             const dmg = Math.random();
-            const mat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.7 });
+            const mat = new THREE.MeshBasicMaterial({ color: col });
 
             if (dmg > 0.4) {
+                // Hela byggnader
                 const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
                 wall.position.y = h / 2;
                 bGroup.add(wall);
             } else if (dmg > 0.15) {
+                // Sönderbombade lutande hus
                 const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h * 0.7, d), mat);
                 wall.position.y = (h * 0.7) / 2;
                 bGroup.add(wall);
-                bGroup.rotation.z = (Math.random() - 0.5) * 0.3; // Sönderbombat lutande hus
+                bGroup.rotation.z = (Math.random() - 0.5) * 0.3;
             } else {
+                // Ruinhögar/Rasmassor på marken
                 for (let j = 0; j < 3; j++) {
-                    const rubble = new THREE.Mesh(new THREE.BoxGeometry(w * 0.6, 2, d * 0.6), new THREE.MeshStandardMaterial({ color: 0x3e3a36, roughness: 0.9 }));
+                    const rubble = new THREE.Mesh(
+                        new THREE.BoxGeometry(w * 0.6, 2, d * 0.6), 
+                        new THREE.MeshBasicMaterial({ color: 0x3e3a36 })
+                    );
                     rubble.position.set((Math.random() - 0.5) * 4, 1, (Math.random() - 0.5) * 4);
-                    bGroup.add(rubble); // Ruinhög
+                    bGroup.add(rubble);
                 }
             }
             bGroup.position.set(x, 0, z);
             scene.add(bGroup);
         }
 
-        // Mus och Kontroller
+        // Muslåsning och skärmklick
         let cameraYAngle = 0, cameraXAngle = 0, isMouseLocked = false;
         const startOverlay = document.getElementById('start-overlay');
         const crosshair = document.getElementById('crosshair');
@@ -118,6 +118,7 @@
             }
         });
 
+        // Tangentbordskontroller (W, A, S, D + Mellanslag)
         const keys = { w: false, a: false, s: false, d: false, space: false };
         let velocityY = 0, isGrounded = true, lastTime = performance.now();
 
@@ -132,6 +133,7 @@
             if (e.code === 'Space') keys.space = false;
         });
 
+        // Spelslingan
         function animate() {
             requestAnimationFrame(animate);
             const timeNow = performance.now();
@@ -145,9 +147,12 @@
                 if (keys.a) { moveX += Math.cos(cameraYAngle); moveZ -= Math.sin(cameraYAngle); }
                 if (keys.d) { moveX -= Math.cos(cameraYAngle); moveZ += Math.sin(cameraYAngle); }
 
-                camera.position.x += moveX * 15 * delta;
-                camera.position.z += moveZ * 15 * delta;
-                velocityY -= 28 * delta; camera.position.y += velocityY * delta;
+                camera.position.x += moveX * 16 * delta;
+                camera.position.z += moveZ * 16 * delta;
+                
+                // Tyngdkraft och Hopp
+                velocityY -= 28 * delta; 
+                camera.position.y += velocityY * delta;
 
                 if (keys.space && isGrounded) { velocityY = 11; isGrounded = false; }
                 if (camera.position.y < 2) { camera.position.y = 2; velocityY = 0; isGrounded = true; }
