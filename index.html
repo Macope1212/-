@@ -225,6 +225,24 @@
             metalness: 0.2
         });
 
+        // ---------- NYTT: LÄGENHETSMATERIAL ----------
+        const matApartment = [
+            0x70685a,
+            0x817565,
+            0x625b50,
+            0x8a765e
+        ].map(c => new THREE.MeshStandardMaterial({
+            color: c,
+            roughness: 0.9,
+            metalness: 0.02
+        }));
+
+        const matWindow = new THREE.MeshStandardMaterial({
+            color: 0x25343a,
+            roughness: 0.35,
+            metalness: 0.15
+        });
+
         function addShadowMesh(mesh) {
             mesh.castShadow = true;
             mesh.receiveShadow = true;
@@ -529,6 +547,104 @@
                     )
                 );
             }
+        }
+
+        // ---------- LÄGENHETER LÄNGS DEN OSYNLIGA BARRIÄREN ----------
+        function buildApartment(x, z, rotationY) {
+            const group = new THREE.Group();
+
+            const width = 10;
+            const depth = 8;
+            const height = 18;
+
+            const mat = matApartment[
+                Math.floor(Math.random() * matApartment.length)
+            ];
+
+            const building = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(width, height, depth),
+                    mat
+                )
+            );
+
+            building.position.y = height / 2;
+            group.add(building);
+
+            // Fönster på framsidan
+            for (let floor = 0; floor < 4; floor++) {
+                for (let window = 0; window < 3; window++) {
+                    const win = addShadowMesh(
+                        new THREE.Mesh(
+                            new THREE.BoxGeometry(1.8, 2.2, 0.12),
+                            matWindow
+                        )
+                    );
+
+                    win.position.set(
+                        -3.2 + window * 3.2,
+                        3 + floor * 4,
+                        -depth / 2 - 0.08
+                    );
+
+                    group.add(win);
+                }
+            }
+
+            // Fönster på baksidan
+            for (let floor = 0; floor < 4; floor++) {
+                for (let window = 0; window < 3; window++) {
+                    const win = addShadowMesh(
+                        new THREE.Mesh(
+                            new THREE.BoxGeometry(1.8, 2.2, 0.12),
+                            matWindow
+                        )
+                    );
+
+                    win.position.set(
+                        -3.2 + window * 3.2,
+                        3 + floor * 4,
+                        depth / 2 + 0.08
+                    );
+
+                    group.add(win);
+                }
+            }
+
+            group.position.set(x, 0, z);
+            group.rotation.y = rotationY;
+
+            group.userData.collider = {
+                x: x,
+                z: z,
+                halfW: width / 2 + 0.25,
+                halfD: depth / 2 + 0.25,
+                rotationZ: 0
+            };
+
+            return group;
+        }
+
+        // Norra och södra sidan
+        for (let x = -95; x <= 95; x += 10) {
+            const northApartment = buildApartment(x, -96, 0);
+            scene.add(northApartment);
+            buildingColliders.push(northApartment.userData.collider);
+
+            const southApartment = buildApartment(x, 96, 0);
+            scene.add(southApartment);
+            buildingColliders.push(southApartment.userData.collider);
+        }
+
+        // Östra och västra sidan
+        for (let z = -86; z <= 86; z += 10) {
+            const eastApartment = buildApartment(96, z, Math.PI / 2);
+            scene.add(eastApartment);
+            buildingColliders.push(eastApartment.userData.collider);
+
+            const westApartment = buildApartment(-96, z, Math.PI / 2);
+            scene.add(westApartment);
+            buildingColliders.push(westApartment.userData.collider);
         }
 
         for (let i = 0; i < 6; i++) {
