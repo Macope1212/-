@@ -98,12 +98,20 @@
         const startOverlay = document.getElementById('start-overlay');
         const crosshair = document.getElementById('crosshair');
 
-        startOverlay.addEventListener('click', () => { renderer.domElement.requestPointerLock(); });
+        // Fixat: Begär pointer lock direkt vid klick
+        startOverlay.addEventListener('click', () => {
+            renderer.domElement.requestPointerLock();
+        });
 
         document.addEventListener('pointerlockchange', () => {
             isMouseLocked = (document.pointerLockElement === renderer.domElement);
-            startOverlay.style.display = isMouseLocked ? 'none' : 'flex';
-            crosshair.style.display = isMouseLocked ? 'block' : 'none';
+            if (isMouseLocked) {
+                startOverlay.style.display = 'none';
+                crosshair.style.display = 'block';
+            } else {
+                startOverlay.style.display = 'flex';
+                crosshair.style.display = 'none';
+            }
         });
 
         document.addEventListener('mousemove', (e) => {
