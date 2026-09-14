@@ -448,6 +448,18 @@
             transition: width 0.12s linear;
         }
 
+        #bots-killed-ui {
+            position: absolute;
+            left: 20px;
+            bottom: 78px;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            text-shadow: 2px 2px 3px #000;
+            z-index: 20;
+            pointer-events: none;
+        }
+
         /* ---------- INTERACTION ---------- */
 
         #interaction {
@@ -649,6 +661,8 @@
             <div id="health-bar"></div>
         </div>
     </div>
+
+    <div id="bots-killed-ui">Bottar dödade: 0</div>
 
     <div id="weapon-ui">
         Vapen: Händer
@@ -3103,6 +3117,9 @@
         document.getElementById('btn-solo').addEventListener('click', () => {
 
             Net.enabled = false;
+            if (bots.length === 0 && botsKilled === 0) {
+                spawnBot();
+            }
             enterGame();
         });
 
@@ -3331,6 +3348,137 @@
         }
 
         updateHealth();
+
+        // ---------- SINGLEPLAYER-BOTTAR ----------
+
+        const bots = [];
+        let botsKilled = 0;
+        const botsKilledLabel =
+            document.getElementById('bots-killed-ui');
+        const BOT_HP = 100;
+        const BOT_SPEED = 2.7;
+        const BOT_ATTACK_DISTANCE = 1.8;
+        const BOT_ATTACK_COOLDOWN = 800;
+
+        function updateBotsKilled() {
+            botsKilledLabel.textContent =
+                'Bottar dödade: ' + botsKilled;
+        }
+
+        function findBotSpawnPosition() {
+            for (let attempt = 0; attempt < 100; attempt++) {
+                const x =
+                    -MAP_BOUNDARY + 5 +
+                    Math.random() * (MAP_BOUNDARY * 2 - 10);
+                const z =
+                    -MAP_BOUNDARY + 5 +
+                    Math.random() * (MAP_BOUNDARY * 2 - 10);
+
+                const dx = x - camera.position.x;
+                const dz = z - camera.position.z;
+
+                if (Math.hypot(dx, dz) < 15) {
+                    continue;
+                }
+
+                if (canMoveTo(x, z)) {
+                    return { x, z };
+                }
+            }
+
+            return {
+                x: camera.position.x + 20,
+                z: camera.position.z + 20
+            };
+        }
+
+        function spawnBot() {
+            const spawn = findBotSpawnPosition();
+            const rig = buildRemotePlayerMesh(0x8f3f3f);
+
+            rig.group.position.set(
+                spawn.x,
+                0,
+                spawn.z
+            );
+
+            scene.add(rig.group);
+
+            bots.push({
+                rig,
+                hp: BOT_HP,
+                nextAttack: 0
+            });
+        }
+
+        function spawnBotsAfterKill() {
+            const amount = botsKilled >= 5 ? 2 : 1;
+
+            for (let i = 0; i < amount; i++) {
+                spawnBot();
+            }
+        }
+
+        function killBot(bot) {
+            scene.remove(bot.rig.group);
+
+            const index = bots.indexOf(bot);
+            if (index !== -1) {
+                bots.splice(index, 1);
+            }
+
+            botsKilled++;
+            updateBotsKilled();
+            spawnBotsAfterKill();
+        }
+
+        function updateBots(delta) {
+            if (Net.enabled || !isMouseLocked) {
+                return;
+            }
+
+            const now = performance.now();
+
+            for (const bot of bots) {
+                const group = bot.rig.group;
+                const dx = camera.position.x - group.position.x;
+                const dz = camera.position.z - group.position.z;
+                const distance = Math.hypot(dx, dz);
+
+                if (distance > 0.001) {
+                    group.rotation.y = Math.atan2(dx, dz);
+                }
+
+                if (distance > BOT_ATTACK_DISTANCE) {
+                    const step =
+                        Math.min(BOT_SPEED * delta, distance - BOT_ATTACK_DISTANCE);
+
+                    const moveX = dx / distance * step;
+                    const moveZ = dz / distance * step;
+
+                    const newX = group.position.x + moveX;
+                    const newZ = group.position.z + moveZ;
+
+                    if (canMoveTo(newX, group.position.z) &&
+                        Math.hypot(newX - camera.position.x, group.position.z - camera.position.z) > playerRadius) {
+                        group.position.x = newX;
+                    }
+
+                    if (canMoveTo(group.position.x, newZ) &&
+                        Math.hypot(group.position.x - camera.position.x, newZ - camera.position.z) > playerRadius) {
+                        group.position.z = newZ;
+                    }
+                }
+
+                if (distance <= BOT_ATTACK_DISTANCE && now >= bot.nextAttack) {
+                    playerHP -= 5;
+                    updateHealth();
+                    bot.nextAttack = now + BOT_ATTACK_COOLDOWN;
+                }
+            }
+        }
+
+        updateBotsKilled();
 
         // ---------- VAPEN ----------
 
@@ -3999,6 +4147,44 @@
                             currentWeapon === 'AR' ? 30 : 22;
 
                         Net.sendDamage(hitId, damage);
+                    }
+                }
+            }
+
+            // Träffkontroll mot bottar i singleplayer
+
+            if (!Net.enabled && bots.length > 0) {
+
+                const botToObject = new Map();
+                const botHitBoxes = [];
+
+                for (const bot of bots) {
+                    botToObject.set(bot.rig.group, bot);
+                    botHitBoxes.push(bot.rig.group);
+                }
+
+                const botIntersections =
+                    raycaster.intersectObjects(botHitBoxes, true);
+
+                if (botIntersections.length > 0 && botIntersections[0].distance < 80) {
+                    let hitRoot = botIntersections[0].object;
+
+                    while (hitRoot && !botToObject.has(hitRoot)) {
+                        hitRoot = hitRoot.parent;
+                    }
+
+                    const bot = hitRoot ? botToObject.get(hitRoot) : null;
+
+                    if (bot) {
+                        const damage =
+                            currentWeapon === 'AR' ? 30 : 22;
+
+                        bot.hp -= damage;
+                        bot.rig.drawBar(bot.hp);
+
+                        if (bot.hp <= 0) {
+                            killBot(bot);
+                        }
                     }
                 }
             }
@@ -4793,6 +4979,10 @@
             camera.lookAt(
                 target
             );
+
+            // ---------- SINGLEPLAYER-BOTTAR ----------
+
+            updateBots(delta);
 
             // ---------- MULTIPLAYER ----------
 
