@@ -508,7 +508,17 @@
                 group.add(door);
             }
 
-            if (Math.random() > 0.55) {
+            // Takdetaljen placeras nu på den faktiska byggnadshöjden
+            // istället för alltid på full h-höjd.
+            if (
+                dmg > 0.25 &&
+                Math.random() > 0.55
+            ) {
+                const roofHeight =
+                    dmg > 0.55
+                        ? h
+                        : h * 0.65;
+
                 const roofPiece = addShadowMesh(
                     new THREE.Mesh(
                         new THREE.BoxGeometry(
@@ -522,7 +532,7 @@
 
                 roofPiece.position.set(
                     (Math.random() - 0.5) * w * 0.4,
-                    h + 0.15,
+                    roofHeight + 0.15,
                     (Math.random() - 0.5) * d * 0.3
                 );
 
@@ -756,7 +766,7 @@
         }
 
         // ---------- SKAPA VÄRLD ----------
-        for (let i = 0; i < 70; i++) {
+        for (let i = 0; i < 85; i++) {
             let x, z, tries = 0;
 
             do {
