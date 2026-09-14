@@ -30,7 +30,7 @@
     </div>
     <div id="crosshair"></div>
 
-    <script src="https://cloudflare.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
         const scene = new THREE.Scene();
@@ -90,34 +90,17 @@
             scene.add(bGroup);
         }
 
-        // Lista för att hålla reda på aktiva skott
-        const bullets = [];
-
         // Kontroller
         let cameraYAngle = 0, cameraXAngle = 0, isMouseLocked = false;
         const startOverlay = document.getElementById('start-overlay');
         const crosshair = document.getElementById('crosshair');
 
-        // Begär pointer lock så fort spelaren klickar någonstans på skärmen
-        window.addEventListener('click', () => {
-            if (!isMouseLocked) {
-                renderer.domElement.requestPointerLock();
-            }
-        });
+        startOverlay.addEventListener('click', () => { renderer.domElement.requestPointerLock(); });
 
         document.addEventListener('pointerlockchange', () => {
             isMouseLocked = (document.pointerLockElement === renderer.domElement);
-            if (isMouseLocked) {
-                startOverlay.style.display = 'none';
-                crosshair.style.display = 'block';
-            } else {
-                startOverlay.style.display = 'flex';
-                crosshair.style.display = 'none';
-            }
-        });
-
-        document.addEventListener('pointerlockerror', (err) => {
-            console.error("Pointer Lock misslyckades:", err);
+            startOverlay.style.display = isMouseLocked ? 'none' : 'flex';
+            crosshair.style.display = isMouseLocked ? 'block' : 'none';
         });
 
         document.addEventListener('mousemove', (e) => {
@@ -142,31 +125,7 @@
             if (e.code === 'Space') keys.space = false;
         });
 
-        // Muslyssnare för att skjuta
-        document.addEventListener('mousedown', (e) => {
-            if (isMouseLocked && e.button === 0) {
-                const bulletGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.8, 4);
-                const bulletMat = new THREE.MeshBasicMaterial({ color: 0xffcc00 });
-                const bullet = new THREE.Mesh(bulletGeo, bulletMat);
-
-                bullet.position.copy(camera.position);
-
-                const direction = new THREE.Vector3();
-                camera.getWorldDirection(direction);
-
-                bullet.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.clone().normalize());
-
-                bullet.userData = {
-                    direction: direction,
-                    speed: 120 
-                };
-
-                scene.add(bullet);
-                bullets.push(bullet);
-            }
-        });
-
-        // Hela animationsloopen
+        // Hela animationsloopen som stänger koden korrekt
         function animate() {
             requestAnimationFrame(animate);
             const timeNow = performance.now();
@@ -188,17 +147,6 @@
                 if (camera.position.y < 2) { camera.position.y = 2; velocityY = 0; isGrounded = true; }
             }
 
-            // Uppdatera alla aktiva skott
-            for (let i = bullets.length - 1; i >= 0; i--) {
-                const b = bullets[i];
-                b.position.addScaledVector(b.userData.direction, b.userData.speed * delta);
-
-                if (b.position.distanceTo(camera.position) > 300) {
-                    scene.remove(b);
-                    bullets.splice(i, 1);
-                }
-            }
-
             const target = new THREE.Vector3();
             target.x = camera.position.x + Math.sin(cameraYAngle) * Math.cos(cameraXAngle);
             target.z = camera.position.z + Math.cos(cameraYAngle) * Math.cos(cameraXAngle);
@@ -213,5 +161,4 @@
         });
         animate();
     </script>
-</body>
-</html>
+
