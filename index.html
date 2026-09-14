@@ -3,24 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mitt 3D Spel</title>
+    <title>Mitt 3D Spel med Karaktär</title>
     <style>
         body { margin: 0; overflow: hidden; font-family: sans-serif; }
         #instructions {
             position: absolute; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); color: white;
+            background: rgba(0,0,0,0.6); color: white;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            cursor: pointer; text-align: center;
+            cursor: pointer; text-align: center; z-index: 10;
         }
     </style>
 </head>
 <body>
     <div id="instructions">
-        <h1>Klicka för att spela</h1>
+        <h1>Klicka för att styra gubben</h1>
         <p>Gå: W, A, S, D | Hoppa: SPACE | Titta runt: Musen</p>
     </div>
 
-    <!-- Vi laddar Three.js för 3D-grafik -->
     <script type="importmap">
         {
             "imports": {
@@ -34,44 +33,103 @@
         import * as THREE from 'three';
         import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 
-        // 1. Grundläggande 3D-scen och kamera
+        // 1. Scen, himmel och rendering
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x87ceeb); // Blå himmel
-        scene.fog = new THREE.FogExp2(0x87ceeb, 0.015);
+        scene.fog = new THREE.FogExp2(0x87ceeb, 0.01);
 
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.y = 2; // Ögonhöjd
-
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
         document.body.appendChild(renderer.domElement);
 
-        // 2. Ljus i scenen
-        const light = new THREE.AmbientLight(0xffffff, 0.6);
-        scene.add(light);
+        // Ljus
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
         const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
         dirLight.position.set(20, 40, 20);
+        dirLight.castShadow = true;
         scene.add(dirLight);
 
-        // 3. Spelplanen (Marken)
-        const floorGeo = new THREE.PlaneGeometry(2000, 2000);
-        const floorMat = new THREE.MeshStandardMaterial({ color: 0x228b22 }); // Gräsgrön
+        // 2. Grönt gräs (Marken)
+        const floorGeo = new THREE.PlaneGeometry(1000, 1000);
+        const floorMat = new THREE.MeshStandardMaterial({ color: 0x2e8b57 }); // Gräsgrön
         const floor = new THREE.Mesh(floorGeo, floorMat);
         floor.rotation.x = -Math.PI / 2;
+        floor.receiveShadow = true;
         scene.add(floor);
 
-        // Lägg till några slumpmässiga 3D-block (hinder/hus) att gå runt
-        const boxGeo = new THREE.BoxGeometry(4, 4, 4);
-        for(let i = 0; i < 50; i++) {
-            const boxMat = new THREE.MeshStandardMaterial({ color: Math.random() * 0xffffff });
+        // Lite extra block i världen att hoppa på
+        const boxGeo = new THREE.BoxGeometry(4, 2, 4);
+        const boxMat = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+        for(let i = 0; i < 20; i++) {
             const box = new THREE.Mesh(boxGeo, boxMat);
-            box.position.x = (Math.random() - 0.5) * 150;
-            box.position.z = (Math.random() - 0.5) * 150;
-            box.position.y = 2;
+            box.position.set((Math.random() - 0.5) * 100, 1, (Math.random() - 0.5) * 100);
+            box.receiveShadow = true;
+            box.castShadow = true;
             scene.add(box);
         }
 
-        // 4. Kontroller (Gör så att musen låser sig vid klick)
+        // 3. SKAPA 3D-GUBBEN (Sammansatt av olika delar)
+        const playerGroup = new THREE.Group();
+        scene.add(playerGroup);
+        playerGroup.position.set(0, 0, 0);
+
+        // Material till gubben
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0x333333 }); // Mörkgrå mage/leder
+        const skinMat = new THREE.MeshStandardMaterial({ color: 0xff4500 }); // Orange huvud/armar/ben
+
+        // Mage / Torso
+        const torsoGeo = new THREE.BoxGeometry(1.2, 1.5, 0.8);
+        const torso = new THREE.Mesh(torsoGeo, bodyMat);
+        torso.position.y = 1.65; // Höjd från marken
+        torso.castShadow = true;
+        playerGroup.add(torso);
+
+        // Hals
+        const neckGeo = new THREE.CylinderGeometry(0.15, 0.15, 0.3);
+        const neck = new THREE.Mesh(neckGeo, bodyMat);
+        neck.position.y = 2.5;
+        neck.castShadow = true;
+        playerGroup.add(neck);
+
+        // Huvud
+        const headGeo = new THREE.BoxGeometry(0.7, 0.7, 0.7);
+        const head = new THREE.Mesh(headGeo, skinMat);
+        head.position.y = 2.9;
+        head.castShadow = true;
+        playerGroup.add(head);
+
+        // Vänster arm
+        const leftArmGeo = new THREE.BoxGeometry(0.3, 1.2, 0.3);
+        const leftArm = new THREE.Mesh(leftArmGeo, skinMat);
+        leftArm.position.set(-0.8, 1.65, 0);
+        leftArm.castShadow = true;
+        playerGroup.add(leftArm);
+
+        // Höger arm
+        const rightArmGeo = new THREE.BoxGeometry(0.3, 1.2, 0.3);
+        const rightArm = new THREE.Mesh(rightArmGeo, skinMat);
+        rightArm.position.set(0.8, 1.65, 0);
+        rightArm.castShadow = true;
+        playerGroup.add(rightArm);
+
+        // Vänster ben
+        const leftLegGeo = new THREE.BoxGeometry(0.4, 0.9, 0.4);
+        const leftLeg = new THREE.Mesh(leftLegGeo, skinMat);
+        leftLeg.position.set(-0.35, 0.45, 0);
+        leftLeg.castShadow = true;
+        playerGroup.add(leftLeg);
+
+        // Höger ben
+        const rightLegGeo = new THREE.BoxGeometry(0.4, 0.9, 0.4);
+        const rightLeg = new THREE.Mesh(rightLegGeo, skinMat);
+        rightLeg.position.set(0.35, 0.45, 0);
+        rightLeg.castShadow = true;
+        playerGroup.add(rightLeg);
+
+        // 4. Kontroller & Kamera-fokus
         const controls = new PointerLockControls(camera, document.body);
         const instructions = document.getElementById('instructions');
 
@@ -79,13 +137,23 @@
         controls.addEventListener('lock', () => instructions.style.display = 'none');
         controls.addEventListener('unlock', () => instructions.style.display = 'flex');
 
-        // 5. Hantera tangentbordsknappar
+        // Mus-rotationer för att titta runt gubben
+        let cameraYAngle = 0;
+        let cameraXAngle = 0.3; // Titta lite nedåt från början
+
+        document.addEventListener('mousemove', (e) => {
+            if (controls.isLocked) {
+                cameraYAngle -= e.movementX * 0.002;
+                cameraXAngle -= e.movementY * 0.002;
+                // Begränsa hur högt/lågt man kan titta
+                cameraXAngle = Math.max(-0.5, Math.min(0.8, cameraXAngle));
+            }
+        });
+
+        // Tangentbords-input
         const keys = { w: false, a: false, s: false, d: false, space: false };
-        const moveDirection = new THREE.Vector3();
-        const velocity = new THREE.Vector3();
-        
-        // Fysikvariabler för hopp/gravitation
-        let canJump = false;
+        let velocityY = 0;
+        let isGrounded = true;
         const clock = new THREE.Clock();
 
         document.addEventListener('keydown', (e) => {
@@ -104,57 +172,72 @@
             if (e.code === 'Space') keys.space = false;
         });
 
-        // 6. Spel-loopen (Uppdateras 60 gånger i sekunden)
+        // 5. Spelslingan (Animation & Rörelse)
         function animate() {
             requestAnimationFrame(animate);
 
+            const delta = Math.min(clock.getDelta(), 0.1);
+
             if (controls.isLocked) {
-                const delta = clock.getDelta();
+                // Rörelseriktning relativt till kamerans vinkel
+                let moveX = 0;
+                let moveZ = 0;
 
-                // Dämpa farten gradvis (friktion)
-                velocity.x -= velocity.x * 10.0 * delta;
-                velocity.z -= velocity.z * 10.0 * delta;
-                velocity.y -= 9.8 * 2.0 * delta; // Gravitation (faller neråt)
+                if (keys.w) { moveX += Math.sin(cameraYAngle); moveZ += Math.cos(cameraYAngle); }
+                if (keys.s) { moveX -= Math.sin(cameraYAngle); moveZ -= Math.cos(cameraYAngle); }
+                if (keys.a) { moveX += Math.cos(cameraYAngle); moveZ -= Math.sin(cameraYAngle); }
+                if (keys.d) { moveX -= Math.cos(cameraYAngle); moveZ += Math.sin(cameraYAngle); }
 
-                // Räkna ut rörelseriktning baserat på vart kameran tittar
-                moveDirection.z = Number(keys.w) - Number(keys.s);
-                moveDirection.x = Number(keys.d) - Number(keys.a);
-                moveDirection.normalize();
+                // Applicera rörelse på gubben
+                const speed = 8;
+                if (moveX !== 0 || moveZ !== 0) {
+                    playerGroup.position.x += moveX * speed * delta;
+                    playerGroup.position.z += moveZ * speed * delta;
 
-                // Applicera hastighet
-                if (keys.w || keys.s) velocity.z -= moveDirection.z * 40.0 * delta;
-                if (keys.a || keys.d) velocity.x -= moveDirection.x * 40.0 * delta;
+                    // Rotera gubben åt det håll den springer
+                    playerGroup.rotation.y = Math.atan2(moveX, moveZ);
 
-                // Hantera Hopp
-                if (keys.space && canJump) {
-                    velocity.y = 8; // Kraften i hoppet
-                    canJump = false;
+                    // Enkel animation för armar och ben när man går
+                    const time = Date.now() * 0.01;
+                    leftLeg.rotation.x = Math.sin(time) * 0.5;
+                    rightLeg.rotation.x = -Math.sin(time) * 0.5;
+                    leftArm.rotation.x = -Math.sin(time) * 0.5;
+                    rightArm.rotation.x = Math.sin(time) * 0.5;
+                } else {
+                    // Återställ armar/ben när man står stilla
+                    leftLeg.rotation.x = 0;
+                    rightLeg.rotation.x = 0;
+                    leftArm.rotation.x = 0;
+                    rightArm.rotation.x = 0;
                 }
 
-                // Flytta kameran (spelaren)
-                controls.moveRight(-velocity.x * delta);
-                controls.moveForward(-velocity.z * delta);
-                camera.position.y += velocity.y * delta;
+                // Gravitation och Hopp
+                velocityY -= 22 * delta; // Dragningskraft
+                playerGroup.position.y += velocityY * delta;
 
-                // Kolla om spelaren landar på marken
-                if (camera.position.y < 2) {
-                    velocity.y = 0;
-                    camera.position.y = 2;
-                    canJump = true;
+                if (keys.space && isGrounded) {
+                    velocityY = 9; // Hoppstyrka
+                    isGrounded = false;
+                }
+
+                // Kolla om gubben landar på gräset (y = 0)
+                if (playerGroup.position.y < 0) {
+                    playerGroup.position.y = 0;
+                    velocityY = 0;
+                    isGrounded = true;
                 }
             }
+
+            // 6. Tredjepersonkamera: Sätt kameran bakom gubben
+            const radius = 6; // Avstånd från gubben
+            camera.position.x = playerGroup.position.x - radius * Math.sin(cameraYAngle) * Math.cos(cameraXAngle);
+            camera.position.z = playerGroup.position.z - radius * Math.cos(cameraYAngle) * Math.cos(cameraXAngle);
+            camera.position.y = playerGroup.position.y + 2 + radius * Math.sin(cameraXAngle);
+
+            // Rikta kameran mot gubbens mage
+            camera.lookAt(playerGroup.position.x, playerGroup.position.y + 1.5, playerGroup.position.z);
 
             renderer.render(scene, camera);
         }
 
-        // Hantera om man ändrar storlek på webbläsarfönstret
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        animate();
-    </script>
-</body>
-</html>
