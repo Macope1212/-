@@ -30,7 +30,7 @@
     </div>
     <div id="crosshair"></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cloudflare.com"></script>
 
     <script>
         const scene = new THREE.Scene();
@@ -52,6 +52,9 @@
         floor.rotation.x = -Math.PI / 2;
         scene.add(floor);
 
+        // Lista för att spara byggnadernas positioner för väggstopp
+        const colliders = [];
+
         // Byggnader (Hela, lutande ruiner och rasmassor)
         const colors = [0x555d50, 0x3e3a36, 0x7b3f00, 0x4a4135, 0x8b0000]; // Militärgrön, Aska, Rost, Mörkröd
         for (let i = 0; i < 45; i++) {
@@ -72,12 +75,18 @@
                 const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshBasicMaterial({ color: col }));
                 wall.position.y = h / 2;
                 bGroup.add(wall);
+                
+                // Spara husets koordinater för väggstoppet
+                colliders.push({ x: x, z: z, w: w, d: d });
             } else if (dmg > 0.15) {
                 // Lutande bombat hus
                 const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h * 0.7, d), new THREE.MeshBasicMaterial({ color: col }));
                 wall.position.y = (h * 0.7) / 2;
                 bGroup.add(wall);
                 bGroup.rotation.z = (Math.random() - 0.5) * 0.3;
+                
+                // Spara lutande hus med lite extra marginal för säkerhets skull
+                colliders.push({ x: x, z: z, w: w * 1.1, d: d * 1.1 });
             } else {
                 // Rasmassa på marken
                 for (let j = 0; j < 3; j++) {
@@ -139,8 +148,37 @@
                 if (keys.a) { moveX += Math.cos(cameraYAngle); moveZ -= Math.sin(cameraYAngle); }
                 if (keys.d) { moveX -= Math.cos(cameraYAngle); moveZ += Math.sin(cameraYAngle); }
 
-                camera.position.x += moveX * 15 * delta;
-                camera.position.z += moveZ * 15 * delta;
+                const speed = 15;
+                
+                // Beräkna var spelaren vill gå härnäst (test-position)
+                const nextX = camera.position.x + moveX * speed * delta;
+                const nextZ = camera.position.z + moveZ * speed * delta;
+                
+                // Kollisionskontroll mot husen
+                let collisionX = false;
+                let collisionZ = false;
+                const playerRadius = 0.8; // Storlek på spelarens krock-yta
+
+                for (let i = 0; i < colliders.length; i++) {
+                    const b = colliders[i];
+                    
+                    // Kolla krock på X-axeln
+                    if (nextX + playerRadius > b.x - b.w/2 && nextX - playerRadius < b.x + b.w/2 &&
+                        camera.position.z + playerRadius > b.z - b.d/2 && camera.position.z - playerRadius < b.z + b.d/2) {
+                        collisionX = true;
+                    }
+                    
+                    // Kolla krock på Z-axeln
+                    if (camera.position.x + playerRadius > b.x - b.w/2 && camera.position.x - playerRadius < b.x + b.w/2 &&
+                        nextZ + playerRadius > b.z - b.d/2 && nextZ - playerRadius < b.z + b.d/2) {
+                        collisionZ = true;
+                    }
+                }
+
+                // Flytta bara om vägen är helt fri från husväggar
+                if (!collisionX) camera.position.x = nextX;
+                if (!collisionZ) camera.position.z = nextZ;
+
                 velocityY -= 28 * delta; camera.position.y += velocityY * delta;
 
                 if (keys.space && isGrounded) { velocityY = 11; isGrounded = false; }
@@ -161,4 +199,5 @@
         });
         animate();
     </script>
-
+</body>
+</html>
