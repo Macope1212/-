@@ -26,7 +26,6 @@
     <canvas id="gameCanvas"></canvas>
 
     <script>
-        // Inbyggd mini-3D-motor för att helt runda skolans brandvägg
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const infoText = document.getElementById('info-text');
@@ -39,30 +38,33 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // Spelarens tillstånd
+        // Spelarens variabler
         const player = { x: 0, y: 2, z: 0, yaw: 0, pitch: 0 };
         const keys = { w: false, a: false, s: false, d: false, space: false };
         let isMouseLocked = false, velocityY = 0, isGrounded = true, lastTime = performance.now();
 
-        // Generera krigshärjade ruiner och rasmassor
+        // Skapa ökenbyggnader
         const buildings = [];
-        const colors = ['#555d50', '#3e3a36', '#7b3f00', '#4a4135', '#8b0000']; // Militärgrön, aska, rost, mörkröd
+        const colors = ['#555d50', '#3e3a36', '#7b3f00', '#4a4135', '#8b0000']; 
         
-        for (let i = 0; i < 40; i++) {
-            const bx = (Math.random() - 0.5) * 150;
-            const bz = 15 + Math.random() * 150; // Placera framför startpunkten
-            if (Math.abs(bx) < 10 && Math.abs(bz) < 15) continue;
+        for (let i = 0; i < 45; i++) {
+            const bx = (Math.random() - 0.5) * 160;
+            const bz = (Math.random() - 0.5) * 160;
+            // Håll startytan fri
+            if (Math.abs(bx) < 15 && Math.abs(bz) < 15) continue;
 
-            const w = 6 + Math.random() * 6;
-            const h = 8 + Math.random() * 12;
-            const d = 6 + Math.random() * 6;
-            const col = colors[Math.floor(Math.random() * colors.length)];
-            const dmg = Math.random();
-
-            buildings.push({ x: bx, z: bz, w: w, h: h, d: d, color: col, dmg: dmg });
+            buildings.push({
+                x: bx,
+                z: bz,
+                w: 6 + Math.random() * 6,
+                h: 8 + Math.random() * 14,
+                d: 6 + Math.random() * 6,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                dmg: Math.random()
+            });
         }
 
-        // Interaktion & Muslåsning
+        // Lås muspekaren vid klick på skärmen
         canvas.addEventListener('click', () => { canvas.requestPointerLock(); });
         document.addEventListener('pointerlockchange', () => {
             isMouseLocked = (document.pointerLockElement === canvas);
@@ -74,7 +76,8 @@
             if (isMouseLocked) {
                 player.yaw -= e.movementX * 0.0025;
                 player.pitch -= e.movementY * 0.0025;
-                player.pitch = Math.max(-Math.PI / 2.3, Math.min(Math.PI / 2.3, player.pitch));
+                // Spärr för att titta rakt upp/ner
+                player.pitch = Math.max(-1.4, Math.min(1.4, player.pitch));
             }
         });
 
@@ -89,66 +92,72 @@
             if (e.code === 'Space') keys.space = false;
         });
 
-        // Matte-funktion för att projicera 3D till din 2D-skärm
+        // 3D-projektion till din 2D-skärm
         function project(x, y, z) {
-            // Relativt till spelarens position
             let rx = x - player.x;
             let ry = y - player.y;
             let rz = z - player.z;
 
-            // Rotera runt Y-axeln (Kolla vart spelaren tittar)
+            // Rotera kamera (Yaw - höger/vänster)
             const cosY = Math.cos(-player.yaw), sinY = Math.sin(-player.yaw);
             const rotX = rx * cosY - rz * sinY;
             const rotZ = rx * sinY + rz * cosY;
 
-            // Rotera runt X-axeln (Titta upp/ner)
+            // Rotera kamera (Pitch - upp/ner)
             const cosX = Math.cos(-player.pitch), sinX = Math.sin(-player.pitch);
             const finalY = ry * cosX - rotZ * sinX;
             const finalZ = ry * sinX + rotZ * cosX;
 
-            if (finalZ <= 0.1) return null; // Bakom kameran
+            if (finalZ <= 0.5) return null; // Bakom kameran
 
-            // Perspektiv-skalning
             const fov = Math.min(canvas.width, canvas.height);
-            const screenX = (rotX / finalZ) * fov + canvas.width / 2;
-            const screenY = -(finalY / finalZ) * fov + canvas.height / 2;
-            return { x: screenX, y: screenY, depth: finalZ };
+            return {
+                x: (rotX / finalZ) * fov + canvas.width / 2,
+                y: -(finalY / finalZ) * fov + canvas.height / 2,
+                depth: finalZ
+            };
         }
 
-        // Rit-funktion för 3D-blocken
-        function drawCube(b) {
-            const h = b.dmg > 0.4 ? b.h : b.h * 0.6; // Minska höjden på skadade hus
+        // Rita en byggnad stabilt
+        function drawBuilding(b) {
+            const h = b.dmg > 0.3 ? b.h : b.h * 0.4; // Sönderbombad höjd
             
-            // Fyrkantens 8 hörn i 3D-rymden
-            const vertices = [
-                {x: b.x - b.w/2, y: 0, z: b.z - b.d/2}, {x: b.x + b.w/2, y: 0, z: b.z - b.d/2},
-                {x: b.x + b.w/2, y: h, z: b.z - b.d/2}, {x: b.x - b.w/2, y: h, z: b.z - b.d/2},
-                {x: b.x - b.w/2, y: 0, z: b.z + b.d/2}, {x: b.x + b.w/2, y: 0, z: b.z + b.d/2},
-                {x: b.x + b.w/2, y: h, z: b.z + b.d/2}, {x: b.x - b.w/2, y: h, z: b.z + b.d/2}
-            ];
+            // Beräkna basen och toppen av byggnaden
+            const pBase = project(b.x, 0, b.z);
+            const pTop = project(b.x, h, b.z);
 
-            const pts = vertices.map(v => project(v.x, v.y, v.z));
-            if (pts.includes(null)) return; // Skippa om något hörn är bakom oss
+            if (!pBase || !pTop) return; // Rita inte om huset är utom synhåll
 
-            // Sidor index
-            const faces = [, [1, 5, 6, 2], [5, 4, 7, 6], [4, 0, 3, 7], [3, 2, 6, 7]
-            ];
+            // Räkna ut storlek på skärmen baserat på avstånd (djup)
+            const sizeW = (b.w / pBase.depth) * Math.min(canvas.width, canvas.height);
+            const sizeH = pBase.y - pTop.y;
 
-            ctx.fillStyle = b.dmg < 0.15 ? '#3e3a36' : b.color; // Gör rasmassor askgrå
+            // Om huset lutar på grund av skador (War zone-effekt)
+            ctx.save();
+            ctx.translate(pBase.x, pBase.y);
+            if (b.dmg <= 0.3 && b.dmg > 0.1) {
+                ctx.rotate((b.x % 2 === 0 ? 0.15 : -0.15)); // Luta huset slumpmässigt
+            }
+
+            // Rita husets framsida
+            ctx.fillStyle = b.dmg < 0.1 ? '#3e3a36' : b.color; // Totalt förstörda hus blir askgrå
             ctx.strokeStyle = '#222';
-            ctx.lineWidth = 1;
+            ctx.lineWidth = Math.max(1, 4 / pBase.depth);
+            
+            ctx.beginPath();
+            ctx.rect(-sizeW / 2, -sizeH, sizeW, sizeH);
+            ctx.fill();
+            ctx.stroke();
 
-            faces.forEach(face => {
-                ctx.beginPath();
-                ctx.moveTo(pts[face[0]].x, pts[face[0]].y);
-                for(let i = 1; i < 4; i++) ctx.lineTo(pts[face[i]].x, pts[face[i]].y);
-                ctx.closePath();
-                ctx.fill();
-                ctx.stroke();
-            });
+            // Rita dörr på stående hus
+            if (b.dmg > 0.3) {
+                ctx.fillStyle = '#111';
+                ctx.fillRect(-sizeW * 0.12, -sizeH * 0.25, sizeW * 0.24, sizeH * 0.25);
+            }
+            ctx.restore();
         }
 
-        // Spelslingan (Fysik och Grafikuppdatering)
+        // Spelslingan
         function gameLoop() {
             requestAnimationFrame(gameLoop);
             const timeNow = performance.now();
@@ -162,33 +171,39 @@
                 if (keys.a) { moveX += Math.cos(player.yaw); moveZ -= Math.sin(player.yaw); }
                 if (keys.d) { moveX -= Math.cos(player.yaw); moveZ += Math.sin(player.yaw); }
 
-                player.x += moveX * 14 * delta;
-                player.z += moveZ * 14 * delta;
+                player.x += moveX * 16 * delta;
+                player.z += moveZ * 16 * delta;
 
-                // Gravitation & Hopp
-                velocityY -= 26 * delta;
+                // Hopp-fysik
+                velocityY -= 28 * delta;
                 player.y += velocityY * delta;
 
-                if (keys.space && isGrounded) { velocityY = 10; isGrounded = false; }
+                if (keys.space && isGrounded) { velocityY = 11; isGrounded = false; }
                 if (player.y < 2) { player.y = 2; velocityY = 0; isGrounded = true; }
             }
 
-            // RENDERING (Rita ut allt på skärmen)
-            ctx.fillStyle = '#d5a97a'; // Sandfärgad bakgrund / sandstorm
+            // RENDERING
+            // Rita himlen (Solnedgång i öknen)
+            ctx.fillStyle = '#d5a97a';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Rita horisont/markgräns
-            ctx.fillStyle = '#c29d70'; // Ökensandens mark
-            ctx.fillRect(0, canvas.height / 2 + Math.tan(player.pitch) * (canvas.height/2), canvas.width, canvas.height);
+            // Rita ökensanden
+            const horizon = canvas.height / 2 + Math.tan(player.pitch) * (canvas.height / 2);
+            ctx.fillStyle = '#c29d70';
+            ctx.fillRect(0, horizon, canvas.width, canvas.height - horizon);
 
-            // Sortera byggnader efter avstånd (så de som är långt borta ritas först)
+            // Sortera byggnader utifrån avstånd (rita de längst bort först)
             buildings.forEach(b => {
                 b.dist = Math.pow(b.x - player.x, 2) + Math.pow(b.z - player.z, 2);
             });
             buildings.sort((a, b) => b.dist - a.dist);
 
-            // Rita ut alla byggnader
-            buildings.forEach(b => drawCube(b));
+            // Rita byggnaderna på skärmen
+            buildings.forEach(b => drawBuilding(b));
+
+            // Skapa sandstorms-effekt (Lägg en svag dimma över allt)
+            ctx.fillStyle = 'rgba(213, 169, 122, 0.35)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
 
         gameLoop();
