@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitt 3D Spel</title>
+    <style>
+        body { margin: 0; overflow: hidden; font-family: sans-serif; }
+        #instructions {
+            position: absolute; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); color: white;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            cursor: pointer; text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="instructions">
+        <h1>Klicka för att spela</h1>
+        <p>Gå: W, A, S, D | Hoppa: SPACE | Titta runt: Musen</p>
+    </div>
+
+    <!-- Vi laddar Three.js för 3D-grafik -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com",
+                "three/addons/": "https://unpkg.com"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+
+        // 1. Grundläggande 3D-scen och kamera
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87ceeb); // Blå himmel
+        scene.fog = new THREE.FogExp2(0x87ceeb, 0.015);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.y = 2; // Ögonhöjd
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // 2. Ljus i scenen
+        const light = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(light);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(20, 40, 20);
+        scene.add(dirLight);
+
+        // 3. Spelplanen (Marken)
+        const floorGeo = new THREE.PlaneGeometry(2000, 2000);
+        const floorMat = new THREE.MeshStandardMaterial({ color: 0x228b22 }); // Gräsgrön
+        const floor = new THREE.Mesh(floorGeo, floorMat);
+        floor.rotation.x = -Math.PI / 2;
+        scene.add(floor);
+
+        // Lägg till några slumpmässiga 3D-block (hinder/hus) att gå runt
+        const boxGeo = new THREE.BoxGeometry(4, 4, 4);
+        for(let i = 0; i < 50; i++) {
+            const boxMat = new THREE.MeshStandardMaterial({ color: Math.random() * 0xffffff });
+            const box = new THREE.Mesh(boxGeo, boxMat);
+            box.position.x = (Math.random() - 0.5) * 150;
+            box.position.z = (Math.random() - 0.5) * 150;
+            box.position.y = 2;
+            scene.add(box);
+        }
+
+        // 4. Kontroller (Gör så att musen låser sig vid klick)
+        const controls = new PointerLockControls(camera, document.body);
+        const instructions = document.getElementById('instructions');
+
+        instructions.addEventListener('click', () => controls.lock());
+        controls.addEventListener('lock', () => instructions.style.display = 'none');
+        controls.addEventListener('unlock', () => instructions.style.display = 'flex');
+
+        // 5. Hantera tangentbordsknappar
+        const keys = { w: false, a: false, s: false, d: false, space: false };
+        const moveDirection = new THREE.Vector3();
+        const velocity = new THREE.Vector3();
+        
+        // Fysikvariabler för hopp/gravitation
+        let canJump = false;
+        const clock = new THREE.Clock();
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'KeyW') keys.w = true;
+            if (e.code === 'KeyA') keys.a = true;
+            if (e.code === 'KeyS') keys.s = true;
+            if (e.code === 'KeyD') keys.d = true;
+            if (e.code === 'Space') keys.space = true;
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.code === 'KeyW') keys.w = false;
+            if (e.code === 'KeyA') keys.a = false;
+            if (e.code === 'KeyS') keys.s = false;
+            if (e.code === 'KeyD') keys.d = false;
+            if (e.code === 'Space') keys.space = false;
+        });
+
+        // 6. Spel-loopen (Uppdateras 60 gånger i sekunden)
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (controls.isLocked) {
+                const delta = clock.getDelta();
+
+                // Dämpa farten gradvis (friktion)
+                velocity.x -= velocity.x * 10.0 * delta;
+                velocity.z -= velocity.z * 10.0 * delta;
+                velocity.y -= 9.8 * 2.0 * delta; // Gravitation (faller neråt)
+
+                // Räkna ut rörelseriktning baserat på vart kameran tittar
+                moveDirection.z = Number(keys.w) - Number(keys.s);
+                moveDirection.x = Number(keys.d) - Number(keys.a);
+                moveDirection.normalize();
+
+                // Applicera hastighet
+                if (keys.w || keys.s) velocity.z -= moveDirection.z * 40.0 * delta;
+                if (keys.a || keys.d) velocity.x -= moveDirection.x * 40.0 * delta;
+
+                // Hantera Hopp
+                if (keys.space && canJump) {
+                    velocity.y = 8; // Kraften i hoppet
+                    canJump = false;
+                }
+
+                // Flytta kameran (spelaren)
+                controls.moveRight(-velocity.x * delta);
+                controls.moveForward(-velocity.z * delta);
+                camera.position.y += velocity.y * delta;
+
+                // Kolla om spelaren landar på marken
+                if (camera.position.y < 2) {
+                    velocity.y = 0;
+                    camera.position.y = 2;
+                    canJump = true;
+                }
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // Hantera om man ändrar storlek på webbläsarfönstret
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>
