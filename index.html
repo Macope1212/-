@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desert War Zone</title>
+    <title>Desert War Zone - Ultra Graphics</title>
     <style>
         body { margin: 0; overflow: hidden; background-color: #000; font-family: sans-serif; user-select: none; }
         canvas { display: block; }
@@ -26,63 +26,85 @@
 <body>
 
     <div id="start-overlay">
-        <div class="start-text">STARTA ÖKENKRIGET (KLICKA HÄR)</div>
+        <div class="start-text">STARTA ÖKENKRIGET (ULTRA GRAFIK)</div>
     </div>
     <div id="crosshair"></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cloudflare.com"></script>
 
     <script>
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0xd5a97a); 
-        scene.fog = new THREE.FogExp2(0xd5a97a, 0.025); // Tung sandstorm/krigsdimma
+        scene.fog = new THREE.FogExp2(0xd5a97a, 0.02); // Atmosfärisk sandstorm
 
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 2, 0); // Ögonhöjd
+        camera.position.set(0, 2, 0); 
 
+        // Rendererare inställd för vacker och mjuk 3D-grafik (Antialias + Skuggor)
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Ger mjuka, fina skuggor
         document.body.appendChild(renderer.domElement);
 
-        const light = new THREE.AmbientLight(0xfff0e0, 1.0);
-        scene.add(light);
+        // LJUSUPPGRADERING: Omgivningsljus + en stark sol som kastar skuggor
+        const ambientLight = new THREE.AmbientLight(0xfff0e0, 0.5);
+        scene.add(ambientLight);
 
-        // Ökensand (Marken)
-        const floor = new THREE.Mesh(new THREE.PlaneGeometry(2000, 2000), new THREE.MeshBasicMaterial({ color: 0xc29d70 }));
+        const sunLight = new THREE.DirectionalLight(0xffe0bd, 1.2);
+        sunLight.position.set(40, 80, 40);
+        sunLight.castShadow = true;
+        sunLight.shadow.mapSize.width = 2048; // Högupplösta skuggor
+        sunLight.shadow.mapSize.height = 2048;
+        sunLight.shadow.camera.near = 0.5;
+        sunLight.shadow.camera.far = 300;
+        const d = 100;
+        sunLight.shadow.camera.left = -d; sunLight.shadow.camera.right = d;
+        sunLight.shadow.camera.top = d; sunLight.shadow.camera.bottom = -d;
+        scene.add(sunLight);
+
+        // MATERIALUPPGRADERING: Ökensand som reagerar på ljus (MeshStandardMaterial)
+        const floorGeo = new THREE.PlaneGeometry(2000, 2000);
+        const floorMat = new THREE.MeshStandardMaterial({ color: 0xc29d70, roughness: 0.9, metalness: 0.1 });
+        const floor = new THREE.Mesh(floorGeo, floorMat);
         floor.rotation.x = -Math.PI / 2;
+        floor.receiveShadow = true; // Marken tar emot skuggor från husen
         scene.add(floor);
 
-        // Byggnader (Hela, lutande ruiner och rasmassor)
-        const colors = [0x555d50, 0x3e3a36, 0x7b3f00, 0x4a4135, 0x8b0000]; // Militärgrön, Aska, Rost, Mörkröd
+        // Krigshärjade byggnader med avancerade skuggmaterial
+        const colors = [0x555d50, 0x3e3a36, 0x7b3f00, 0x4a4135, 0x8b0000]; 
         for (let i = 0; i < 45; i++) {
             const x = (Math.random() - 0.5) * 160;
             const z = (Math.random() - 0.5) * 160;
-            if (Math.abs(x) < 12 && Math.abs(z) < 12) continue; // Spawnfritt
+            if (Math.abs(x) < 12 && Math.abs(z) < 12) continue;
 
             const w = 7 + Math.random() * 6;
             const h = 8 + Math.random() * 12;
-            const d = 7 + Math.random() * 6;
+            const dDepth = 7 + Math.random() * 6;
             const col = colors[Math.floor(Math.random() * colors.length)];
 
             const bGroup = new THREE.Group();
             const dmg = Math.random();
+            // Matt material med struktur för sliten krigskänsla
+            const wallMat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.8, metalness: 0.2 });
 
             if (dmg > 0.4) {
-                // Stående hus
-                const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshBasicMaterial({ color: col }));
+                const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, dDepth), wallMat);
                 wall.position.y = h / 2;
+                wall.castShadow = true; wall.receiveShadow = true;
                 bGroup.add(wall);
             } else if (dmg > 0.15) {
-                // Lutande bombat hus
-                const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h * 0.7, d), new THREE.MeshBasicMaterial({ color: col }));
+                const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h * 0.7, dDepth), wallMat);
                 wall.position.y = (h * 0.7) / 2;
+                wall.castShadow = true; wall.receiveShadow = true;
                 bGroup.add(wall);
-                bGroup.rotation.z = (Math.random() - 0.5) * 0.3;
+                bGroup.rotation.z = (Math.random() - 0.5) * 0.3; // Lutande bombat hus
             } else {
-                // Rasmassa på marken
                 for (let j = 0; j < 3; j++) {
-                    const rubble = new THREE.Mesh(new THREE.BoxGeometry(w * 0.6, 2, d * 0.6), new THREE.MeshBasicMaterial({ color: 0x3e3a36 }));
+                    const rubbleMat = new THREE.MeshStandardMaterial({ color: 0x3e3a36, roughness: 0.9 });
+                    const rubble = new THREE.Mesh(new THREE.BoxGeometry(w * 0.6, 2, dDepth * 0.6), rubbleMat);
                     rubble.position.set((Math.random() - 0.5) * 4, 1, (Math.random() - 0.5) * 4);
+                    rubble.castShadow = true; rubble.receiveShadow = true;
                     bGroup.add(rubble);
                 }
             }
@@ -90,7 +112,7 @@
             scene.add(bGroup);
         }
 
-        // Kontroller
+        // Mus- och skärmkontroll
         let cameraYAngle = 0, cameraXAngle = 0, isMouseLocked = false;
         const startOverlay = document.getElementById('start-overlay');
         const crosshair = document.getElementById('crosshair');
@@ -125,7 +147,6 @@
             if (e.code === 'Space') keys.space = false;
         });
 
-        // Hela animationsloopen som stänger koden korrekt
         function animate() {
             requestAnimationFrame(animate);
             const timeNow = performance.now();
@@ -161,3 +182,5 @@
         });
         animate();
     </script>
+</body>
+</html>
