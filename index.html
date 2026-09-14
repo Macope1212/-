@@ -52,9 +52,6 @@
         floor.rotation.x = -Math.PI / 2;
         scene.add(floor);
 
-        // HÄR LIGGER LISTAN NU PÅ RÄTT PLATS INNAN LOOPEN STARTAR
-        const colliders = [];
-
         // Byggnader (Hela, lutande ruiner och rasmassor)
         const colors = [0x555d50, 0x3e3a36, 0x7b3f00, 0x4a4135, 0x8b0000]; // Militärgrön, Aska, Rost, Mörkröd
         for (let i = 0; i < 45; i++) {
@@ -75,14 +72,12 @@
                 const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshBasicMaterial({ color: col }));
                 wall.position.y = h / 2;
                 bGroup.add(wall);
-                colliders.push({ x: x, z: z, w: w, d: d });
             } else if (dmg > 0.15) {
                 // Lutande bombat hus
                 const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h * 0.7, d), new THREE.MeshBasicMaterial({ color: col }));
                 wall.position.y = (h * 0.7) / 2;
                 bGroup.add(wall);
                 bGroup.rotation.z = (Math.random() - 0.5) * 0.3;
-                colliders.push({ x: x, z: z, w: w, d: d });
             } else {
                 // Rasmassa på marken
                 for (let j = 0; j < 3; j++) {
@@ -144,29 +139,8 @@
                 if (keys.a) { moveX += Math.cos(cameraYAngle); moveZ -= Math.sin(cameraYAngle); }
                 if (keys.d) { moveX -= Math.cos(cameraYAngle); moveZ += Math.sin(cameraYAngle); }
 
-                const speed = 15;
-                const nextX = camera.position.x + moveX * speed * delta;
-                const nextZ = camera.position.z + moveZ * speed * delta;
-                
-                let collisionX = false;
-                let collisionZ = false;
-                const playerRadius = 0.8; 
-
-                for (let i = 0; i < colliders.length; i++) {
-                    const b = colliders[i];
-                    if (nextX + playerRadius > b.x - b.w/2 && nextX - playerRadius < b.x + b.w/2 &&
-                        camera.position.z + playerRadius > b.z - b.d/2 && camera.position.z - playerRadius < b.z + b.d/2) {
-                        collisionX = true;
-                    }
-                    if (camera.position.x + playerRadius > b.x - b.w/2 && camera.position.x - playerRadius < b.x + b.w/2 &&
-                        nextZ + playerRadius > b.z - b.d/2 && nextZ - playerRadius < b.z + b.d/2) {
-                        collisionZ = true;
-                    }
-                }
-
-                if (!collisionX) camera.position.x = nextX;
-                if (!collisionZ) camera.position.z = nextZ;
-
+                camera.position.x += moveX * 15 * delta;
+                camera.position.z += moveZ * 15 * delta;
                 velocityY -= 28 * delta; camera.position.y += velocityY * delta;
 
                 if (keys.space && isGrounded) { velocityY = 11; isGrounded = false; }
