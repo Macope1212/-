@@ -696,6 +696,14 @@
 
         const MAP_BOUNDARY = 100;
 
+        // Kamerans ögonhöjd när man står på marken (matchar "camera.position.y < 2"
+        // längre ner). Nätverket skickar kamerans (dvs ögats) Y-position, men
+        // fjärrspelarens 3D-modell är byggd utifrån att modellens "group" står
+        // på marken (Y=0). Utan den här offseten hamnar andra spelares kroppar
+        // svävande uppe vid ögonhöjd istället för att stå på marken, vilket gör
+        // att man siktar/skjuter fel höjd och sällan träffar.
+        const PLAYER_EYE_HEIGHT = 2;
+
         // ---------- HIMMEL ----------
 
         function createSkyTexture() {
@@ -961,16 +969,36 @@
                 roughness: 0.9
             });
 
-        const matHeal =
+        const matGunAccent =
             new THREE.MeshStandardMaterial({
-                color: 0x4caf50,
-                roughness: 0.8
+                color: 0x4b4f3f,
+                roughness: 0.75,
+                metalness: 0.15
             });
 
-        const matHealWhite =
+        const matGunLight =
             new THREE.MeshStandardMaterial({
-                color: 0xe8e8e8,
-                roughness: 0.8
+                color: 0x8a8a8a,
+                roughness: 0.35,
+                metalness: 0.8
+            });
+
+        const matBandage =
+            new THREE.MeshStandardMaterial({
+                color: 0xe8e0cf,
+                roughness: 0.95
+            });
+
+        const matBandageShadow =
+            new THREE.MeshStandardMaterial({
+                color: 0xcfc4ac,
+                roughness: 0.95
+            });
+
+        const matBandageRed =
+            new THREE.MeshStandardMaterial({
+                color: 0xb3382c,
+                roughness: 0.6
             });
 
         function addShadowMesh(mesh) {
@@ -1617,57 +1645,68 @@
 
         function createPistol() {
 
+            // Kompakt handeldvapen: bred, tjock slide ovanpå en tunnare
+            // ram, en kraftigt bakåtvinklad grepp och ett litet avtryckarbygel
+            // — en tydligt annorlunda, mycket kortare siluett än AR:n.
+
             const group = new THREE.Group();
 
-            const body = new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    0.8,
-                    0.25,
-                    0.32
-                ),
+            const slide = new THREE.Mesh(
+                new THREE.BoxGeometry(0.62, 0.17, 0.18),
                 matGun
             );
 
-            body.position.y = 0.3;
+            slide.position.set(0.02, 0.34, 0);
 
-            group.add(body);
+            group.add(slide);
 
-            const barrel = new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    0.55,
-                    0.13,
-                    0.13
-                ),
+            const frame = new THREE.Mesh(
+                new THREE.BoxGeometry(0.48, 0.13, 0.16),
                 matGun
             );
 
-            barrel.position.set(
-                0.6,
-                0.32,
-                0
+            frame.position.set(-0.03, 0.235, 0);
+
+            group.add(frame);
+
+            const muzzle = new THREE.Mesh(
+                new THREE.BoxGeometry(0.06, 0.1, 0.1),
+                matGunLight
             );
 
-            group.add(barrel);
+            muzzle.position.set(0.33, 0.34, 0);
+
+            group.add(muzzle);
 
             const grip = new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    0.22,
-                    0.55,
-                    0.25
-                ),
+                new THREE.BoxGeometry(0.18, 0.42, 0.19),
                 matGunGrip
             );
 
-            grip.position.set(
-                -0.18,
-                0.03,
-                0
-            );
+            grip.position.set(-0.19, 0.03, 0);
 
-            grip.rotation.z =
-                -0.25;
+            grip.rotation.z = -0.34;
 
             group.add(grip);
+
+            const triggerGuard = new THREE.Mesh(
+                new THREE.TorusGeometry(0.09, 0.018, 6, 10, Math.PI * 1.4),
+                matGun
+            );
+
+            triggerGuard.position.set(-0.06, 0.18, 0);
+            triggerGuard.rotation.z = Math.PI / 2;
+
+            group.add(triggerGuard);
+
+            const rearSight = new THREE.Mesh(
+                new THREE.BoxGeometry(0.05, 0.045, 0.15),
+                matGunLight
+            );
+
+            rearSight.position.set(-0.27, 0.435, 0);
+
+            group.add(rearSight);
 
             group.rotation.z =
                 -Math.PI / 2;
@@ -1677,74 +1716,107 @@
 
         function createAR() {
 
+            // Långt sturmgevär-format: överdel/underdel, cylindriskt
+            // handskydd i olivgrönt, tunn synlig pipa, sikten fram och bak,
+            // en kolv bak och ett vinklat, hängande magasin — helt annan
+            // siluett än den korta, kompakta pistolen.
+
             const group = new THREE.Group();
 
-            const body = new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    1.65,
-                    0.25,
-                    0.3
-                ),
+            const upper = new THREE.Mesh(
+                new THREE.BoxGeometry(0.85, 0.17, 0.15),
                 matGun
             );
 
-            body.position.y = 0.3;
+            upper.position.set(0.12, 0.34, 0);
 
-            group.add(body);
+            group.add(upper);
+
+            const lower = new THREE.Mesh(
+                new THREE.BoxGeometry(0.58, 0.14, 0.15),
+                matGun
+            );
+
+            lower.position.set(0.02, 0.215, 0);
+
+            group.add(lower);
+
+            const handguard = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.1, 0.1, 0.62, 8),
+                matGunAccent
+            );
+
+            handguard.rotation.z = Math.PI / 2;
+            handguard.position.set(0.75, 0.32, 0);
+
+            group.add(handguard);
 
             const barrel = new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    1.1,
-                    0.11,
-                    0.11
-                ),
-                matGun
+                new THREE.CylinderGeometry(0.032, 0.032, 0.42, 6),
+                matGunLight
             );
 
-            barrel.position.x =
-                1.2;
-
-            barrel.position.y =
-                0.3;
+            barrel.rotation.z = Math.PI / 2;
+            barrel.position.set(1.18, 0.32, 0);
 
             group.add(barrel);
 
-            const stock = new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    0.6,
-                    0.25,
-                    0.28
-                ),
-                matGunGrip
+            const frontSight = new THREE.Mesh(
+                new THREE.BoxGeometry(0.035, 0.16, 0.035),
+                matGunLight
             );
 
-            stock.position.x =
-                -1;
+            frontSight.position.set(1.02, 0.46, 0);
 
-            stock.position.y =
-                0.32;
+            group.add(frontSight);
+
+            const rearSight = new THREE.Mesh(
+                new THREE.BoxGeometry(0.06, 0.1, 0.1),
+                matGunLight
+            );
+
+            rearSight.position.set(0.22, 0.46, 0);
+
+            group.add(rearSight);
+
+            const stock = new THREE.Mesh(
+                new THREE.BoxGeometry(0.42, 0.22, 0.14),
+                matGunAccent
+            );
+
+            stock.position.set(-0.58, 0.27, 0);
 
             group.add(stock);
 
+            const buffTube = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.05, 0.05, 0.22, 6),
+                matGun
+            );
+
+            buffTube.rotation.z = Math.PI / 2;
+            buffTube.position.set(-0.32, 0.29, 0);
+
+            group.add(buffTube);
+
             const grip = new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    0.25,
-                    0.55,
-                    0.25
-                ),
+                new THREE.BoxGeometry(0.16, 0.36, 0.17),
                 matGunGrip
             );
 
-            grip.position.set(
-                -0.25,
-                0,
-                0
-            );
-
-            grip.rotation.z =
-                -0.25;
+            grip.position.set(-0.1, 0.0, 0);
+            grip.rotation.z = -0.26;
 
             group.add(grip);
+
+            const magazine = new THREE.Mesh(
+                new THREE.BoxGeometry(0.13, 0.44, 0.18),
+                matGunAccent
+            );
+
+            magazine.position.set(0.14, -0.1, 0);
+            magazine.rotation.z = 0.22;
+
+            group.add(magazine);
 
             group.rotation.z =
                 -Math.PI / 2;
@@ -1752,56 +1824,59 @@
             return group;
         }
 
-        function createHeal() {
+        function createBandage() {
+
+            // En rulle bandage som ligger ner på sidan, med en lös flik
+            // som sticker ut och en röd kors-lapp — tydligt ett bandage,
+            // inte en medicinflaska.
 
             const group = new THREE.Group();
 
-            const bottle = new THREE.Mesh(
-                new THREE.CylinderGeometry(
-                    0.25,
-                    0.25,
-                    0.65,
-                    8
-                ),
-                matHeal
+            const roll = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.22, 0.22, 0.52, 12),
+                matBandage
             );
 
-            bottle.position.y =
-                0.4;
+            roll.rotation.z = Math.PI / 2;
+            roll.position.y = 0.3;
 
-            group.add(bottle);
+            group.add(roll);
+
+            const wrapShadow = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.225, 0.225, 0.05, 12),
+                matBandageShadow
+            );
+
+            wrapShadow.rotation.z = Math.PI / 2;
+            wrapShadow.position.set(0.15, 0.3, 0);
+
+            group.add(wrapShadow);
+
+            const flap = new THREE.Mesh(
+                new THREE.BoxGeometry(0.16, 0.02, 0.2),
+                matBandage
+            );
+
+            flap.position.set(-0.3, 0.3, 0.05);
+            flap.rotation.y = 0.3;
+
+            group.add(flap);
 
             const cross1 = new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    0.28,
-                    0.07,
-                    0.05
-                ),
-                matHealWhite
+                new THREE.BoxGeometry(0.05, 0.16, 0.02),
+                matBandageRed
             );
 
-            cross1.position.set(
-                0,
-                0.4,
-                -0.26
-            );
+            cross1.position.set(0, 0.3, 0.23);
 
             group.add(cross1);
 
             const cross2 = new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    0.07,
-                    0.28,
-                    0.05
-                ),
-                matHealWhite
+                new THREE.BoxGeometry(0.16, 0.05, 0.02),
+                matBandageRed
             );
 
-            cross2.position.set(
-                0,
-                0.4,
-                -0.26
-            );
+            cross2.position.set(0, 0.3, 0.23);
 
             group.add(cross2);
 
@@ -1838,20 +1913,20 @@
 
             scene.add(weapon);
 
-            const heal = createHeal();
+            const bandage = createBandage();
 
-            heal.position.set(
+            bandage.position.set(
                 chest.position.x - 2.0,
                 0,
                 chest.position.z
             );
 
-            heal.userData.pickupType =
-                'Heal';
+            bandage.userData.pickupType =
+                'Bandage';
 
-            groundItems.push(heal);
+            groundItems.push(bandage);
 
-            scene.add(heal);
+            scene.add(bandage);
         }
 
         // ---------- VÄRLD ----------
@@ -2573,7 +2648,7 @@
 
                 this.players.set(id, {
                     rig,
-                    targetPos: new THREE.Vector3(0, 2, 0),
+                    targetPos: new THREE.Vector3(0, 0, 0),
                     targetYaw: 0,
                     hp: 100,
                     weapon: null,
@@ -2696,7 +2771,7 @@
 
                         if (p) {
 
-                            p.targetPos.set(data.x, data.y, data.z);
+                            p.targetPos.set(data.x, data.y - PLAYER_EYE_HEIGHT, data.z);
                             p.targetYaw = data.ry;
                             p.hp = data.hp;
                             p.rig.drawBar(data.hp);
@@ -3179,6 +3254,30 @@
         let velocityY = 0;
         let isGrounded = true;
 
+        // ---------- REALISTISK RÖRELSE ----------
+        // Istället för att hastigheten hoppar direkt till max/noll så
+        // accelererar och bromsar spelaren in mjukt, precis som i de
+        // flesta FPS-spel. Samma kod körs oavsett om man spelar solo
+        // eller i multiplayer — det finns ingen separat rörelselogik
+        // för de olika lägena.
+
+        const MAX_SPEED = 15;
+        const GROUND_ACCEL = 85;
+        const GROUND_FRICTION = 110;
+        const AIR_ACCEL = 22;
+        const AIR_FRICTION = 6;
+
+        const moveVelocity = { x: 0, z: 0 };
+
+        function moveToward(current, target, maxDelta) {
+
+            if (Math.abs(target - current) <= maxDelta) {
+                return target;
+            }
+
+            return current + Math.sign(target - current) * maxDelta;
+        }
+
         let lastTime =
             performance.now();
 
@@ -3221,60 +3320,56 @@
 
         function buildViewmodelPistol() {
 
+            // Kort, kompakt siluett i förstaperson: bred slide, smalare
+            // ram under, och ett tydligt bakåtvinklat grepp.
+
             const group = new THREE.Group();
 
+            const slide = new THREE.Mesh(
+                new THREE.BoxGeometry(0.13, 0.09, 0.34),
+                matGun
+            );
+
+            slide.position.set(0, 0.03, -0.16);
+
+            group.add(slide);
+
+            const frame = new THREE.Mesh(
+                new THREE.BoxGeometry(0.115, 0.07, 0.26),
+                matGun
+            );
+
+            frame.position.set(0, -0.045, -0.1);
+
+            group.add(frame);
+
+            const muzzle = new THREE.Mesh(
+                new THREE.BoxGeometry(0.075, 0.06, 0.04),
+                matGunLight
+            );
+
+            muzzle.position.set(0, 0.03, -0.33);
+
+            group.add(muzzle);
+
             const grip = new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    0.13,
-                    0.3,
-                    0.16
-                ),
+                new THREE.BoxGeometry(0.11, 0.26, 0.1),
                 matGunGrip
             );
 
-            grip.position.set(
-                0,
-                -0.22,
-                0.06
-            );
-
-            grip.rotation.x = 0.15;
+            grip.position.set(0, -0.2, 0.08);
+            grip.rotation.x = 0.3;
 
             group.add(grip);
 
-            const body = new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    0.14,
-                    0.16,
-                    0.36
-                ),
-                matGun
+            const rearSight = new THREE.Mesh(
+                new THREE.BoxGeometry(0.095, 0.03, 0.035),
+                matGunLight
             );
 
-            body.position.set(
-                0,
-                -0.02,
-                -0.08
-            );
+            rearSight.position.set(0, 0.095, 0.01);
 
-            group.add(body);
-
-            const barrel = new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    0.07,
-                    0.07,
-                    0.3
-                ),
-                matGun
-            );
-
-            barrel.position.set(
-                0,
-                0.02,
-                -0.4
-            );
-
-            group.add(barrel);
+            group.add(rearSight);
 
             group.position.set(
                 0.32,
@@ -3296,94 +3391,96 @@
 
         function buildViewmodelAR() {
 
+            // Lång, spretig gevärs-siluett i förstaperson: kolv bak,
+            // cylindriskt handskydd i olivgrönt fram, synliga sikten,
+            // och ett vinklat magasin — mycket längre och spretigare
+            // än den kompakta pistolen.
+
             const group = new THREE.Group();
 
             const stock = new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    0.14,
-                    0.16,
-                    0.3
-                ),
-                matGunGrip
+                new THREE.BoxGeometry(0.13, 0.13, 0.24),
+                matGunAccent
             );
 
-            stock.position.set(
-                0,
-                -0.01,
-                0.32
-            );
+            stock.position.set(0, 0.0, 0.34);
 
             group.add(stock);
 
-            const body = new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    0.16,
-                    0.18,
-                    0.55
-                ),
+            const buffTube = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.038, 0.038, 0.16, 6),
                 matGun
             );
 
-            body.position.set(
-                0,
-                -0.01,
-                -0.05
+            buffTube.rotation.x = Math.PI / 2;
+            buffTube.position.set(0, 0.0, 0.2);
+
+            group.add(buffTube);
+
+            const body = new THREE.Mesh(
+                new THREE.BoxGeometry(0.15, 0.16, 0.42),
+                matGun
             );
+
+            body.position.set(0, 0.0, -0.08);
 
             group.add(body);
 
-            const barrel = new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    0.08,
-                    0.08,
-                    0.55
-                ),
-                matGun
+            const handguard = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.075, 0.075, 0.34, 8),
+                matGunAccent
             );
 
-            barrel.position.set(
-                0,
-                0.03,
-                -0.55
+            handguard.rotation.x = Math.PI / 2;
+            handguard.position.set(0, 0.01, -0.44);
+
+            group.add(handguard);
+
+            const barrel = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.028, 0.028, 0.2, 6),
+                matGunLight
             );
+
+            barrel.rotation.x = Math.PI / 2;
+            barrel.position.set(0, 0.01, -0.66);
 
             group.add(barrel);
 
+            const frontSight = new THREE.Mesh(
+                new THREE.BoxGeometry(0.028, 0.12, 0.028),
+                matGunLight
+            );
+
+            frontSight.position.set(0, 0.09, -0.58);
+
+            group.add(frontSight);
+
+            const rearSight = new THREE.Mesh(
+                new THREE.BoxGeometry(0.045, 0.08, 0.06),
+                matGunLight
+            );
+
+            rearSight.position.set(0, 0.1, -0.04);
+
+            group.add(rearSight);
+
             const grip = new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    0.12,
-                    0.3,
-                    0.14
-                ),
+                new THREE.BoxGeometry(0.12, 0.27, 0.13),
                 matGunGrip
             );
 
-            grip.position.set(
-                0,
-                -0.27,
-                -0.05
-            );
-
-            grip.rotation.x = 0.2;
+            grip.position.set(0, -0.24, -0.02);
+            grip.rotation.x = 0.22;
 
             group.add(grip);
 
             const magazine = new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    0.1,
-                    0.28,
-                    0.12
-                ),
-                matGunGrip
+                new THREE.BoxGeometry(0.1, 0.26, 0.11),
+                matGunAccent
             );
 
-            magazine.position.set(
-                0,
-                -0.27,
-                -0.18
-            );
-
-            magazine.rotation.x = -0.25;
+            magazine.position.set(0, -0.28, -0.16);
+            magazine.rotation.x = -0.28;
 
             group.add(magazine);
 
@@ -3533,7 +3630,7 @@
                 return;
             }
 
-            if (item.type === 'heal') {
+            if (item.type === 'bandage') {
 
                 if (
                     playerHP >= maxHP
@@ -3707,12 +3804,12 @@
 
             if (
                 closest.userData.pickupType ===
-                'Heal'
+                'Bandage'
             ) {
 
                 addToInventory({
-                    type: 'heal',
-                    icon: '+HP'
+                    type: 'bandage',
+                    icon: '🩹'
                 });
 
                 scene.remove(
@@ -3895,7 +3992,7 @@
 
                 nextShotTime =
                     performance.now() +
-                    300;
+                    150;
 
             } else if (
                 currentWeapon ===
@@ -4320,17 +4417,17 @@
 
             if (isMouseLocked) {
 
-                let moveX = 0;
-                let moveZ = 0;
+                let inputX = 0;
+                let inputZ = 0;
 
                 if (keys.w) {
 
-                    moveX +=
+                    inputX +=
                         Math.sin(
                             cameraYAngle
                         );
 
-                    moveZ +=
+                    inputZ +=
                         Math.cos(
                             cameraYAngle
                         );
@@ -4338,12 +4435,12 @@
 
                 if (keys.s) {
 
-                    moveX -=
+                    inputX -=
                         Math.sin(
                             cameraYAngle
                         );
 
-                    moveZ -=
+                    inputZ -=
                         Math.cos(
                             cameraYAngle
                         );
@@ -4351,12 +4448,12 @@
 
                 if (keys.a) {
 
-                    moveX +=
+                    inputX +=
                         Math.cos(
                             cameraYAngle
                         );
 
-                    moveZ -=
+                    inputZ -=
                         Math.sin(
                             cameraYAngle
                         );
@@ -4364,27 +4461,53 @@
 
                 if (keys.d) {
 
-                    moveX -=
+                    inputX -=
                         Math.cos(
                             cameraYAngle
                         );
 
-                    moveZ +=
+                    inputZ +=
                         Math.sin(
                             cameraYAngle
                         );
                 }
 
-                const speed =
-                    15 * delta;
+                const inputLen =
+                    Math.hypot(inputX, inputZ);
+
+                if (inputLen > 0) {
+
+                    inputX /= inputLen;
+                    inputZ /= inputLen;
+                }
+
+                const hasInput = inputLen > 0;
+
+                const targetVX = inputX * MAX_SPEED;
+                const targetVZ = inputZ * MAX_SPEED;
+
+                // Acceleration/inbromsning: snabbare på marken, trögare
+                // (mer "sväng") i luften — precis som i de flesta FPS-spel.
+
+                const rate = hasInput
+                    ? (isGrounded ? GROUND_ACCEL : AIR_ACCEL)
+                    : (isGrounded ? GROUND_FRICTION : AIR_FRICTION);
+
+                const maxDelta = rate * delta;
+
+                moveVelocity.x =
+                    moveToward(moveVelocity.x, targetVX, maxDelta);
+
+                moveVelocity.z =
+                    moveToward(moveVelocity.z, targetVZ, maxDelta);
 
                 const newX =
                     camera.position.x +
-                    moveX * speed;
+                    moveVelocity.x * delta;
 
                 const newZ =
                     camera.position.z +
-                    moveZ * speed;
+                    moveVelocity.z * delta;
 
                 // Kollisionskontroll separat
                 // för X och Z så man inte fastnar
@@ -4398,6 +4521,10 @@
 
                     camera.position.x =
                         newX;
+
+                } else {
+
+                    moveVelocity.x = 0;
                 }
 
                 if (
@@ -4409,6 +4536,10 @@
 
                     camera.position.z =
                         newZ;
+
+                } else {
+
+                    moveVelocity.z = 0;
                 }
 
                 velocityY -=
