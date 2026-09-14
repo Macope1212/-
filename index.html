@@ -155,6 +155,48 @@
             transition: width 0.12s linear;
         }
 
+        /* ---------- INVENTORY ---------- */
+
+        #inventory-ui {
+            position: absolute;
+            left: 50%;
+            bottom: 20px;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .inventory-slot {
+            width: 58px;
+            height: 58px;
+            background: rgba(20,20,20,0.72);
+            border: 2px solid rgba(255,255,255,0.55);
+            border-radius: 6px;
+            box-sizing: border-box;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 1px 1px 2px #000;
+            position: relative;
+        }
+
+        .inventory-slot.selected {
+            border: 3px solid white;
+        }
+
+        .inventory-number {
+            position: absolute;
+            left: 4px;
+            top: 2px;
+            font-size: 11px;
+        }
+
         /* ---------- INTERACTION ---------- */
 
         #interaction {
@@ -188,48 +230,7 @@
             background: #e6b84f;
         }
 
-        /* ---------- INVENTORY ---------- */
-        #inventory {
-            position: absolute;
-            left: 50%;
-            bottom: 20px;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 6px;
-            z-index: 20;
-            pointer-events: none;
-        }
-
-        .inventory-slot {
-            position: relative;
-            width: 62px;
-            height: 62px;
-            background: rgba(25,25,25,0.78);
-            border: 2px solid rgba(255,255,255,0.65);
-            border-radius: 5px;
-            box-sizing: border-box;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 11px;
-            font-weight: bold;
-            text-shadow: 2px 2px 3px #000;
-        }
-
-        .inventory-slot.selected {
-            border-color: #f2c94c;
-            box-shadow: 0 0 8px rgba(242,201,76,0.75);
-        }
-
-        .inventory-number {
-            position: absolute;
-            top: 3px;
-            left: 5px;
-            font-size: 11px;
-        }
-
-        /* ---------- WEAPON UI ---------- */
+        /* ---------- WEAPON UI ---------- */
 
         #weapon-ui {
             position: absolute;
@@ -261,14 +262,6 @@
 
     <canvas id="minimap" width="180" height="180"></canvas>
 
-    <div id="inventory">
-        <div class="inventory-slot selected" data-slot="0"><span class="inventory-number">1</span></div>
-        <div class="inventory-slot" data-slot="1"><span class="inventory-number">2</span></div>
-        <div class="inventory-slot" data-slot="2"><span class="inventory-number">3</span></div>
-        <div class="inventory-slot" data-slot="3"><span class="inventory-number">4</span></div>
-        <div class="inventory-slot" data-slot="4"><span class="inventory-number">5</span></div>
-    </div>
-
     <div id="interaction">
         HÅLL E FÖR ATT ÖPPNA KISTAN
         <div id="interaction-progress">
@@ -281,6 +274,14 @@
         <div id="health-bar-bg">
             <div id="health-bar"></div>
         </div>
+    </div>
+
+    <div id="inventory-ui">
+        <div class="inventory-slot selected"><span class="inventory-number">1</span><span></span></div>
+        <div class="inventory-slot"><span class="inventory-number">2</span><span></span></div>
+        <div class="inventory-slot"><span class="inventory-number">3</span><span></span></div>
+        <div class="inventory-slot"><span class="inventory-number">4</span><span></span></div>
+        <div class="inventory-slot"><span class="inventory-number">5</span><span></span></div>
     </div>
 
     <div id="weapon-ui">
@@ -1674,11 +1675,11 @@
             [-20, 65],
             [70, 10],
             [-72, -5],
-            [85, -20],
-            [30, 80],
-            [-85, 45],
-            [85, 75],
-            [-90, -55]
+            [85, -20],
+            [30, 80],
+            [-85, 45],
+            [85, 75],
+            [-90, -55]
         ];
 
         for (const pos of chestPositions) {
@@ -1800,82 +1801,34 @@
                 'weapon-ui'
             );
 
-        const inventorySlots =
-            document.querySelectorAll(
-                '.inventory-slot'
-            );
+        const inventorySlots = document.querySelectorAll('.inventory-slot');
 
-        const inventory = [];
-        let selectedInventorySlot = 0;
+        const inventory = [];
+        let selectedInventorySlot = 0;
 
-        function updateInventory() {
-            inventorySlots.forEach(
-                (slot, index) => {
-                    slot.innerHTML =
-                        '<span class="inventory-number">' +
-                        (index + 1) +
-                        '</span>';
+        function updateInventory() {
+            inventorySlots.forEach((slot, index) => {
+                slot.classList.toggle('selected', index === selectedInventorySlot);
+                slot.querySelector('span:last-child').textContent = inventory[index] || '';
+            });
+        }
 
-                    if (inventory[index]) {
-                        slot.innerHTML +=
-                            '<div>' +
-                            inventory[index] +
-                            '</div>';
-                    }
+        function addToInventory(type) {
+            if (inventory.length >= 5) return false;
+            inventory.push(type);
+            updateInventory();
+            return true;
+        }
 
-                    slot.classList.toggle(
-                        'selected',
-                        index === selectedInventorySlot
-                    );
-                }
-            );
-        }
+        function selectInventorySlot(index) {
+            if (index < 0 || index >= 5) return;
+            selectedInventorySlot = index;
+            updateInventory();
+            const item = inventory[index];
+            if (item === 'Pistol' || item === 'AR') setWeapon(item);
+        }
 
-        function addToInventory(type) {
-            if (inventory.length >= 5) {
-                return false;
-            }
-
-            inventory.push(type);
-            updateInventory();
-            return true;
-        }
-
-        function selectInventorySlot(index) {
-            if (index < 0 || index >= 5) {
-                return;
-            }
-
-            selectedInventorySlot = index;
-            updateInventory();
-
-            const item = inventory[index];
-
-            if (
-                item === 'Pistol' ||
-                item === 'AR'
-            ) {
-                setWeapon(item);
-            }
-
-            if (
-                item === 'Heal' &&
-                playerHP < maxHP
-            ) {
-                playerHP =
-                    Math.min(
-                        maxHP,
-                        playerHP + 35
-                    );
-
-                updateHealth();
-                inventory.splice(index, 1);
-                updateInventory();
-            }
-        }
-
-        updateInventory();
-
+        updateInventory();
 
         loading.style.display = 'none';
 
@@ -2090,70 +2043,99 @@
 
         function pickUpNearbyItem() {
 
-            let closest = null;
-            let closestDistance = 2.4;
+            let closest = null;
+            let closestDistance = 2.4;
 
-            for (
-                const item of groundItems
-            ) {
+            for (
+                const item of groundItems
+            ) {
 
-                if (
-                    !item.parent
-                ) {
-                    continue;
-                }
+                if (
+                    !item.parent
+                ) {
+                    continue;
+                }
 
-                const dx =
-                    camera.position.x -
-                    item.position.x;
+                const dx =
+                    camera.position.x -
+                    item.position.x;
 
-                const dz =
-                    camera.position.z -
-                    item.position.z;
+                const dz =
+                    camera.position.z -
+                    item.position.z;
 
-                const distance =
-                    Math.sqrt(
-                        dx * dx +
-                        dz * dz
-                    );
+                const distance =
+                    Math.sqrt(
+                        dx * dx +
+                        dz * dz
+                    );
 
-                if (
-                    distance <
-                    closestDistance
-                ) {
+                if (
+                    distance <
+                    closestDistance
+                ) {
 
-                    closest =
-                        item;
+                    closest =
+                        item;
 
-                    closestDistance =
-                        distance;
-                }
-            }
+                    closestDistance =
+                        distance;
+                }
+            }
 
-            if (!closest) {
-                return;
-            }
+            if (!closest) {
+                return;
+            }
 
-            const type =
-                closest.userData.pickupType;
+            if (closest.userData.pickupType ===
+                'Heal'
+            ) {
 
-            if (!addToInventory(type)) {
-                return;
-            }
+                if (!addToInventory(closest.userData.pickupType)) {
+                    return;
+                }
 
-            if (
-                type === 'Pistol' ||
-                type === 'AR'
-            ) {
-                setWeapon(type);
-            }
+                scene.remove(
+                    closest
+                );
 
-            scene.remove(
-                closest
-            );
-        }
+                return;
+            }
 
-        // ---------- SKJUTA ----------
+
+            if (closest.userData.pickupType ===
+                'Pistol'
+            ) {
+
+                if (!addToInventory(closest.userData.pickupType)) {
+                    return;
+                }
+
+                scene.remove(
+                    closest
+                );
+
+                return;
+            }
+
+
+            if (closest.userData.pickupType ===
+                'AR'
+            ) {
+
+                if (!addToInventory(closest.userData.pickupType)) {
+                    return;
+                }
+
+                scene.remove(
+                    closest
+                );
+            }
+
+
+        }
+
+        // ---------- SKJUTA ----------
 
         const raycaster =
             new THREE.Raycaster();
@@ -2286,22 +2268,13 @@
                 if (e.code === 'Space')
                     keys.space = true;
 
-                if (e.code === 'Digit1')
-                    selectInventorySlot(0);
+                if (e.code === 'Digit1') selectInventorySlot(0);
+                if (e.code === 'Digit2') selectInventorySlot(1);
+                if (e.code === 'Digit3') selectInventorySlot(2);
+                if (e.code === 'Digit4') selectInventorySlot(3);
+                if (e.code === 'Digit5') selectInventorySlot(4);
 
-                if (e.code === 'Digit2')
-                    selectInventorySlot(1);
-
-                if (e.code === 'Digit3')
-                    selectInventorySlot(2);
-
-                if (e.code === 'Digit4')
-                    selectInventorySlot(3);
-
-                if (e.code === 'Digit5')
-                    selectInventorySlot(4);
-
-                if (e.code === 'KeyE') {
+                if (e.code === 'KeyE') {
 
                     keys.e = true;
 
