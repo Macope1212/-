@@ -663,7 +663,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js" defer></script>
 
     <script>
         // ---------- GRUNDUPPSÄTTNING ----------
@@ -2293,6 +2293,18 @@
 
             hostParty() {
 
+                if (typeof Peer === 'undefined') {
+
+                    createStatusEl.textContent =
+                        'Nätverket laddas fortfarande, försök igen om en sekund.';
+
+                    createStatusEl.classList.add('error');
+
+                    setTimeout(() => this.hostParty(), 400);
+
+                    return;
+                }
+
                 this.teardown();
                 this.isHost = true;
 
@@ -2430,6 +2442,18 @@
             },
 
             joinParty(code) {
+
+                if (typeof Peer === 'undefined') {
+
+                    joinStatusEl.textContent =
+                        'Nätverket laddas fortfarande, försök igen om en sekund.';
+
+                    joinStatusEl.classList.add('error');
+
+                    setTimeout(() => this.joinParty(code), 400);
+
+                    return;
+                }
 
                 this.teardown();
                 this.isHost = false;
@@ -3886,37 +3910,4 @@
 
         let nextShotTime = 0;
 
-        document.addEventListener(
-            'mousedown',
-            e => {
-
-                if (
-                    e.button === 0 &&
-                    performance.now() >=
-                    nextShotTime
-                ) {
-
-                    shoot();
-                }
-            }
-        );
-
-        // ---------- TANGENTBINDNINGAR ----------
-
-        document.addEventListener(
-            'keydown',
-            e => {
-
-                if (e.code === 'KeyW')
-                    keys.w = true;
-
-                if (e.code === 'KeyA')
-                    keys.a = true;
-
-                if (e.code === 'KeyS')
-                    keys.s = true;
-
-                if (e.code === 'KeyD')
-                    keys.d = true;
-
-  
+        document.addEvent
