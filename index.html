@@ -3910,4 +3910,762 @@
 
         let nextShotTime = 0;
 
-        document.addEvent
+        document.addEventListener(
+            'mousedown',
+            e => {
+
+                if (
+                    e.button === 0 &&
+                    performance.now() >=
+                    nextShotTime
+                ) {
+
+                    shoot();
+                }
+            }
+        );
+
+        // ---------- TANGENTBINDNINGAR ----------
+
+        document.addEventListener(
+            'keydown',
+            e => {
+
+                if (e.code === 'KeyW')
+                    keys.w = true;
+
+                if (e.code === 'KeyA')
+                    keys.a = true;
+
+                if (e.code === 'KeyS')
+                    keys.s = true;
+
+                if (e.code === 'KeyD')
+                    keys.d = true;
+
+                if (e.code === 'Space')
+                    keys.space = true;
+
+                if (e.code === 'KeyE') {
+
+                    keys.e = true;
+
+                    if (
+                        !chestHoldStart
+                    ) {
+
+                        chestHoldStart =
+                            performance.now();
+
+                        chestOpenedThisHold =
+                            false;
+                    }
+                }
+
+                if (
+                    e.code === 'Digit1'
+                ) useSlot(0);
+
+                if (
+                    e.code === 'Digit2'
+                ) useSlot(1);
+
+                if (
+                    e.code === 'Digit3'
+                ) useSlot(2);
+
+                if (
+                    e.code === 'Digit4'
+                ) useSlot(3);
+
+                if (
+                    e.code === 'Digit5'
+                ) useSlot(4);
+            }
+        );
+
+        document.addEventListener(
+            'keyup',
+            e => {
+
+                if (e.code === 'KeyW')
+                    keys.w = false;
+
+                if (e.code === 'KeyA')
+                    keys.a = false;
+
+                if (e.code === 'KeyS')
+                    keys.s = false;
+
+                if (e.code === 'KeyD')
+                    keys.d = false;
+
+                if (e.code === 'Space')
+                    keys.space = false;
+
+                if (e.code === 'KeyE') {
+
+                    keys.e = false;
+
+                    chestHoldStart =
+                        0;
+
+                    chestOpenedThisHold =
+                        false;
+
+                    interactionFill.style.width =
+                        '0%';
+                }
+            }
+        );
+
+        // ---------- MINIMAP ----------
+
+        const minimap =
+            document.getElementById(
+                'minimap'
+            );
+
+        const minimapCtx =
+            minimap.getContext(
+                '2d'
+            );
+
+        const minimapSize =
+            180;
+
+        function worldToMinimapX(x) {
+
+            return (
+                (x + MAP_BOUNDARY) /
+                (MAP_BOUNDARY * 2) *
+                minimapSize
+            );
+        }
+
+        function worldToMinimapZ(z) {
+
+            return (
+                (z + MAP_BOUNDARY) /
+                (MAP_BOUNDARY * 2) *
+                minimapSize
+            );
+        }
+
+        function drawMinimap() {
+
+            minimapCtx.clearRect(
+                0,
+                0,
+                minimapSize,
+                minimapSize
+            );
+
+            // Sand
+
+            minimapCtx.fillStyle =
+                '#b99a68';
+
+            minimapCtx.fillRect(
+                0,
+                0,
+                minimapSize,
+                minimapSize
+            );
+
+            // Rutnät
+
+            minimapCtx.strokeStyle =
+                'rgba(70,55,35,0.18)';
+
+            minimapCtx.lineWidth = 1;
+
+            for (
+                let i = 1;
+                i < 10;
+                i++
+            ) {
+
+                const p =
+                    i *
+                    minimapSize /
+                    10;
+
+                minimapCtx.beginPath();
+
+                minimapCtx.moveTo(
+                    p,
+                    0
+                );
+
+                minimapCtx.lineTo(
+                    p,
+                    minimapSize
+                );
+
+                minimapCtx.stroke();
+
+                minimapCtx.beginPath();
+
+                minimapCtx.moveTo(
+                    0,
+                    p
+                );
+
+                minimapCtx.lineTo(
+                    minimapSize,
+                    p
+                );
+
+                minimapCtx.stroke();
+            }
+
+            // Alla byggnader
+
+            minimapCtx.fillStyle =
+                '#40372d';
+
+            for (
+                const c of buildingColliders
+            ) {
+
+                const px =
+                    worldToMinimapX(
+                        c.x
+                    );
+
+                const pz =
+                    worldToMinimapZ(
+                        c.z
+                    );
+
+                const width =
+                    Math.max(
+                        2,
+                        (c.halfW * 2) /
+                        (MAP_BOUNDARY * 2) *
+                        minimapSize
+                    );
+
+                const depth =
+                    Math.max(
+                        2,
+                        (c.halfD * 2) /
+                        (MAP_BOUNDARY * 2) *
+                        minimapSize
+                    );
+
+                minimapCtx.fillRect(
+                    px - width / 2,
+                    pz - depth / 2,
+                    width,
+                    depth
+                );
+            }
+
+            // Kistor
+
+            for (
+                const chest of chests
+            ) {
+
+                if (
+                    chest.userData.opened
+                ) {
+                    continue;
+                }
+
+                const px =
+                    worldToMinimapX(
+                        chest.position.x
+                    );
+
+                const pz =
+                    worldToMinimapZ(
+                        chest.position.z
+                    );
+
+                minimapCtx.fillStyle =
+                    '#d39b35';
+
+                minimapCtx.fillRect(
+                    px - 2,
+                    pz - 2,
+                    5,
+                    5
+                );
+            }
+
+            // Andra spelare (multiplayer)
+
+            for (const p of Net.players.values()) {
+
+                const rx = worldToMinimapX(p.rig.group.position.x);
+                const rz = worldToMinimapZ(p.rig.group.position.z);
+
+                minimapCtx.beginPath();
+                minimapCtx.arc(rx, rz, 4, 0, Math.PI * 2);
+                minimapCtx.fillStyle = '#' + p.colorHex.toString(16).padStart(6, '0');
+                minimapCtx.fill();
+                minimapCtx.strokeStyle = '#ffffff';
+                minimapCtx.lineWidth = 1;
+                minimapCtx.stroke();
+            }
+
+            // Spelare
+
+            const playerX =
+                worldToMinimapX(
+                    camera.position.x
+                );
+
+            const playerZ =
+                worldToMinimapZ(
+                    camera.position.z
+                );
+
+            minimapCtx.beginPath();
+
+            minimapCtx.arc(
+                playerX,
+                playerZ,
+                5,
+                0,
+                Math.PI * 2
+            );
+
+            minimapCtx.fillStyle =
+                '#e53935';
+
+            minimapCtx.fill();
+
+            minimapCtx.strokeStyle =
+                '#ffffff';
+
+            minimapCtx.lineWidth = 2;
+
+            minimapCtx.stroke();
+
+            // Spelarens riktning
+
+            const directionLength =
+                10;
+
+            const directionX =
+                Math.sin(
+                    cameraYAngle
+                ) *
+                directionLength;
+
+            const directionZ =
+                Math.cos(
+                    cameraYAngle
+                ) *
+                directionLength;
+
+            minimapCtx.beginPath();
+
+            minimapCtx.moveTo(
+                playerX,
+                playerZ
+            );
+
+            minimapCtx.lineTo(
+                playerX + directionX,
+                playerZ + directionZ
+            );
+
+            minimapCtx.strokeStyle =
+                '#ffffff';
+
+            minimapCtx.lineWidth = 2;
+
+            minimapCtx.stroke();
+
+            // Tydlig ram
+
+            minimapCtx.strokeStyle =
+                '#fff0c7';
+
+            minimapCtx.lineWidth = 2;
+
+            minimapCtx.strokeRect(
+                1,
+                1,
+                minimapSize - 2,
+                minimapSize - 2
+            );
+        }
+
+        // ---------- ANIMATIONSLOOP ----------
+
+        function animate() {
+
+            requestAnimationFrame(
+                animate
+            );
+
+            const timeNow =
+                performance.now();
+
+            const delta =
+                Math.min(
+                    (timeNow - lastTime) /
+                    1000,
+                    0.1
+                );
+
+            lastTime =
+                timeNow;
+
+            if (isMouseLocked) {
+
+                let moveX = 0;
+                let moveZ = 0;
+
+                if (keys.w) {
+
+                    moveX +=
+                        Math.sin(
+                            cameraYAngle
+                        );
+
+                    moveZ +=
+                        Math.cos(
+                            cameraYAngle
+                        );
+                }
+
+                if (keys.s) {
+
+                    moveX -=
+                        Math.sin(
+                            cameraYAngle
+                        );
+
+                    moveZ -=
+                        Math.cos(
+                            cameraYAngle
+                        );
+                }
+
+                if (keys.a) {
+
+                    moveX +=
+                        Math.cos(
+                            cameraYAngle
+                        );
+
+                    moveZ -=
+                        Math.sin(
+                            cameraYAngle
+                        );
+                }
+
+                if (keys.d) {
+
+                    moveX -=
+                        Math.cos(
+                            cameraYAngle
+                        );
+
+                    moveZ +=
+                        Math.sin(
+                            cameraYAngle
+                        );
+                }
+
+                const speed =
+                    15 * delta;
+
+                const newX =
+                    camera.position.x +
+                    moveX * speed;
+
+                const newZ =
+                    camera.position.z +
+                    moveZ * speed;
+
+                // Kollisionskontroll separat
+                // för X och Z så man inte fastnar
+
+                if (
+                    canMoveTo(
+                        newX,
+                        camera.position.z
+                    )
+                ) {
+
+                    camera.position.x =
+                        newX;
+                }
+
+                if (
+                    canMoveTo(
+                        camera.position.x,
+                        newZ
+                    )
+                ) {
+
+                    camera.position.z =
+                        newZ;
+                }
+
+                velocityY -=
+                    28 * delta;
+
+                camera.position.y +=
+                    velocityY * delta;
+
+                if (
+                    keys.space &&
+                    isGrounded
+                ) {
+
+                    velocityY = 11;
+                    isGrounded = false;
+                }
+
+                if (
+                    camera.position.y < 2
+                ) {
+
+                    camera.position.y = 2;
+                    velocityY = 0;
+                    isGrounded = true;
+                }
+
+                // Liten "bob"-rörelse på vapnet man håller
+
+                const activeViewmodel =
+                    currentWeapon === 'Pistol'
+                        ? viewmodelPistol
+                        : currentWeapon === 'AR'
+                        ? viewmodelAR
+                        : null;
+
+                if (activeViewmodel) {
+
+                    const walking =
+                        (keys.w ||
+                        keys.a ||
+                        keys.s ||
+                        keys.d) &&
+                        isGrounded;
+
+                    viewmodelBobT +=
+                        delta *
+                        (walking ? 9 : 2);
+
+                    const bobAmount =
+                        walking
+                            ? 0.02
+                            : 0.006;
+
+                    const base =
+                        activeViewmodel.userData.basePos;
+
+                    activeViewmodel.position.y =
+                        base.y +
+                        Math.sin(
+                            viewmodelBobT
+                        ) *
+                        bobAmount;
+
+                    activeViewmodel.position.x =
+                        base.x +
+                        Math.cos(
+                            viewmodelBobT * 0.5
+                        ) *
+                        bobAmount * 0.5;
+                }
+            }
+
+            // ---------- KISTA E ----------
+
+            nearbyChest =
+                findNearbyChest();
+
+            if (
+                nearbyChest &&
+                keys.e &&
+                !nearbyChest.userData.opened
+            ) {
+
+                interaction.style.display =
+                    'block';
+
+                if (!chestHoldStart) {
+
+                    chestHoldStart =
+                        performance.now();
+                }
+
+                const heldFor =
+                    performance.now() -
+                    chestHoldStart;
+
+                const progress =
+                    Math.min(
+                        100,
+                        heldFor / 1000 * 100
+                    );
+
+                interactionFill.style.width =
+                    progress + '%';
+
+                if (
+                    heldFor >= 1000 &&
+                    !chestOpenedThisHold
+                ) {
+
+                    chestOpenedThisHold =
+                        true;
+
+                    openChest(
+                        nearbyChest
+                    );
+                }
+
+            } else if (!nearbyChest) {
+
+                interaction.style.display =
+                    'none';
+
+                interactionFill.style.width =
+                    '0%';
+
+                chestHoldStart =
+                    0;
+
+            } else if (!keys.e) {
+
+                interaction.style.display =
+                    'block';
+
+                interactionFill.style.width =
+                    '0%';
+
+                chestHoldStart =
+                    0;
+            }
+
+            // ---------- PICKUP AV SAKER ----------
+
+            pickUpNearbyItem();
+
+            // ---------- DAMM ----------
+
+            const pos =
+                dustGeo.attributes.position;
+
+            for (
+                let i = 0;
+                i < dustCount;
+                i++
+            ) {
+
+                pos.array[i * 3] +=
+                    0.15 *
+                    delta *
+                    10;
+
+                pos.array[i * 3 + 1] -=
+                    0.02 *
+                    delta *
+                    10;
+
+                if (
+                    pos.array[i * 3 + 1] <
+                    0
+                ) {
+
+                    pos.array[i * 3 + 1] =
+                        18;
+                }
+
+                if (
+                    pos.array[i * 3] >
+                    camera.position.x +
+                    100
+                ) {
+
+                    pos.array[i * 3] =
+                        camera.position.x -
+                        100;
+                }
+            }
+
+            pos.needsUpdate = true;
+
+            // ---------- KAMERA ----------
+
+            const target =
+                lookTarget;
+
+            target.x =
+                camera.position.x +
+                Math.sin(
+                    cameraYAngle
+                ) *
+                Math.cos(
+                    cameraXAngle
+                );
+
+            target.z =
+                camera.position.z +
+                Math.cos(
+                    cameraYAngle
+                ) *
+                Math.cos(
+                    cameraXAngle
+                );
+
+            target.y =
+                camera.position.y +
+                Math.sin(
+                    cameraXAngle
+                );
+
+            camera.lookAt(
+                target
+            );
+
+            // ---------- MULTIPLAYER ----------
+
+            Net.updateRemotePlayers(delta);
+            Net.sendState();
+
+            // ---------- MINIMAP ----------
+
+            drawMinimap();
+
+            renderer.render(
+                scene,
+                camera
+            );
+        }
+
+        window.addEventListener(
+            'resize',
+            () => {
+
+                camera.aspect =
+                    window.innerWidth /
+                    window.innerHeight;
+
+                camera.updateProjectionMatrix();
+
+                renderer.setSize(
+                    window.innerWidth,
+                    window.innerHeight
+                );
+            }
+        );
+
+        animate();
+
+    </script>
+
+</body>
+</html>
