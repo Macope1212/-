@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mitt 3D FPS Spel - Desert War Zone</title>
+    <title>Desert War Zone</title>
     <style>
         body { margin: 0; overflow: hidden; background-color: #000; font-family: sans-serif; }
         canvas { display: block; }
         #crosshair {
-            position: absolute; top: 50%; left: 50%;
-            width: 10px; height: 10px; background: white;
-            border-radius: 50%; transform: translate(-50%, -50%);
+            position: absolute; top: 50%; left: 50%; width: 10px; height: 10px;
+            background: white; border-radius: 50%; transform: translate(-50%, -50%);
             pointer-events: none; opacity: 0.8; z-index: 10; display: none;
         }
         #start-overlay {
@@ -21,241 +20,140 @@
             padding: 20px 40px; font-size: 24px; font-weight: bold; background: #d35400;
             color: white; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
-        #start-button:hover { background: #e67e22; }
     </style>
 </head>
 <body>
 
-    <!-- Startskärm som tvingar webbläsaren att uppdatera -->
-    <div id="start-overlay">
-        <button id="start-button">STARTA ÖKENKRIGET (KLICKA HÄR)</button>
-    </div>
-
-    <!-- Sikte i mitten -->
+    <div id="start-overlay"><button id="start-button">STARTA ÖKENKRIGET</button></div>
     <div id="crosshair"></div>
 
-    <!-- Stabil och säker JavaScript-länk för 3D-motorn -->
     <script src="https://cloudflare.com"></script>
 
     <script>
-        // 1. Inställningar för 3D-scen och kamera
         const scene = new THREE.Scene();
-        
-        // Öken-atmosfär: Apelsingul solnedgång och tung sandstorms-dimma
         scene.background = new THREE.Color(0xd5a97a); 
-        scene.fog = new THREE.FogExp2(0xd5a97a, 0.025); // Tät dimma för war zone-känsla
+        scene.fog = new THREE.FogExp2(0xd5a97a, 0.025); 
 
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 2, 0); // Startar i ögonhöjd (2 meter upp från marken)
+        camera.position.set(0, 2, 0); 
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // Allmänt ljus i världen (lite svagare för att passa en mörk krigszon)
         const light = new THREE.AmbientLight(0xfff0e0, 0.9);
         scene.add(light);
 
-        // 2. Ökensand (Marken)
-        const floorGeo = new THREE.PlaneGeometry(2000, 2000);
-        const floorMat = new THREE.MeshBasicMaterial({ color: 0xc29d70 }); // Sandfärgad mark
-        const floor = new THREE.Mesh(floorGeo, floorMat);
+        // Ökensand
+        const floor = new THREE.Mesh(new THREE.PlaneGeometry(2000, 2000), new THREE.MeshBasicMaterial({ color: 0xc29d70 }));
         floor.rotation.x = -Math.PI / 2;
         scene.add(floor);
 
-        // 3. FUNKTION FÖR ATT SKAPA RASERADE OCH SKADADE BYGGNADER
-        function createRuinedBuilding(x, z, width, height, depth, wallColor, roofColor) {
-            const buildingGroup = new THREE.Group();
-
-            // Slumpa om byggnaden är totalförstörd, skadad eller ganska hel
-            const damageType = Math.random(); 
-
-            if (damageType > 0.4) {
-                // Kategori 1: Stående byggnad men med skador (kanske saknar tak)
-                const wallGeo = new THREE.BoxGeometry(width, height, depth);
-                const wallMat = new THREE.MeshBasicMaterial({ color: wallColor });
-                const walls = new THREE.Mesh(wallGeo, wallMat);
-                walls.position.y = height / 2;
-                buildingGroup.add(walls);
-
-                // Endast 50% chans att taket klarat sig i krigszonen
-                if (Math.random() > 0.5) {
-                    const roofHeight = width * 0.4;
-                    const roofGeo = new THREE.ConeGeometry(Math.max(width, depth) * 0.75, roofHeight, 4);
-                    const roofMat = new THREE.MeshBasicMaterial({ color: roofColor });
-                    const roof = new THREE.Mesh(roofGeo, roofMat);
-                    roof.position.y = height + (roofHeight / 2);
-                    roof.rotation.y = Math.PI / 4;
-                    buildingGroup.add(roof);
-                }
-
-                // Sönderbammad dörröppning (bränt mörkt block)
-                const doorGeo = new THREE.BoxGeometry(width * 0.25, height * 0.25, 0.1);
-                const doorMat = new THREE.MeshBasicMaterial({ color: 0x1a1a1a }); 
-                const door = new THREE.Mesh(doorGeo, doorMat);
-                door.position.set(0, (height * 0.25) / 2, (depth / 2) + 0.01); 
-                buildingGroup.add(door);
-
-            } else if (damageType > 0.15) {
-                // Kategori 2: Halvt kollapsat hus som lutar kraftigt efter en bombträff
-                const wallGeo = new THREE.BoxGeometry(width, height * 0.7, depth);
-                const wallMat = new THREE.MeshBasicMaterial({ color: wallColor });
-                const walls = new THREE.Mesh(wallGeo, wallMat);
-                walls.position.y = (height * 0.7) / 2;
-                buildingGroup.add(walls);
-
-                // Få huset att luta dramatiskt
-                buildingGroup.rotation.z = (Math.random() - 0.5) * 0.3;
-                buildingGroup.rotation.x = (Math.random() - 0.5) * 0.3;
-
-            } else {
-                // Kategori 3: Totalförstört hus - bara rasmassor kvar på marken
-                for (let j = 0; j < 4; j++) {
-                    const rubbleGeo = new THREE.BoxGeometry(width * 0.6, 2, depth * 0.6);
-                    const rubbleMat = new THREE.MeshBasicMaterial({ color: 0x3e3a36 }); // Askgrå rasmassa
-                    const rubble = new THREE.Mesh(rubbleGeo, rubbleMat);
-                    rubble.position.set((Math.random() - 0.5) * 4, 1, (Math.random() - 0.5) * 4);
-                    rubble.rotation.set(Math.random(), Math.random(), Math.random());
-                    buildingGroup.add(rubble);
-                }
-            }
-
-            // Placera ut byggnaden/ruinen på kartan
-            buildingGroup.position.set(x, 0, z);
-            scene.add(buildingGroup);
-        }
-
-        // Militära, smutsiga och brända färger (Militärgrön, Aska, Rost, Lera)
-        const warZoneColors = [0x555d50, 0x3e3a36, 0x7b3f00, 0x4a4135, 0x8b0000, 0x6e6456]; 
-        const ruinRoofColors = [0x1a1a1a, 0x2b2621, 0x423629]; 
-
-        // Generera 45 krigshärjade byggnader i öknen
+        // Byggnader (Hela, trasiga och rasmassor)
+        const colors = [0x555d50, 0x3e3a36, 0x7b3f00, 0x4a4135, 0x8b0000]; 
         for (let i = 0; i < 45; i++) {
-            const x = (Math.random() - 0.5) * 180;
-            const z = (Math.random() - 0.5) * 180;
-            
+            const x = (Math.random() - 0.5) * 160;
+            const z = (Math.random() - 0.5) * 160;
+            if (Math.abs(x) < 12 && Math.abs(z) < 12) continue;
+
             const w = 7 + Math.random() * 6;
             const h = 8 + Math.random() * 12;
             const d = 7 + Math.random() * 6;
+            const col = colors[Math.floor(Math.random() * colors.length)];
 
-            const randomWall = warZoneColors[Math.floor(Math.random() * warZoneColors.length)];
-            const randomRoof = ruinRoofColors[Math.floor(Math.random() * ruinRoofColors.length)];
+            const bGroup = new THREE.Group();
+            const dmg = Math.random();
 
-            if (Math.abs(x) < 12 && Math.abs(z) < 12) continue; // Håll startplatsen fri
-
-            createRuinedBuilding(x, z, w, h, d, randomWall, randomRoof);
+            if (dmg > 0.4) {
+                const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshBasicMaterial({ color: col }));
+                wall.position.y = h / 2;
+                bGroup.add(wall);
+            } else if (dmg > 0.15) {
+                const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h * 0.7, d), new THREE.MeshBasicMaterial({ color: col }));
+                wall.position.y = (h * 0.7) / 2;
+                bGroup.add(wall);
+                bGroup.rotation.z = (Math.random() - 0.5) * 0.3;
+            } else {
+                for (let j = 0; j < 3; j++) {
+                    const rubble = new THREE.Mesh(new THREE.BoxGeometry(w * 0.6, 2, d * 0.6), new THREE.MeshBasicMaterial({ color: 0x3e3a36 }));
+                    rubble.position.set((Math.random() - 0.5) * 4, 1, (Math.random() - 0.5) * 4);
+                    bGroup.add(rubble);
+                }
+            }
+            bGroup.position.set(x, 0, z);
+            scene.add(bGroup);
         }
 
-        // Lägg till några sönderbombade, jättehöga skyskrapor/torn i utkanterna
-        for (let i = 0; i < 5; i++) {
-            const x = (Math.random() - 0.5) * 250;
-            const z = (Math.random() - 0.5) * 250;
-            if (Math.abs(x) < 40 && Math.abs(z) < 40) continue;
-
-            createRuinedBuilding(x, z, 14, 40 + Math.random() * 15, 14, 0x2f3538, 0x111111);
-        }
-
-        // 4. Hantering av mus och låsning
-        let cameraYAngle = 0; 
-        let cameraXAngle = 0; 
-        let isMouseLocked = false;
-
+        // Mus och Kontroller
+        let cameraYAngle = 0, cameraXAngle = 0, isMouseLocked = false;
         const startOverlay = document.getElementById('start-overlay');
         const startButton = document.getElementById('start-button');
         const crosshair = document.getElementById('crosshair');
 
-        startButton.addEventListener('click', () => {
-            renderer.domElement.requestPointerLock();
-        });
+        startButton.addEventListener('click', () => { renderer.domElement.requestPointerLock(); });
 
         document.addEventListener('pointerlockchange', () => {
-            if (document.pointerLockElement === renderer.domElement) {
-                isMouseLocked = true;
-                startOverlay.style.display = 'none';
-                crosshair.style.display = 'block';
-            } else {
-                isMouseLocked = false;
-                startOverlay.style.display = 'flex';
-                crosshair.style.display = 'none';
-            }
+            isMouseLocked = (document.pointerLockElement === renderer.domElement);
+            startOverlay.style.display = isMouseLocked ? 'none' : 'flex';
+            crosshair.style.display = isMouseLocked ? 'block' : 'none';
         });
 
         document.addEventListener('mousemove', (e) => {
             if (isMouseLocked) {
                 cameraYAngle -= e.movementX * 0.002;
                 cameraXAngle -= e.movementY * 0.002;
-                cameraXAngle = Math.max(-Math.PI/2.2, Math.min(Math.PI/2.2, cameraXAngle)); 
+                cameraXAngle = Math.max(-Math.PI/2.2, Math.min(Math.PI/2.2, cameraXAngle));
             }
         });
 
-        // 5. Tangentbords-inputs
         const keys = { w: false, a: false, s: false, d: false, space: false };
-        let velocityY = 0;
-        let isGrounded = true;
-        let lastTime = performance.now();
+        let velocityY = 0, isGrounded = true, lastTime = performance.now();
 
         document.addEventListener('keydown', (e) => {
-            if (e.code === 'KeyW') keys.w = true;
-            if (e.code === 'KeyA') keys.a = true;
-            if (e.code === 'KeyS') keys.s = true;
-            if (e.code === 'KeyD') keys.d = true;
+            if (e.code === 'KeyW') keys.w = true; if (e.code === 'KeyA') keys.a = true;
+            if (e.code === 'KeyS') keys.s = true; if (e.code === 'KeyD') keys.d = true;
             if (e.code === 'Space') keys.space = true;
         });
-
         document.addEventListener('keyup', (e) => {
-            if (e.code === 'KeyW') keys.w = false;
-            if (e.code === 'KeyA') keys.a = false;
-            if (e.code === 'KeyS') keys.s = false;
-            if (e.code === 'KeyD') keys.d = false;
+            if (e.code === 'KeyW') keys.w = false; if (e.code === 'KeyA') keys.a = false;
+            if (e.code === 'KeyS') keys.s = false; if (e.code === 'KeyD') keys.d = false;
             if (e.code === 'Space') keys.space = false;
         });
 
-        // 6. Spelslingan (Rörelse & Fysik)
         function animate() {
             requestAnimationFrame(animate);
-
             const timeNow = performance.now();
             const delta = Math.min((timeNow - lastTime) / 1000, 0.1);
             lastTime = timeNow;
 
             if (isMouseLocked) {
-                let moveX = 0;
-                let moveZ = 0;
-
+                let moveX = 0, moveZ = 0;
                 if (keys.w) { moveX += Math.sin(cameraYAngle); moveZ += Math.cos(cameraYAngle); }
+                if (keys.s) { moveX -= Math.sin(cameraYAngle); moveZ -= Math.cos(cameraYAngle); }
+                if (keys.a) { moveX += Math.cos(cameraYAngle); moveZ -= Math.sin(cameraYAngle); }
+                if (keys.d) { moveX -= Math.cos(cameraYAngle); moveZ += Math.sin(cameraYAngle); }
 
-if (keys.s) { moveX -= Math.sin(cameraYAngle); moveZ -= Math.cos(cameraYAngle); }
-if (keys.a) { moveX += Math.cos(cameraYAngle); moveZ -= Math.sin(cameraYAngle); }
-if (keys.d) { moveX -= Math.cos(cameraYAngle); moveZ += Math.sin(cameraYAngle); }
-const speed = 15; // Gånghastighet över sanden
-camera.position.x += moveX * speed * delta;
-camera.position.z += moveZ * speed * delta;
-// Tyngdkraft och Hoppstyrka
-velocityY -= 28 * delta;
-camera.position.y += velocityY * delta;
-if (keys.space && isGrounded) {
-velocityY = 11;
-isGrounded = false;
-}
-// Spärr så man inte faller igenom ökensanden
-if (camera.position.y < 2) {
-camera.position.y = 2;
-velocityY = 0;
-isGrounded = true;
-}
-}
-// Uppdatera vart kameran pekar utifrån musvinklarna
-const target = new THREE.Vector3();
-target.x = camera.position.x + Math.sin(cameraYAngle) * Math.cos(cameraXAngle);
-target.z = camera.position.z + Math.cos(cameraYAngle) * Math.cos(cameraXAngle);
-target.y = camera.position.y + Math.sin(cameraXAngle);
-camera.lookAt(target);
-renderer.render(scene, camera);
-}
-window.addEventListener('resize', () => {
-camera.aspect = window.innerWidth / window.innerHeight;
-camera.updateProjectionMatrix();
-renderer.setSize(window.innerWidth, window.innerHeight);
-});
-animate();
+                camera.position.x += moveX * 15 * delta;
+                camera.position.z += moveZ * 15 * delta;
+                velocityY -= 28 * delta; camera.position.y += velocityY * delta;
 
+                if (keys.space && isGrounded) { velocityY = 11; isGrounded = false; }
+                if (camera.position.y < 2) { camera.position.y = 2; velocityY = 0; isGrounded = true; }
+            }
+
+            const target = new THREE.Vector3();
+            target.x = camera.position.x + Math.sin(cameraYAngle) * Math.cos(cameraXAngle);
+            target.z = camera.position.z + Math.cos(cameraYAngle) * Math.cos(cameraXAngle);
+            target.y = camera.position.y + Math.sin(cameraXAngle);
+            camera.lookAt(target);
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        animate();
+    </script>
+</body>
+</html>
