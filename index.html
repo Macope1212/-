@@ -202,6 +202,55 @@
             pointer-events: none;
             text-align: right;
         }
+
+        /* ---------- INVENTORY ---------- */
+
+        #inventory-ui {
+            position: absolute;
+            left: 50%;
+            bottom: 20px;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .inv-slot {
+            width: 62px;
+            height: 62px;
+            background: rgba(20, 20, 20, 0.55);
+            border: 2px solid rgba(255, 255, 255, 0.55);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+        }
+
+        .inv-slot .slot-number {
+            position: absolute;
+            top: 3px;
+            left: 5px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.75);
+            font-weight: bold;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        .inv-slot .slot-icon {
+            font-size: 15px;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            text-shadow: 1px 1px 3px #000;
+        }
+
+        .inv-slot.selected {
+            border-color: #ffe38a;
+            box-shadow: 0 0 10px #ffe38a, 0 3px 10px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
 
@@ -236,6 +285,14 @@
 
     <div id="weapon-ui">
         Vapen: Händer
+    </div>
+
+    <div id="inventory-ui">
+        <div class="inv-slot" data-index="0"><span class="slot-number">1</span><span class="slot-icon"></span></div>
+        <div class="inv-slot" data-index="1"><span class="slot-number">2</span><span class="slot-icon"></span></div>
+        <div class="inv-slot" data-index="2"><span class="slot-number">3</span><span class="slot-icon"></span></div>
+        <div class="inv-slot" data-index="3"><span class="slot-number">4</span><span class="slot-icon"></span></div>
+        <div class="inv-slot" data-index="4"><span class="slot-number">5</span><span class="slot-icon"></span></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -1624,7 +1681,12 @@
             [15, -70],
             [-20, 65],
             [70, 10],
-            [-72, -5]
+            [-72, -5],
+            [30, 80],
+            [-40, -80],
+            [80, -20],
+            [-85, 55],
+            [5, 85]
         ];
 
         for (const pos of chestPositions) {
@@ -1874,6 +1936,127 @@
 
         }
 
+        // ---------- INVENTORY ----------
+
+        const inventory = [
+            null,
+            null,
+            null,
+            null,
+            null
+        ];
+
+        let selectedSlot = -1;
+
+        const invSlotElements =
+            Array.from(
+                document.querySelectorAll(
+                    '.inv-slot'
+                )
+            );
+
+        function renderInventory() {
+
+            invSlotElements.forEach(
+                (el, i) => {
+
+                    const item =
+                        inventory[i];
+
+                    const iconEl =
+                        el.querySelector(
+                            '.slot-icon'
+                        );
+
+                    iconEl.textContent =
+                        item
+                            ? item.icon
+                            : '';
+
+                    el.classList.toggle(
+                        'selected',
+                        i === selectedSlot
+                    );
+                }
+            );
+        }
+
+        function findEmptySlot() {
+
+            return inventory.indexOf(
+                null
+            );
+        }
+
+        function addToInventory(item) {
+
+            const slot =
+                findEmptySlot();
+
+            if (slot === -1) {
+                return -1;
+            }
+
+            inventory[slot] = item;
+
+            renderInventory();
+
+            return slot;
+        }
+
+        function useSlot(index) {
+
+            const item =
+                inventory[index];
+
+            if (!item) {
+                return;
+            }
+
+            if (item.type === 'weapon') {
+
+                selectedSlot = index;
+
+                setWeapon(
+                    item.name
+                );
+
+                renderInventory();
+
+                return;
+            }
+
+            if (item.type === 'heal') {
+
+                if (
+                    playerHP >= maxHP
+                ) {
+                    return;
+                }
+
+                playerHP =
+                    Math.min(
+                        maxHP,
+                        playerHP + 35
+                    );
+
+                updateHealth();
+
+                inventory[index] =
+                    null;
+
+                if (
+                    selectedSlot ===
+                    index
+                ) {
+
+                    selectedSlot = -1;
+                }
+
+                renderInventory();
+            }
+        }
+
         // ---------- E-INTERAKTION ----------
 
         let nearbyChest = null;
@@ -2004,21 +2187,21 @@
             }
 
             if (
+                findEmptySlot() === -1
+            ) {
+                // Inventoryt är fullt (5/5), kan inte plocka upp mer
+                return;
+            }
+
+            if (
                 closest.userData.pickupType ===
                 'Heal'
             ) {
 
-                if (playerHP >= maxHP) {
-                    return;
-                }
-
-                playerHP =
-                    Math.min(
-                        maxHP,
-                        playerHP + 35
-                    );
-
-                updateHealth();
+                addToInventory({
+                    type: 'heal',
+                    icon: '+HP'
+                });
 
                 scene.remove(
                     closest
@@ -2032,9 +2215,20 @@
                 'Pistol'
             ) {
 
+                const slot =
+                    addToInventory({
+                        type: 'weapon',
+                        name: 'Pistol',
+                        icon: 'PIS'
+                    });
+
+                selectedSlot = slot;
+
                 setWeapon(
                     'Pistol'
                 );
+
+                renderInventory();
 
                 scene.remove(
                     closest
@@ -2048,9 +2242,20 @@
                 'AR'
             ) {
 
+                const slot =
+                    addToInventory({
+                        type: 'weapon',
+                        name: 'AR',
+                        icon: 'AR'
+                    });
+
+                selectedSlot = slot;
+
                 setWeapon(
                     'AR'
                 );
+
+                renderInventory();
 
                 scene.remove(
                     closest
@@ -2206,6 +2411,26 @@
                             false;
                     }
                 }
+
+                if (
+                    e.code === 'Digit1'
+                ) useSlot(0);
+
+                if (
+                    e.code === 'Digit2'
+                ) useSlot(1);
+
+                if (
+                    e.code === 'Digit3'
+                ) useSlot(2);
+
+                if (
+                    e.code === 'Digit4'
+                ) useSlot(3);
+
+                if (
+                    e.code === 'Digit5'
+                ) useSlot(4);
             }
         );
 
@@ -2828,4 +3053,3 @@
 
 </body>
 </html>
-
