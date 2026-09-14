@@ -98,9 +98,11 @@
         const startOverlay = document.getElementById('start-overlay');
         const crosshair = document.getElementById('crosshair');
 
-        // Fixat: Begär pointer lock direkt vid klick
-        startOverlay.addEventListener('click', () => {
-            renderer.domElement.requestPointerLock();
+        // Garanterar aktivering genom att lyssna på hela fönstret vid klick
+        window.addEventListener('click', () => {
+            if (!isMouseLocked) {
+                renderer.domElement.requestPointerLock();
+            }
         });
 
         document.addEventListener('pointerlockchange', () => {
@@ -112,6 +114,11 @@
                 startOverlay.style.display = 'flex';
                 crosshair.style.display = 'none';
             }
+        });
+
+        // Loggar eventuella säkerhetsfel i webbläsarkonsolen för lättare felsökning
+        document.addEventListener('pointerlockerror', (err) => {
+            console.error("Pointer Lock misslyckades. Webbläsaren blockerade anropet:", err);
         });
 
         document.addEventListener('mousemove', (e) => {
@@ -172,7 +179,7 @@
                 if (keys.w) { moveX += Math.sin(cameraYAngle); moveZ += Math.cos(cameraYAngle); }
                 if (keys.s) { moveX -= Math.sin(cameraYAngle); moveZ -= Math.cos(cameraYAngle); }
                 if (keys.a) { moveX += Math.cos(cameraYAngle); moveZ -= Math.sin(cameraYAngle); }
-                if (keys.d) { moveX -= Math.cos(cameraYAngle); moveZ += Math.sin(cameraYAngle); }
+                if (keys.d) { moveX -= Math.cos(cameraYAngle); moveZ += Math.+= Math.cos(cameraYAngle); moveZ += Math.sin(cameraYAngle); }
 
                 camera.position.x += moveX * 15 * delta;
                 camera.position.z += moveZ * 15 * delta;
