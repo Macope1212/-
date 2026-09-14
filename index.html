@@ -508,6 +508,63 @@
             }
 
 
+            // ---------- DÖRRAR OCH FÖNSTER ----------
+
+            if (Math.random() > 0.25) {
+
+                const door = addShadowMesh(
+                    new THREE.Mesh(
+                        new THREE.BoxGeometry(
+                            1.5,
+                            3,
+                            0.18
+                        ),
+                        matConcreteHole
+                    )
+                );
+
+                door.position.set(
+                    0,
+                    1.5,
+                    d / 2 + 0.1
+                );
+
+                group.add(door);
+            }
+
+
+            if (Math.random() > 0.2) {
+
+                const windowCount =
+                    2 + Math.floor(Math.random() * 3);
+
+                for (let i = 0; i < windowCount; i++) {
+
+                    const windowMesh = addShadowMesh(
+                        new THREE.Mesh(
+                            new THREE.BoxGeometry(
+                                1.4,
+                                1.3,
+                                0.15
+                            ),
+                            matConcreteHole
+                        )
+                    );
+
+                    windowMesh.position.set(
+                        -w / 2 +
+                        1.5 +
+                        i * Math.max(1.8, (w - 3) / windowCount),
+                        3 +
+                        Math.random() * Math.max(1, h * 0.35),
+                        d / 2 + 0.08
+                    );
+
+                    group.add(windowMesh);
+                }
+            }
+
+
             // ---------- EXTRA DETALJER ----------
 
             if (Math.random() > 0.6) {
@@ -543,6 +600,29 @@
 
                     group.add(bag);
                 }
+            }
+
+
+            if (Math.random() > 0.55) {
+
+                const box = addShadowMesh(
+                    new THREE.Mesh(
+                        new THREE.BoxGeometry(
+                            1.2,
+                            0.8,
+                            1.2
+                        ),
+                        matRubble
+                    )
+                );
+
+                box.position.set(
+                    -w / 2 - 0.7,
+                    0.4,
+                    d / 2 + 0.7
+                );
+
+                group.add(box);
             }
 
 
@@ -771,7 +851,7 @@
 
         // ---------- VANLIGA RUINER ----------
 
-        for (let i = 0; i < 55; i++) {
+        for (let i = 0; i < 70; i++) {
 
             let x, z, tries = 0;
 
@@ -862,7 +942,18 @@
             [-30, 48],
             [-15, 48],
             [15, 48],
-            [30, 48]
+            [30, 48],
+
+            [-55, 48],
+            [55, 48],
+            [-55, 28],
+            [55, 28],
+            [-55, 5],
+            [55, 5],
+            [-55, -18],
+            [55, -18],
+            [-55, -38],
+            [55, -38]
         ];
 
 
@@ -1154,8 +1245,17 @@
         };
 
 
+        // ---------- REALISTISKARE RÖRELSE ----------
+
         let velocityY = 0;
         let isGrounded = true;
+
+        let velocityX = 0;
+        let velocityZ = 0;
+
+        const acceleration = 55;
+        const friction = 12;
+        const maxSpeed = 15;
 
         let lastTime =
             performance.now();
@@ -1274,15 +1374,62 @@
                 }
 
 
-                const speed = 15;
+                const inputLength =
+                    Math.hypot(moveX, moveZ);
+
+
+                if (inputLength > 0) {
+
+                    moveX /= inputLength;
+                    moveZ /= inputLength;
+
+
+                    velocityX +=
+                        moveX * acceleration * delta;
+
+                    velocityZ +=
+                        moveZ * acceleration * delta;
+                } else {
+
+                    const slowdown =
+                        Math.max(
+                            0,
+                            1 - friction * delta
+                        );
+
+                    velocityX *= slowdown;
+                    velocityZ *= slowdown;
+                }
+
+
+                const horizontalSpeed =
+                    Math.hypot(
+                        velocityX,
+                        velocityZ
+                    );
+
+
+                if (
+                    horizontalSpeed >
+                    maxSpeed
+                ) {
+
+                    const scale =
+                        maxSpeed /
+                        horizontalSpeed;
+
+                    velocityX *= scale;
+                    velocityZ *= scale;
+                }
+
 
                 const nextX =
                     camera.position.x +
-                    moveX * speed * delta;
+                    velocityX * delta;
 
                 const nextZ =
                     camera.position.z +
-                    moveZ * speed * delta;
+                    velocityZ * delta;
 
 
                 // Kollision separat i X och Z
@@ -1297,6 +1444,10 @@
 
                     camera.position.x =
                         nextX;
+
+                } else {
+
+                    velocityX = 0;
                 }
 
 
@@ -1309,6 +1460,10 @@
 
                     camera.position.z =
                         nextZ;
+
+                } else {
+
+                    velocityZ = 0;
                 }
 
 
