@@ -3,44 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mitt 3D FPS Spel</title>
+    <title>Mitt 3D FPS Spel med Byggnader</title>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #000; font-family: sans-serif; }
+        body { margin: 0; overflow: hidden; background-color: #87ceeb; font-family: sans-serif; }
         canvas { display: block; }
         #crosshair {
             position: absolute; top: 50%; left: 50%;
             width: 10px; height: 10px; background: white;
             border-radius: 50%; transform: translate(-50%, -50%);
-            pointer-events: none; opacity: 0.8; z-index: 10; display: none;
+            pointer-events: none; opacity: 0.8; z-index: 10;
         }
-        #start-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9); display: flex; justify-content: center; align-items: center; z-index: 100;
-        }
-        #start-button {
-            padding: 20px 40px; font-size: 24px; font-weight: bold; background: #ff4500;
-            color: white; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-        }
-        #start-button:hover { background: #ff5722; }
     </style>
 </head>
 <body>
 
-    <!-- Startskärm som tvingar webbläsaren att uppdatera -->
-    <div id="start-overlay">
-        <button id="start-button">STARTA SPELET (KLICKA HÄR)</button>
-    </div>
-
-    <!-- Sikte i mitten -->
+    <!-- Sikte i mitten av skärmen -->
     <div id="crosshair"></div>
 
-    <!-- Stabil och säker JavaScript-länk för 3D-motorn -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Stabil basversion av Three.js -->
+    <script src="https://cloudflare.com"></script>
 
     <script>
-        // 1. Inställningar för 3D-scen och kamera
+        // 1. Starta 3D-världen och kameran i ögonhöjd
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x87ceeb); // Garanterat ljusblå himmel
+        scene.background = new THREE.Color(0x87ceeb); // Blå himmel
 
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 2, 0); // Startar i ögonhöjd (2 meter upp från marken)
@@ -49,60 +35,96 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // Allmänt ljus i världen
+        // Allmänt ljus som lyser upp världen och alla byggnader direkt
         const light = new THREE.AmbientLight(0xffffff, 1.0);
         scene.add(light);
 
         // 2. Det gröna gräset (Marken)
         const floorGeo = new THREE.PlaneGeometry(2000, 2000);
-        const floorMat = new THREE.MeshBasicMaterial({ color: 0x2e8b57 }); // Garanterat grönt gräs
+        const floorMat = new THREE.MeshBasicMaterial({ color: 0x2e8b57 }); // Garanterat stabilt grönt gräs
         const floor = new THREE.Mesh(floorGeo, floorMat);
         floor.rotation.x = -Math.PI / 2;
         scene.add(floor);
 
-        // 3. Stora färgade pelare så du ser när du går
-        const boxGeo = new THREE.BoxGeometry(4, 10, 4);
-        const colors = [0xff0000, 0xffff00, 0x0000ff, 0xff00ff]; // Röd, Gul, Blå, Lila
+        // 3. SKAPA FINA BYGGNADER
+        // Funktion för att bygga ett hus med väggar, tak och dörr
+        function createBuilding(x, z, width, height, depth, wallColor, roofColor) {
+            const buildingGroup = new THREE.Group();
 
-        for (let i = 0; i < 50; i++) {
-            const randomColor = colors[Math.floor(Math.random() * colors.length)];
-            const boxMat = new THREE.MeshBasicMaterial({ color: randomColor });
-            const box = new THREE.Mesh(boxGeo, boxMat);
-            
-            box.position.x = (Math.random() - 0.5) * 160;
-            box.position.z = (Math.random() - 0.5) * 160;
-            box.position.y = 5; // Placerade perfekt stående på gräset
-            
-            // Rensa startytan så inget block blockerar kameran vid start
-            if (Math.abs(box.position.x) < 8 && Math.abs(box.position.z) < 8) {
-                box.position.z -= 25;
-            }
-            scene.add(box);
+            // Själva huset (väggarna)
+            const wallGeo = new THREE.BoxGeometry(width, height, depth);
+            const wallMat = new THREE.MeshBasicMaterial({ color: wallColor });
+            const walls = new THREE.Mesh(wallGeo, wallMat);
+            walls.position.y = height / 2; // Sätt huset på marken
+            buildingGroup.add(walls);
+
+            // Taket (Vi gör ett platt men snyggt takutsprång eller pyramidliknande block)
+            const roofHeight = 2;
+            const roofGeo = new THREE.ConeGeometry(Math.max(width, depth) * 0.7, roofHeight, 4);
+            const roofMat = new THREE.MeshBasicMaterial({ color: roofColor });
+            const roof = new THREE.Mesh(roofGeo, roofMat);
+            roof.position.y = height + (roofHeight / 2);
+            roof.rotation.y = Math.PI / 4; // Rotera taket så det passar fyrkantiga hus
+            buildingGroup.add(roof);
+
+            // En dörr på framsidan av huset (svart block)
+            const doorGeo = new THREE.BoxGeometry(width * 0.2, height * 0.3, 0.1);
+            const doorMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
+            const door = new THREE.Mesh(doorGeo, doorMat);
+            door.position.set(0, (height * 0.3) / 2, (depth / 2) + 0.02);
+            buildingGroup.add(door);
+
+            // Placera ut hela huset på kartan
+            buildingGroup.position.set(x, 0, z);
+            scene.add(buildingGroup);
         }
 
-        // 4. Hantering av mus och låsning
+        // Färger till husen
+        const wallColors = [0xdd4b39, 0xf39c12, 0x3498db, 0x9b59b6, 0xbdc3c7]; // Röd, Orange, Blå, Lila, Grå
+        const roofColors = [0x2c3e50, 0x7f8c8d, 0xc0392b, 0x111111]; // Mörka takfärger
+
+        // Bygg 25 unika hus på slumpmässiga ställen
+        for (let i = 0; i < 25; i++) {
+            const x = (Math.random() - 0.5) * 160;
+            const z = (Math.random() - 0.5) * 160;
+            
+            // Slumpa storleken på huset
+            const w = 6 + Math.random() * 6;
+            const h = 8 + Math.random() * 12; // Mellan 8 och 20 meter höga
+            const d = 6 + Math.random() * 6;
+
+            const wallColor = wallColors[Math.floor(Math.random() * wallColors.length)];
+            const roofColor = roofColors[Math.floor(Math.random() * roofColors.length)];
+
+            // Se till att husen inte byggs precis där spelaren startar (0,0)
+            if (Math.abs(x) < 12 && Math.abs(z) < 12) {
+                continue; 
+            }
+
+            createBuilding(x, z, w, h, d, wallColor, roofColor);
+        }
+
+        // Bygg några riktigt höga "skyskrapor" i bakgrunden
+        for (let i = 0; i < 5; i++) {
+            const x = (Math.random() - 0.5) * 250;
+            const z = (Math.random() - 0.5) * 250;
+            if (Math.abs(x) < 30 && Math.abs(z) < 30) continue;
+
+            createBuilding(x, z, 10, 40, 10, 0x2c3e50, 0xf1c40f); // Blågrå skyskrapor med gult tak
+        }
+
+
+        // 4. Muskontroller (Klicka på skärmen för att låsa musen och titta runt)
         let cameraYAngle = 0; 
         let cameraXAngle = 0; 
         let isMouseLocked = false;
 
-        const startOverlay = document.getElementById('start-overlay');
-        const startButton = document.getElementById('start-button');
-        const crosshair = document.getElementById('crosshair');
-
-        startButton.addEventListener('click', () => {
+        document.addEventListener('click', () => {
             renderer.domElement.requestPointerLock();
         });
 
         document.addEventListener('pointerlockchange', () => {
-            if (document.pointerLockElement === renderer.domElement) {
-                isMouseLocked = true;
-                startOverlay.style.display = 'none';
-                crosshair.style.display = 'block';
-            } else {
-                isMouseLocked = false;
-                startOverlay.style.display = 'flex';
-                crosshair.style.display = 'none';
-            }
+            isMouseLocked = (document.pointerLockElement === renderer.domElement);
         });
 
         document.addEventListener('mousemove', (e) => {
@@ -113,7 +135,7 @@
             }
         });
 
-        // 5. Tangentbords-inputs
+        // 5. Tangentbordskontroller för W, A, S, D och Hopp (Mellanslag)
         const keys = { w: false, a: false, s: false, d: false, space: false };
         let velocityY = 0;
         let isGrounded = true;
@@ -135,7 +157,7 @@
             if (e.code === 'Space') keys.space = false;
         });
 
-        // 6. Spelslingan (Rörelse & Fysik)
+        // 6. Spelslingan (Hanterar fysik och rörelse)
         function animate() {
             requestAnimationFrame(animate);
 
@@ -143,37 +165,39 @@
             const delta = Math.min((timeNow - lastTime) / 1000, 0.1);
             lastTime = timeNow;
 
-            if (isMouseLocked) {
-                let moveX = 0;
-                let moveZ = 0;
+            let moveX = 0;
+            let moveZ = 0;
 
-                if (keys.w) { moveX += Math.sin(cameraYAngle); moveZ += Math.cos(cameraYAngle); }
-                if (keys.s) { moveX -= Math.sin(cameraYAngle); moveZ -= Math.cos(cameraYAngle); }
-                if (keys.a) { moveX += Math.cos(cameraYAngle); moveZ -= Math.sin(cameraYAngle); }
-                if (keys.d) { moveX -= Math.cos(cameraYAngle); moveZ += Math.sin(cameraYAngle); }
+            // Räkna ut rörelseriktning utifrån vart du tittar
+            if (keys.w) { moveX += Math.sin(cameraYAngle); moveZ += Math.cos(cameraYAngle); }
+            if (keys.s) { moveX -= Math.sin(cameraYAngle); moveZ -= Math.cos(cameraYAngle); }
+            if (keys.a) { moveX += Math.cos(cameraYAngle); moveZ -= Math.sin(cameraYAngle); }
+            if (keys.d) { moveX -= Math.cos(cameraYAngle); moveZ += Math.sin(cameraYAngle); }
 
-                const speed = 16; // Gånghastighet
+            // Flytta kameran (Dig)
+            const speed = 14;
+            if (moveX !== 0 || moveZ !== 0) {
                 camera.position.x += moveX * speed * delta;
                 camera.position.z += moveZ * speed * delta;
-
-                // Tyngdkraft och Hoppstyrka
-                velocityY -= 28 * delta; 
-                camera.position.y += velocityY * delta;
-
-                if (keys.space && isGrounded) {
-                    velocityY = 11;
-                    isGrounded = false;
-                }
-
-                // Spärr så man inte faller igenom det gröna gräset
-                if (camera.position.y < 2) {
-                    camera.position.y = 2;
-                    velocityY = 0;
-                    isGrounded = true;
-                }
             }
 
-            // Uppdatera vart kameran pekar utifrån musvinklarna
+            // Gravitation och Hoppstyrka
+            velocityY -= 24 * delta; 
+            camera.position.y += velocityY * delta;
+
+            if (keys.space && isGrounded) {
+                velocityY = 11; // Ger dig ett bra och högt hopp
+                isGrounded = false;
+            }
+
+            // Hindra spelaren från att falla igenom gräset (ögonhöjd = 2 meter)
+            if (camera.position.y < 2) {
+                camera.position.y = 2;
+                velocityY = 0;
+                isGrounded = true;
+            }
+
+            // Uppdatera kamerans blick utifrån musrörelsen
             const target = new THREE.Vector3();
             target.x = camera.position.x + Math.sin(cameraYAngle) * Math.cos(cameraXAngle);
             target.z = camera.position.z + Math.cos(cameraYAngle) * Math.cos(cameraXAngle);
