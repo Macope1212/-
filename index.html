@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desert War Zone</title>
+    <title>Desert War Zone - Unblocked</title>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #000; font-family: sans-serif; user-select: none; }
-        canvas { display: block; }
+        body { margin: 0; overflow: hidden; background-color: #d5a97a; font-family: sans-serif; user-select: none; }
+        canvas { display: block; width: 100vw; height: 100vh; }
         #crosshair {
             position: absolute; top: 50%; left: 50%; width: 10px; height: 10px;
             background: white; border-radius: 50%; transform: translate(-50%, -50%);
@@ -23,125 +23,175 @@
 
     <div id="info-text">KLICKA PÅ SKÄRMEN FÖR ATT STARTA (W,A,S,D = GÅ | SPACE = HOPPA)</div>
     <div id="crosshair"></div>
-
-    <!-- Hela 3D-motorn är inbakad här på en rad så att internet inte behövs -->
-    <script src="https://pastebin.com" integrity="sha384-H4L7PZzUqU5gE3F1c7zUqU5gE3F1c7zUqU5gE3F1c7zUqU5gE3F1c7zUqU5gE3F1" crossorigin="anonymous" onerror="let s=document.createElement('script');s.src='https://jsdelivr.net;"></script>
+    <canvas id="gameCanvas"></canvas>
 
     <script>
-        window.addEventListener('load', () => {
-            if (typeof THREE === 'undefined') {
-                alert("Webbläsaren blockerar skriptet. Testa att öppna filen direkt på datorn istället!");
-                return;
-            }
+        // Inbyggd mini-3D-motor för att helt runda skolans brandvägg
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const infoText = document.getElementById('info-text');
+        const crosshair = document.getElementById('crosshair');
 
-            const scene = new THREE.Scene();
-            scene.background = new THREE.Color(0xd5a97a); 
-            scene.fog = new THREE.FogExp2(0xd5a97a, 0.025); 
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
 
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 2, 0); 
+        // Spelarens tillstånd
+        const player = { x: 0, y: 2, z: 0, yaw: 0, pitch: 0 };
+        const keys = { w: false, a: false, s: false, d: false, space: false };
+        let isMouseLocked = false, velocityY = 0, isGrounded = true, lastTime = performance.now();
 
-            const renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
+        // Generera krigshärjade ruiner och rasmassor
+        const buildings = [];
+        const colors = ['#555d50', '#3e3a36', '#7b3f00', '#4a4135', '#8b0000']; // Militärgrön, aska, rost, mörkröd
+        
+        for (let i = 0; i < 40; i++) {
+            const bx = (Math.random() - 0.5) * 150;
+            const bz = 15 + Math.random() * 150; // Placera framför startpunkten
+            if (Math.abs(bx) < 10 && Math.abs(bz) < 15) continue;
 
-            const floor = new THREE.Mesh(new THREE.PlaneGeometry(2000, 2000), new THREE.MeshBasicMaterial({ color: 0xc29d70 }));
-            floor.rotation.x = -Math.PI / 2;
-            scene.add(floor);
+            const w = 6 + Math.random() * 6;
+            const h = 8 + Math.random() * 12;
+            const d = 6 + Math.random() * 6;
+            const col = colors[Math.floor(Math.random() * colors.length)];
+            const dmg = Math.random();
 
-            const colors = [0x555d50, 0x3e3a36, 0x7b3f00, 0x4a4135, 0x8b0000]; 
-            for (let i = 0; i < 45; i++) {
-                const x = (Math.random() - 0.5) * 160;
-                const z = (Math.random() - 0.5) * 160;
-                if (Math.abs(x) < 12 && Math.abs(z) < 12) continue;
+            buildings.push({ x: bx, z: bz, w: w, h: h, d: d, color: col, dmg: dmg });
+        }
 
-                const w = 7 + Math.random() * 6, h = 8 + Math.random() * 12, d = 7 + Math.random() * 6;
-                const col = colors[Math.floor(Math.random() * colors.length)];
-                const bGroup = new THREE.Group(), dmg = Math.random(), mat = new THREE.MeshBasicMaterial({ color: col });
-
-                if (dmg > 0.4) {
-                    const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
-                    wall.position.y = h / 2; bGroup.add(wall);
-                } else if (dmg > 0.15) {
-                    const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h * 0.7, d), mat);
-                    wall.position.y = (h * 0.7) / 2; bGroup.add(wall);
-                    bGroup.rotation.z = (Math.random() - 0.5) * 0.3;
-                } else {
-                    for (let j = 0; j < 3; j++) {
-                        const rubble = new THREE.Mesh(new THREE.BoxGeometry(w * 0.6, 2, d * 0.6), new THREE.MeshBasicMaterial({ color: 0x3e3a36 }));
-                        rubble.position.set((Math.random() - 0.5) * 4, 1, (Math.random() - 0.5) * 4);
-                        bGroup.add(rubble);
-                    }
-                }
-                bGroup.position.set(x, 0, z); scene.add(bGroup);
-            }
-
-            let cameraYAngle = 0, cameraXAngle = 0, isMouseLocked = false;
-            const crosshair = document.getElementById('crosshair'), infoText = document.getElementById('info-text');
-
-            document.addEventListener('click', () => { renderer.domElement.requestPointerLock(); });
-
-            document.addEventListener('pointerlockchange', () => {
-                isMouseLocked = (document.pointerLockElement === renderer.domElement);
-                crosshair.style.display = isMouseLocked ? 'block' : 'none';
-                infoText.style.display = isMouseLocked ? 'none' : 'block';
-            });
-
-            document.addEventListener('mousemove', (e) => {
-                if (isMouseLocked) {
-                    cameraYAngle -= e.movementX * 0.002; cameraXAngle -= e.movementY * 0.002;
-                    cameraXAngle = Math.max(-Math.PI/2.2, Math.min(Math.PI/2.2, cameraXAngle));
-                }
-            });
-
-            const keys = { w: false, a: false, s: false, d: false, space: false };
-            let velocityY = 0, isGrounded = true, lastTime = performance.now();
-
-            document.addEventListener('keydown', (e) => {
-                if (e.code === 'KeyW') keys.w = true; if (e.code === 'KeyA') keys.a = true;
-                if (e.code === 'KeyS') keys.s = true; if (e.code === 'KeyD') keys.d = true;
-                if (e.code === 'Space') keys.space = true;
-            });
-            document.addEventListener('keyup', (e) => {
-                if (e.code === 'KeyW') keys.w = false; if (e.code === 'KeyA') keys.a = false;
-                if (e.code === 'KeyS') keys.s = false; if (e.code === 'KeyD') keys.d = false;
-                if (e.code === 'Space') keys.space = false;
-            });
-
-            function animate() {
-                requestAnimationFrame(animate);
-                const timeNow = performance.now();
-                const delta = Math.min((timeNow - lastTime) / 1000, 0.1);
-                lastTime = timeNow;
-
-                if (isMouseLocked) {
-                    let moveX = 0, moveZ = 0;
-                    if (keys.w) { moveX += Math.sin(cameraYAngle); moveZ += Math.cos(cameraYAngle); }
-                    if (keys.s) { moveX -= Math.sin(cameraYAngle); moveZ -= Math.cos(cameraYAngle); }
-                    if (keys.a) { moveX += Math.cos(cameraYAngle); moveZ -= Math.sin(cameraYAngle); }
-                    if (keys.d) { moveX -= Math.cos(cameraYAngle); moveZ += Math.sin(cameraYAngle); }
-
-                    camera.position.x += moveX * 16 * delta; camera.position.z += moveZ * 16 * delta;
-                    velocityY -= 28 * delta; camera.position.y += velocityY * delta;
-
-                    if (keys.space && isGrounded) { velocityY = 11; isGrounded = false; }
-                    if (camera.position.y < 2) { camera.position.y = 2; velocityY = 0; isGrounded = true; }
-                }
-
-                const target = new THREE.Vector3();
-                target.x = camera.position.x + Math.sin(cameraYAngle) * Math.cos(cameraXAngle);
-                target.z = camera.position.z + Math.cos(cameraYAngle) * Math.cos(cameraXAngle);
-                target.y = camera.position.y + Math.sin(cameraXAngle);
-                camera.lookAt(target);
-                renderer.render(scene, camera);
-            }
-
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-            animate();
+        // Interaktion & Muslåsning
+        canvas.addEventListener('click', () => { canvas.requestPointerLock(); });
+        document.addEventListener('pointerlockchange', () => {
+            isMouseLocked = (document.pointerLockElement === canvas);
+            crosshair.style.display = isMouseLocked ? 'block' : 'none';
+            infoText.style.display = isMouseLocked ? 'none' : 'block';
         });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isMouseLocked) {
+                player.yaw -= e.movementX * 0.0025;
+                player.pitch -= e.movementY * 0.0025;
+                player.pitch = Math.max(-Math.PI / 2.3, Math.min(Math.PI / 2.3, player.pitch));
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'KeyW') keys.w = true; if (e.code === 'KeyA') keys.a = true;
+            if (e.code === 'KeyS') keys.s = true; if (e.code === 'KeyD') keys.d = true;
+            if (e.code === 'Space') keys.space = true;
+        });
+        document.addEventListener('keyup', (e) => {
+            if (e.code === 'KeyW') keys.w = false; if (e.code === 'KeyA') keys.a = false;
+            if (e.code === 'KeyS') keys.s = false; if (e.code === 'KeyD') keys.d = false;
+            if (e.code === 'Space') keys.space = false;
+        });
+
+        // Matte-funktion för att projicera 3D till din 2D-skärm
+        function project(x, y, z) {
+            // Relativt till spelarens position
+            let rx = x - player.x;
+            let ry = y - player.y;
+            let rz = z - player.z;
+
+            // Rotera runt Y-axeln (Kolla vart spelaren tittar)
+            const cosY = Math.cos(-player.yaw), sinY = Math.sin(-player.yaw);
+            const rotX = rx * cosY - rz * sinY;
+            const rotZ = rx * sinY + rz * cosY;
+
+            // Rotera runt X-axeln (Titta upp/ner)
+            const cosX = Math.cos(-player.pitch), sinX = Math.sin(-player.pitch);
+            const finalY = ry * cosX - rotZ * sinX;
+            const finalZ = ry * sinX + rotZ * cosX;
+
+            if (finalZ <= 0.1) return null; // Bakom kameran
+
+            // Perspektiv-skalning
+            const fov = Math.min(canvas.width, canvas.height);
+            const screenX = (rotX / finalZ) * fov + canvas.width / 2;
+            const screenY = -(finalY / finalZ) * fov + canvas.height / 2;
+            return { x: screenX, y: screenY, depth: finalZ };
+        }
+
+        // Rit-funktion för 3D-blocken
+        function drawCube(b) {
+            const h = b.dmg > 0.4 ? b.h : b.h * 0.6; // Minska höjden på skadade hus
+            
+            // Fyrkantens 8 hörn i 3D-rymden
+            const vertices = [
+                {x: b.x - b.w/2, y: 0, z: b.z - b.d/2}, {x: b.x + b.w/2, y: 0, z: b.z - b.d/2},
+                {x: b.x + b.w/2, y: h, z: b.z - b.d/2}, {x: b.x - b.w/2, y: h, z: b.z - b.d/2},
+                {x: b.x - b.w/2, y: 0, z: b.z + b.d/2}, {x: b.x + b.w/2, y: 0, z: b.z + b.d/2},
+                {x: b.x + b.w/2, y: h, z: b.z + b.d/2}, {x: b.x - b.w/2, y: h, z: b.z + b.d/2}
+            ];
+
+            const pts = vertices.map(v => project(v.x, v.y, v.z));
+            if (pts.includes(null)) return; // Skippa om något hörn är bakom oss
+
+            // Sidor index
+            const faces = [, [1, 5, 6, 2], [5, 4, 7, 6], [4, 0, 3, 7], [3, 2, 6, 7]
+            ];
+
+            ctx.fillStyle = b.dmg < 0.15 ? '#3e3a36' : b.color; // Gör rasmassor askgrå
+            ctx.strokeStyle = '#222';
+            ctx.lineWidth = 1;
+
+            faces.forEach(face => {
+                ctx.beginPath();
+                ctx.moveTo(pts[face[0]].x, pts[face[0]].y);
+                for(let i = 1; i < 4; i++) ctx.lineTo(pts[face[i]].x, pts[face[i]].y);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            });
+        }
+
+        // Spelslingan (Fysik och Grafikuppdatering)
+        function gameLoop() {
+            requestAnimationFrame(gameLoop);
+            const timeNow = performance.now();
+            const delta = Math.min((timeNow - lastTime) / 1000, 0.1);
+            lastTime = timeNow;
+
+            if (isMouseLocked) {
+                let moveX = 0, moveZ = 0;
+                if (keys.w) { moveX += Math.sin(player.yaw); moveZ += Math.cos(player.yaw); }
+                if (keys.s) { moveX -= Math.sin(player.yaw); moveZ -= Math.cos(player.yaw); }
+                if (keys.a) { moveX += Math.cos(player.yaw); moveZ -= Math.sin(player.yaw); }
+                if (keys.d) { moveX -= Math.cos(player.yaw); moveZ += Math.sin(player.yaw); }
+
+                player.x += moveX * 14 * delta;
+                player.z += moveZ * 14 * delta;
+
+                // Gravitation & Hopp
+                velocityY -= 26 * delta;
+                player.y += velocityY * delta;
+
+                if (keys.space && isGrounded) { velocityY = 10; isGrounded = false; }
+                if (player.y < 2) { player.y = 2; velocityY = 0; isGrounded = true; }
+            }
+
+            // RENDERING (Rita ut allt på skärmen)
+            ctx.fillStyle = '#d5a97a'; // Sandfärgad bakgrund / sandstorm
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Rita horisont/markgräns
+            ctx.fillStyle = '#c29d70'; // Ökensandens mark
+            ctx.fillRect(0, canvas.height / 2 + Math.tan(player.pitch) * (canvas.height/2), canvas.width, canvas.height);
+
+            // Sortera byggnader efter avstånd (så de som är långt borta ritas först)
+            buildings.forEach(b => {
+                b.dist = Math.pow(b.x - player.x, 2) + Math.pow(b.z - player.z, 2);
+            });
+            buildings.sort((a, b) => b.dist - a.dist);
+
+            // Rita ut alla byggnader
+            buildings.forEach(b => drawCube(b));
+        }
+
+        gameLoop();
     </script>
 </body>
 </html>
