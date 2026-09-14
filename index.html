@@ -276,6 +276,126 @@
             .briefing-controls { grid-template-columns: repeat(2, 1fr); row-gap: 16px; }
         }
 
+        /* ---------- MULTIPLAYER-PANEL ---------- */
+
+        #start-overlay { cursor: default; }
+
+        .mode-select {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            position: relative;
+            padding: 15px 10px;
+            border: 1px solid var(--c-accent);
+            background: rgba(207, 106, 44, 0.12);
+            color: var(--c-parchment);
+            font-family: var(--font-display);
+            font-size: 20px;
+            letter-spacing: 2px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .mode-btn:hover {
+            background: rgba(207, 106, 44, 0.28);
+            transform: translateY(-1px);
+        }
+
+        .mode-btn:disabled {
+            opacity: 0.4;
+            cursor: default;
+            transform: none;
+        }
+
+        .mode-btn-back {
+            margin-top: 14px;
+            background: none;
+            border: none;
+            color: rgba(236, 225, 200, 0.55);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .mode-btn-back:hover {
+            color: var(--c-parchment);
+        }
+
+        .multi-panel {
+            margin-bottom: 28px;
+        }
+
+        .multi-label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: var(--c-sand);
+            margin: 0 0 10px;
+        }
+
+        .room-code {
+            font-family: var(--font-display);
+            font-size: 48px;
+            letter-spacing: 10px;
+            font-weight: 700;
+            color: var(--c-parchment);
+            border: 1px solid var(--c-line);
+            padding: 8px 0;
+            margin-bottom: 12px;
+            user-select: all;
+            cursor: text;
+        }
+
+        .join-input {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+            font-family: var(--font-display);
+            font-size: 40px;
+            letter-spacing: 10px;
+            font-weight: 700;
+            color: var(--c-parchment);
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--c-line);
+            padding: 8px 0;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+        }
+
+        .join-input:focus {
+            outline: none;
+            border-color: var(--c-accent);
+        }
+
+        .multi-status {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: rgba(236, 225, 200, 0.7);
+            min-height: 16px;
+            margin: 6px 0 14px;
+        }
+
+        .multi-status.error {
+            color: #e08a7a;
+        }
+
+        .player-count {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: var(--c-sand);
+            margin-bottom: 14px;
+        }
+
         /* ---------- MINIMAP ---------- */
 
         #minimap {
@@ -452,11 +572,42 @@
             <h1 class="briefing-title">ÖKENKRIGET</h1>
 
             <p class="briefing-sub">
-                Ruinerna är fulla av kistor med vapen och medicin. Klicka för att gå in — allt du hittar är ditt.
+                Ruinerna är fulla av kistor med vapen och medicin. Gå in själv, eller ta med ett gäng.
             </p>
 
-            <div class="briefing-cta">
-                <span class="cta-label">KLICKA FÖR ATT GÅ IN</span>
+            <div id="mode-select" class="mode-select">
+                <button type="button" class="mode-btn" id="btn-solo">SPELA SOLO</button>
+                <button type="button" class="mode-btn" id="btn-multi">MULTIPLAYER</button>
+            </div>
+
+            <div id="multi-panel" class="multi-panel" style="display:none;">
+
+                <div id="multi-sub-select">
+                    <div class="mode-select">
+                        <button type="button" class="mode-btn" id="btn-create">SKAPA GRUPP</button>
+                        <button type="button" class="mode-btn" id="btn-join">GÅ MED</button>
+                    </div>
+                    <button type="button" class="mode-btn-back" id="btn-back-1">TILLBAKA</button>
+                </div>
+
+                <div id="multi-sub-create" style="display:none;">
+                    <p class="multi-label">DIN KOD — DELA MED DINA VÄNNER</p>
+                    <div class="room-code" id="room-code-display">····</div>
+                    <p class="multi-status" id="create-status">Skapar rum...</p>
+                    <div class="player-count" id="create-player-count" style="display:none;"></div>
+                    <button type="button" class="mode-btn" id="btn-start-hosted" disabled>STARTA SPELET</button>
+                    <button type="button" class="mode-btn-back" id="btn-back-2">TILLBAKA</button>
+                </div>
+
+                <div id="multi-sub-join" style="display:none;">
+                    <p class="multi-label">ANGE KOD</p>
+                    <input type="text" id="join-code-input" maxlength="4" class="join-input" placeholder="····" autocomplete="off" autocapitalize="characters">
+                    <button type="button" class="mode-btn" id="btn-join-confirm">ANSLUT</button>
+                    <button type="button" class="mode-btn" id="btn-start-joined" style="display:none;">STARTA SPELET</button>
+                    <p class="multi-status" id="join-status"></p>
+                    <button type="button" class="mode-btn-back" id="btn-back-3">TILLBAKA</button>
+                </div>
+
             </div>
 
             <div class="briefing-controls">
@@ -512,6 +663,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
 
     <script>
         // ---------- GRUNDUPPSÄTTNING ----------
@@ -1905,7 +2057,7 @@
             [5, 85]
         ];
 
-        for (const pos of chestPositions) {
+        chestPositions.forEach((pos, chestIndex) => {
 
             const chest =
                 buildChest(
@@ -1920,7 +2072,11 @@
 
             chest.userData.mapZ =
                 pos[1];
-        }
+
+            // Stabilt index för nätverkssynk
+            chest.userData.netIndex =
+                chestIndex;
+        });
 
         // ---------- DAMMPARTIKLAR ----------
 
@@ -1977,6 +2133,762 @@
 
         scene.add(dust);
 
+        // ---------- MULTIPLAYER (PeerJS / WebRTC) ----------
+        //
+        // Stjärntopologi: den som "skapar grupp" är host och kör en egen
+        // PeerJS-peer med ett kort rumskodsnamn. Alla andra ("klienter")
+        // ansluter direkt till hosten via WebRTC. Hosten vidarebefordrar
+        // (relayar) all spelardata mellan alla anslutna klienter, så alla
+        // ser alla — utan att någon behöver hosta en egen server.
+
+        const ROOM_PREFIX = 'okenkriget-';
+
+        const remoteColors = [
+            0xe0523f, 0x4f9bd6, 0x5fd67e, 0xf2c94c,
+            0xb36fd6, 0xf29e4c, 0x4cd6c4, 0xe07bc0
+        ];
+
+        function makeRoomCode() {
+
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = '';
+
+            for (let i = 0; i < 4; i++) {
+                code += chars[Math.floor(Math.random() * chars.length)];
+            }
+
+            return code;
+        }
+
+        function buildRemotePlayerMesh(colorHex) {
+
+            const group = new THREE.Group();
+
+            const mat = new THREE.MeshStandardMaterial({
+                color: colorHex,
+                roughness: 0.8
+            });
+
+            const body = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.4, 0.45, 1.3, 8),
+                    mat
+                )
+            );
+
+            body.position.y = 1.05;
+
+            group.add(body);
+
+            const head = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.SphereGeometry(0.32, 10, 8),
+                    mat
+                )
+            );
+
+            head.position.y = 1.95;
+
+            group.add(head);
+
+            const weaponSlot = new THREE.Group();
+
+            weaponSlot.position.set(0.45, 1.35, 0);
+
+            group.add(weaponSlot);
+
+            // HP-mätare ovanför huvudet
+
+            const barCanvas = document.createElement('canvas');
+
+            barCanvas.width = 64;
+            barCanvas.height = 10;
+
+            const barTex = new THREE.CanvasTexture(barCanvas);
+
+            const barSprite = new THREE.Sprite(
+                new THREE.SpriteMaterial({
+                    map: barTex,
+                    depthTest: false
+                })
+            );
+
+            barSprite.scale.set(1.3, 0.2, 1);
+            barSprite.position.y = 2.55;
+            barSprite.renderOrder = 999;
+
+            group.add(barSprite);
+
+            function drawBar(hp) {
+
+                const ctx = barCanvas.getContext('2d');
+
+                ctx.clearRect(0, 0, 64, 10);
+
+                ctx.fillStyle = 'rgba(0,0,0,0.6)';
+                ctx.fillRect(0, 0, 64, 10);
+
+                const pct = Math.max(0, Math.min(1, hp / 100));
+
+                ctx.fillStyle = pct > 0.4 ? '#39b54a' : '#c94c3d';
+                ctx.fillRect(2, 2, (64 - 4) * pct, 6);
+
+                barTex.needsUpdate = true;
+            }
+
+            drawBar(100);
+
+            return {
+                group,
+                weaponSlot,
+                currentWeaponMesh: null,
+                drawBar
+            };
+        }
+
+        const Net = {
+
+            enabled: false,
+            peer: null,
+            isHost: false,
+            roomCode: null,
+            myId: null,
+            connections: new Map(),   // peerId -> DataConnection (host: everyone, client: just host)
+            players: new Map(),       // peerId -> { rig, targetPos, targetYaw, hp, weapon, colorHex }
+            nextStateSend: 0,
+            joinedAndReady: false,
+
+            teardown() {
+
+                if (this.peer) {
+
+                    try {
+                        this.peer.destroy();
+                    } catch (err) {}
+                }
+
+                this.peer = null;
+                this.isHost = false;
+                this.roomCode = null;
+                this.myId = null;
+                this.connections.clear();
+
+                for (const p of this.players.values()) {
+                    scene.remove(p.rig.group);
+                }
+
+                this.players.clear();
+                this.joinedAndReady = false;
+                this.enabled = false;
+
+                btnStartHostedEl.disabled = true;
+                roomCodeDisplayEl.textContent = '····';
+                createStatusEl.textContent = 'Skapar rum...';
+                createStatusEl.classList.remove('error');
+                createPlayerCountEl.style.display = 'none';
+
+                btnJoinConfirmEl.style.display = 'block';
+                btnStartJoinedEl.style.display = 'none';
+            },
+
+            hostParty() {
+
+                this.teardown();
+                this.isHost = true;
+
+                const code = makeRoomCode();
+
+                this.roomCode = code;
+
+                roomCodeDisplayEl.textContent = code;
+                createStatusEl.textContent = 'Skapar rum...';
+
+                let peer;
+
+                try {
+
+                    peer = new Peer(ROOM_PREFIX + code, {
+                        debug: 1
+                    });
+
+                } catch (err) {
+
+                    createStatusEl.textContent =
+                        'Kunde inte skapa rum. Testa igen.';
+
+                    createStatusEl.classList.add('error');
+
+                    return;
+                }
+
+                this.peer = peer;
+
+                peer.on('open', id => {
+
+                    this.myId = id;
+
+                    createStatusEl.textContent =
+                        'Rum skapat! Dela koden ' + code + ' med dina vänner.';
+
+                    btnStartHostedEl.disabled = false;
+
+                    createPlayerCountEl.style.display = 'block';
+                    createPlayerCountEl.textContent = '0 andra spelare anslutna';
+                });
+
+                peer.on('error', err => {
+
+                    console.warn('PeerJS host error', err);
+
+                    if (err && err.type === 'unavailable-id') {
+
+                        // Extremt osannolik kollision, försök igen med ny kod
+                        this.hostParty();
+                        return;
+                    }
+
+                    createStatusEl.textContent =
+                        'Nätverksfel: ' + (err && err.type ? err.type : 'okänt') + '.';
+
+                    createStatusEl.classList.add('error');
+                });
+
+                peer.on('connection', conn => {
+
+                    this._registerHostConnection(conn);
+                });
+            },
+
+            _registerHostConnection(conn) {
+
+                conn.on('open', () => {
+
+                    this.connections.set(conn.peer, conn);
+
+                    createPlayerCountEl.textContent =
+                        this.connections.size + ' andra spelare anslutna';
+
+                    // Berätta för den nya klienten om alla existerande spelare
+                    // och vilka kistor som redan är öppnade
+
+                    const existingPlayerIds =
+                        [this.myId, ...this.players.keys()];
+
+                    const openedChests = chests
+                        .filter(c => c.userData.opened)
+                        .map(c => c.userData.netIndex);
+
+                    conn.send({
+                        type: 'welcome',
+                        yourId: conn.peer,
+                        hostId: this.myId,
+                        playerIds: existingPlayerIds,
+                        openedChests
+                    });
+
+                    // Berätta för alla andra att en ny spelare gick med
+
+                    this._addRemotePlayer(conn.peer);
+
+                    this._broadcast({
+                        type: 'join',
+                        id: conn.peer
+                    }, conn.peer);
+                });
+
+                conn.on('data', data => {
+
+                    this._handleData(conn.peer, data);
+                });
+
+                conn.on('close', () => {
+
+                    this._dropConnection(conn.peer);
+                });
+
+                conn.on('error', () => {
+
+                    this._dropConnection(conn.peer);
+                });
+            },
+
+            _dropConnection(peerId) {
+
+                this.connections.delete(peerId);
+                this._removeRemotePlayer(peerId);
+
+                if (this.isHost) {
+
+                    createPlayerCountEl.textContent =
+                        this.connections.size + ' andra spelare anslutna';
+
+                    this._broadcast({
+                        type: 'leave',
+                        id: peerId
+                    }, null);
+                }
+            },
+
+            joinParty(code) {
+
+                this.teardown();
+                this.isHost = false;
+                this.roomCode = code;
+
+                let peer;
+
+                try {
+
+                    peer = new Peer({
+                        debug: 1
+                    });
+
+                } catch (err) {
+
+                    joinStatusEl.textContent = 'Kunde inte ansluta. Testa igen.';
+                    joinStatusEl.classList.add('error');
+                    return;
+                }
+
+                this.peer = peer;
+
+                peer.on('open', id => {
+
+                    this.myId = id;
+
+                    const conn = peer.connect(ROOM_PREFIX + code, {
+                        reliable: true
+                    });
+
+                    this._hostConn = conn;
+
+                    conn.on('open', () => {
+
+                        this.connections.set(conn.peer, conn);
+                    });
+
+                    conn.on('data', data => {
+
+                        this._handleData(conn.peer, data);
+                    });
+
+                    conn.on('close', () => {
+
+                        joinStatusEl.textContent =
+                            'Anslutningen till hosten bröts.';
+
+                        joinStatusEl.classList.add('error');
+
+                        this.joinedAndReady = false;
+                        this.enabled = false;
+                    });
+
+                    conn.on('error', err => {
+
+                        joinStatusEl.textContent =
+                            'Kunde inte hitta ett rum med den koden.';
+
+                        joinStatusEl.classList.add('error');
+                    });
+                });
+
+                peer.on('error', err => {
+
+                    console.warn('PeerJS client error', err);
+
+                    joinStatusEl.textContent =
+                        'Kunde inte hitta ett rum med den koden.';
+
+                    joinStatusEl.classList.add('error');
+                });
+            },
+
+            _broadcast(msg, exceptId) {
+
+                for (const [pid, conn] of this.connections.entries()) {
+
+                    if (pid === exceptId) continue;
+
+                    try {
+                        conn.send(msg);
+                    } catch (err) {}
+                }
+            },
+
+            _sendToHost(msg) {
+
+                if (this._hostConn) {
+
+                    try {
+                        this._hostConn.send(msg);
+                    } catch (err) {}
+                }
+            },
+
+            _sendToPlayer(playerId, msg) {
+
+                const conn = this.connections.get(playerId);
+
+                if (conn) {
+
+                    try {
+                        conn.send(msg);
+                    } catch (err) {}
+                }
+            },
+
+            _addRemotePlayer(id) {
+
+                if (this.players.has(id) || id === this.myId) return;
+
+                const colorHex = colorForId(id);
+
+                const rig = buildRemotePlayerMesh(colorHex);
+
+                scene.add(rig.group);
+
+                this.players.set(id, {
+                    rig,
+                    targetPos: new THREE.Vector3(0, 2, 0),
+                    targetYaw: 0,
+                    hp: 100,
+                    weapon: null,
+                    colorHex
+                });
+            },
+
+            _removeRemotePlayer(id) {
+
+                const p = this.players.get(id);
+
+                if (p) {
+
+                    scene.remove(p.rig.group);
+                    this.players.delete(id);
+                }
+            },
+
+            _setRemoteWeapon(id, weaponType) {
+
+                const p = this.players.get(id);
+
+                if (!p) return;
+
+                if (p.weapon === weaponType) return;
+
+                p.weapon = weaponType;
+
+                if (p.rig.currentWeaponMesh) {
+
+                    p.rig.weaponSlot.remove(p.rig.currentWeaponMesh);
+                    p.rig.currentWeaponMesh = null;
+                }
+
+                if (weaponType === 'Pistol') {
+
+                    p.rig.currentWeaponMesh = createPistol();
+                    p.rig.currentWeaponMesh.scale.set(0.8, 0.8, 0.8);
+                    p.rig.weaponSlot.add(p.rig.currentWeaponMesh);
+
+                } else if (weaponType === 'AR') {
+
+                    p.rig.currentWeaponMesh = createAR();
+                    p.rig.currentWeaponMesh.scale.set(0.8, 0.8, 0.8);
+                    p.rig.weaponSlot.add(p.rig.currentWeaponMesh);
+                }
+            },
+
+            _handleData(fromId, data) {
+
+                if (!data || !data.type) return;
+
+                switch (data.type) {
+
+                    case 'welcome': {
+
+                        // Endast klienter tar emot detta
+
+                        for (const id of data.playerIds) {
+
+                            this._addRemotePlayer(id);
+                        }
+
+                        for (const idx of data.openedChests) {
+
+                            const chest = chests.find(
+                                c => c.userData.netIndex === idx
+                            );
+
+                            if (chest) {
+                                openChest(chest, true);
+                            }
+                        }
+
+                        this.joinedAndReady = true;
+
+                        joinStatusEl.textContent =
+                            'Ansluten! Redo att gå in.';
+
+                        joinStatusEl.classList.remove('error');
+
+                        this.enabled = true;
+
+                        btnJoinConfirmEl.style.display = 'none';
+                        btnStartJoinedEl.style.display = 'block';
+
+                        break;
+                    }
+
+                    case 'join': {
+
+                        this._addRemotePlayer(data.id);
+
+                        break;
+                    }
+
+                    case 'leave': {
+
+                        this._removeRemotePlayer(data.id);
+
+                        break;
+                    }
+
+                    case 'state': {
+
+                        // Om vi är host: relaya vidare till alla andra klienter
+
+                        if (this.isHost) {
+                            this._broadcast(data, fromId);
+                        }
+
+                        let p = this.players.get(data.id);
+
+                        if (!p) {
+
+                            this._addRemotePlayer(data.id);
+
+                            p = this.players.get(data.id);
+                        }
+
+                        if (p) {
+
+                            p.targetPos.set(data.x, data.y, data.z);
+                            p.targetYaw = data.ry;
+                            p.hp = data.hp;
+                            p.rig.drawBar(data.hp);
+
+                            this._setRemoteWeapon(data.id, data.weapon);
+                        }
+
+                        break;
+                    }
+
+                    case 'shoot': {
+
+                        if (this.isHost) {
+                            this._broadcast(data, fromId);
+                        }
+
+                        spawnRemoteTracer(data);
+
+                        break;
+                    }
+
+                    case 'chestOpen': {
+
+                        if (this.isHost) {
+                            this._broadcast(data, fromId);
+                        }
+
+                        const chest = chests.find(
+                            c => c.userData.netIndex === data.index
+                        );
+
+                        if (chest && !chest.userData.opened) {
+                            openChest(chest, true);
+                        }
+
+                        break;
+                    }
+
+                    case 'damage': {
+
+                        if (this.isHost && data.targetId !== this.myId) {
+
+                            // Rutta skadan till rätt klient
+                            this._sendToPlayer(data.targetId, data);
+                            break;
+                        }
+
+                        if (data.targetId === this.myId) {
+
+                            playerHP -= data.amount;
+                            updateHealth();
+                        }
+
+                        break;
+                    }
+                }
+            },
+
+            sendState() {
+
+                if (!this.enabled) return;
+
+                const now = performance.now();
+
+                if (now < this.nextStateSend) return;
+
+                this.nextStateSend = now + 60; // ~16 gånger per sekund
+
+                const msg = {
+                    type: 'state',
+                    id: this.myId,
+                    x: camera.position.x,
+                    y: camera.position.y,
+                    z: camera.position.z,
+                    ry: cameraYAngle,
+                    hp: playerHP,
+                    weapon: currentWeapon
+                };
+
+                if (this.isHost) {
+
+                    this._broadcast(msg, null);
+
+                } else {
+
+                    this._sendToHost(msg);
+                }
+            },
+
+            sendShoot(origin, dir) {
+
+                if (!this.enabled) return;
+
+                const msg = {
+                    type: 'shoot',
+                    id: this.myId,
+                    ox: origin.x, oy: origin.y, oz: origin.z,
+                    dx: dir.x, dy: dir.y, dz: dir.z
+                };
+
+                if (this.isHost) {
+
+                    this._broadcast(msg, null);
+
+                } else {
+
+                    this._sendToHost(msg);
+                }
+            },
+
+            sendChestOpen(index) {
+
+                if (!this.enabled) return;
+
+                const msg = { type: 'chestOpen', index };
+
+                if (this.isHost) {
+
+                    this._broadcast(msg, null);
+
+                } else {
+
+                    this._sendToHost(msg);
+                }
+            },
+
+            sendDamage(targetId, amount) {
+
+                if (!this.enabled) return;
+
+                const msg = {
+                    type: 'damage',
+                    targetId,
+                    amount,
+                    fromId: this.myId
+                };
+
+                if (this.isHost) {
+
+                    if (targetId === this.myId) {
+
+                        playerHP -= amount;
+                        updateHealth();
+
+                    } else {
+
+                        this._sendToPlayer(targetId, msg);
+                    }
+
+                } else {
+
+                    this._sendToHost(msg);
+                }
+            },
+
+            updateRemotePlayers(delta) {
+
+                if (this.players.size === 0) return;
+
+                for (const p of this.players.values()) {
+
+                    p.rig.group.position.lerp(p.targetPos, Math.min(1, delta * 10));
+
+                    let yawDiff = p.targetYaw - p.rig.group.rotation.y;
+
+                    while (yawDiff > Math.PI) yawDiff -= Math.PI * 2;
+                    while (yawDiff < -Math.PI) yawDiff += Math.PI * 2;
+
+                    p.rig.group.rotation.y += yawDiff * Math.min(1, delta * 10);
+                }
+            }
+        };
+
+        function hashCode(str) {
+
+            let hash = 0;
+
+            for (let i = 0; i < str.length; i++) {
+
+                hash = (hash << 5) - hash + str.charCodeAt(i);
+                hash |= 0;
+            }
+
+            return hash;
+        }
+
+        function colorForId(id) {
+
+            return remoteColors[Math.abs(hashCode(id)) % remoteColors.length];
+        }
+
+        function spawnRemoteTracer(data) {
+
+            const origin = new THREE.Vector3(data.ox, data.oy, data.oz);
+
+            const dir = new THREE.Vector3(data.dx, data.dy, data.dz);
+
+            const endPoint = origin.clone().add(dir.clone().multiplyScalar(100));
+
+            const geometry = new THREE.BufferGeometry().setFromPoints([
+                origin,
+                endPoint
+            ]);
+
+            const tracer = new THREE.Line(geometry, tracerMaterial);
+
+            scene.add(tracer);
+
+            setTimeout(() => {
+
+                scene.remove(tracer);
+                geometry.dispose();
+
+            }, 35);
+        }
+
         // ---------- KONTROLLER ----------
 
         let cameraYAngle = 0;
@@ -2029,14 +2941,133 @@
         startOverlay.style.display =
             'flex';
 
-        startOverlay.addEventListener(
-            'click',
-            () => {
+        // ---------- MENYNAVIGERING ----------
 
-                renderer.domElement.requestPointerLock();
+        const modeSelectEl = document.getElementById('mode-select');
+        const multiPanelEl = document.getElementById('multi-panel');
+        const multiSubSelectEl = document.getElementById('multi-sub-select');
+        const multiSubCreateEl = document.getElementById('multi-sub-create');
+        const multiSubJoinEl = document.getElementById('multi-sub-join');
 
+        const roomCodeDisplayEl = document.getElementById('room-code-display');
+        const createStatusEl = document.getElementById('create-status');
+        const createPlayerCountEl = document.getElementById('create-player-count');
+        const btnStartHostedEl = document.getElementById('btn-start-hosted');
+
+        const joinCodeInputEl = document.getElementById('join-code-input');
+        const joinStatusEl = document.getElementById('join-status');
+        const btnJoinConfirmEl = document.getElementById('btn-join-confirm');
+        const btnStartJoinedEl = document.getElementById('btn-start-joined');
+
+        btnStartJoinedEl.addEventListener('click', () => {
+
+            enterGame();
+        });
+
+        function showPanel(panel) {
+
+            modeSelectEl.style.display = panel === 'mode' ? 'flex' : 'none';
+            multiPanelEl.style.display = panel === 'mode' ? 'none' : 'block';
+
+            multiSubSelectEl.style.display = panel === 'multi-select' ? 'block' : 'none';
+            multiSubCreateEl.style.display = panel === 'multi-create' ? 'block' : 'none';
+            multiSubJoinEl.style.display = panel === 'multi-join' ? 'block' : 'none';
+        }
+
+        function enterGame() {
+
+            renderer.domElement.requestPointerLock();
+        }
+
+        // Solo
+
+        document.getElementById('btn-solo').addEventListener('click', () => {
+
+            Net.enabled = false;
+            enterGame();
+        });
+
+        // In i multiplayer-vyn
+
+        document.getElementById('btn-multi').addEventListener('click', () => {
+
+            showPanel('multi-select');
+        });
+
+        document.getElementById('btn-back-1').addEventListener('click', () => {
+
+            showPanel('mode');
+        });
+
+        document.getElementById('btn-back-2').addEventListener('click', () => {
+
+            Net.teardown();
+            showPanel('multi-select');
+        });
+
+        document.getElementById('btn-back-3').addEventListener('click', () => {
+
+            Net.teardown();
+            joinStatusEl.textContent = '';
+            joinStatusEl.classList.remove('error');
+            showPanel('multi-select');
+        });
+
+        // Skapa grupp
+
+        document.getElementById('btn-create').addEventListener('click', () => {
+
+            showPanel('multi-create');
+            Net.hostParty();
+        });
+
+        btnStartHostedEl.addEventListener('click', () => {
+
+            Net.enabled = true;
+            enterGame();
+        });
+
+        // Gå med i grupp
+
+        document.getElementById('btn-join').addEventListener('click', () => {
+
+            showPanel('multi-join');
+            joinCodeInputEl.value = '';
+            joinStatusEl.textContent = '';
+            joinStatusEl.classList.remove('error');
+            joinCodeInputEl.focus();
+        });
+
+        joinCodeInputEl.addEventListener('input', () => {
+
+            joinCodeInputEl.value = joinCodeInputEl.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        });
+
+        joinCodeInputEl.addEventListener('keydown', e => {
+
+            if (e.code === 'Enter') {
+                btnJoinConfirmEl.click();
             }
-        );
+        });
+
+        btnJoinConfirmEl.addEventListener('click', () => {
+
+            const code = joinCodeInputEl.value.trim();
+
+            if (code.length < 4) {
+
+                joinStatusEl.textContent = 'Ange en 4-teckens kod.';
+                joinStatusEl.classList.add('error');
+                return;
+            }
+
+            joinStatusEl.textContent = 'Ansluter...';
+            joinStatusEl.classList.remove('error');
+
+            Net.joinParty(code);
+        });
+
+        let gameStarted = false;
 
         document.addEventListener(
             'pointerlockchange',
@@ -2055,6 +3086,35 @@
                     isMouseLocked
                         ? 'block'
                         : 'none';
+
+                if (isMouseLocked && !gameStarted) {
+
+                    gameStarted = true;
+
+                    modeSelectEl.style.display = 'none';
+                    multiPanelEl.style.display = 'none';
+
+                    const briefingControlsEl =
+                        document.querySelector('.briefing-controls');
+
+                    if (briefingControlsEl) {
+                        briefingControlsEl.style.display = 'none';
+                    }
+
+                    const resumeCta =
+                        document.createElement('div');
+
+                    resumeCta.className = 'briefing-cta';
+                    resumeCta.innerHTML =
+                        '<span class="cta-label">KLICKA FÖR ATT FORTSÄTTA</span>';
+
+                    resumeCta.addEventListener(
+                        'click',
+                        enterGame
+                    );
+
+                    document.querySelector('.briefing').appendChild(resumeCta);
+                }
             }
         );
 
@@ -2529,7 +3589,7 @@
             return closest;
         }
 
-        function openChest(chest) {
+        function openChest(chest, fromNetwork) {
 
             if (
                 !chest ||
@@ -2551,6 +3611,11 @@
                 -0.35;
 
             spawnChestLoot(chest);
+
+            if (!fromNetwork) {
+
+                Net.sendChestOpen(chest.userData.netIndex);
+            }
 
             interaction.style.display =
                 'none';
@@ -2759,6 +3824,44 @@
                 35
             );
 
+            Net.sendShoot(camera.position, shootDirection);
+
+            // Träffkontroll mot andra spelare (multiplayer)
+
+            if (Net.enabled && Net.players.size > 0) {
+
+                const groupToId = new Map();
+                const hitBoxes = [];
+
+                for (const [pid, p] of Net.players.entries()) {
+
+                    groupToId.set(p.rig.group, pid);
+                    hitBoxes.push(p.rig.group);
+                }
+
+                const intersections =
+                    raycaster.intersectObjects(hitBoxes, true);
+
+                if (intersections.length > 0 && intersections[0].distance < 80) {
+
+                    let hitRoot = intersections[0].object;
+
+                    while (hitRoot && !groupToId.has(hitRoot)) {
+                        hitRoot = hitRoot.parent;
+                    }
+
+                    const hitId = hitRoot ? groupToId.get(hitRoot) : null;
+
+                    if (hitId) {
+
+                        const damage =
+                            currentWeapon === 'AR' ? 12 : 22;
+
+                        Net.sendDamage(hitId, damage);
+                    }
+                }
+            }
+
             // Olika eldhastighet
 
             if (
@@ -2816,708 +3919,4 @@
                 if (e.code === 'KeyD')
                     keys.d = true;
 
-                if (e.code === 'Space')
-                    keys.space = true;
-
-                if (e.code === 'KeyE') {
-
-                    keys.e = true;
-
-                    if (
-                        !chestHoldStart
-                    ) {
-
-                        chestHoldStart =
-                            performance.now();
-
-                        chestOpenedThisHold =
-                            false;
-                    }
-                }
-
-                if (
-                    e.code === 'Digit1'
-                ) useSlot(0);
-
-                if (
-                    e.code === 'Digit2'
-                ) useSlot(1);
-
-                if (
-                    e.code === 'Digit3'
-                ) useSlot(2);
-
-                if (
-                    e.code === 'Digit4'
-                ) useSlot(3);
-
-                if (
-                    e.code === 'Digit5'
-                ) useSlot(4);
-            }
-        );
-
-        document.addEventListener(
-            'keyup',
-            e => {
-
-                if (e.code === 'KeyW')
-                    keys.w = false;
-
-                if (e.code === 'KeyA')
-                    keys.a = false;
-
-                if (e.code === 'KeyS')
-                    keys.s = false;
-
-                if (e.code === 'KeyD')
-                    keys.d = false;
-
-                if (e.code === 'Space')
-                    keys.space = false;
-
-                if (e.code === 'KeyE') {
-
-                    keys.e = false;
-
-                    chestHoldStart =
-                        0;
-
-                    chestOpenedThisHold =
-                        false;
-
-                    interactionFill.style.width =
-                        '0%';
-                }
-            }
-        );
-
-        // ---------- MINIMAP ----------
-
-        const minimap =
-            document.getElementById(
-                'minimap'
-            );
-
-        const minimapCtx =
-            minimap.getContext(
-                '2d'
-            );
-
-        const minimapSize =
-            180;
-
-        function worldToMinimapX(x) {
-
-            return (
-                (x + MAP_BOUNDARY) /
-                (MAP_BOUNDARY * 2) *
-                minimapSize
-            );
-        }
-
-        function worldToMinimapZ(z) {
-
-            return (
-                (z + MAP_BOUNDARY) /
-                (MAP_BOUNDARY * 2) *
-                minimapSize
-            );
-        }
-
-        function drawMinimap() {
-
-            minimapCtx.clearRect(
-                0,
-                0,
-                minimapSize,
-                minimapSize
-            );
-
-            // Sand
-
-            minimapCtx.fillStyle =
-                '#b99a68';
-
-            minimapCtx.fillRect(
-                0,
-                0,
-                minimapSize,
-                minimapSize
-            );
-
-            // Rutnät
-
-            minimapCtx.strokeStyle =
-                'rgba(70,55,35,0.18)';
-
-            minimapCtx.lineWidth = 1;
-
-            for (
-                let i = 1;
-                i < 10;
-                i++
-            ) {
-
-                const p =
-                    i *
-                    minimapSize /
-                    10;
-
-                minimapCtx.beginPath();
-
-                minimapCtx.moveTo(
-                    p,
-                    0
-                );
-
-                minimapCtx.lineTo(
-                    p,
-                    minimapSize
-                );
-
-                minimapCtx.stroke();
-
-                minimapCtx.beginPath();
-
-                minimapCtx.moveTo(
-                    0,
-                    p
-                );
-
-                minimapCtx.lineTo(
-                    minimapSize,
-                    p
-                );
-
-                minimapCtx.stroke();
-            }
-
-            // Alla byggnader
-
-            minimapCtx.fillStyle =
-                '#40372d';
-
-            for (
-                const c of buildingColliders
-            ) {
-
-                const px =
-                    worldToMinimapX(
-                        c.x
-                    );
-
-                const pz =
-                    worldToMinimapZ(
-                        c.z
-                    );
-
-                const width =
-                    Math.max(
-                        2,
-                        (c.halfW * 2) /
-                        (MAP_BOUNDARY * 2) *
-                        minimapSize
-                    );
-
-                const depth =
-                    Math.max(
-                        2,
-                        (c.halfD * 2) /
-                        (MAP_BOUNDARY * 2) *
-                        minimapSize
-                    );
-
-                minimapCtx.fillRect(
-                    px - width / 2,
-                    pz - depth / 2,
-                    width,
-                    depth
-                );
-            }
-
-            // Kistor
-
-            for (
-                const chest of chests
-            ) {
-
-                if (
-                    chest.userData.opened
-                ) {
-                    continue;
-                }
-
-                const px =
-                    worldToMinimapX(
-                        chest.position.x
-                    );
-
-                const pz =
-                    worldToMinimapZ(
-                        chest.position.z
-                    );
-
-                minimapCtx.fillStyle =
-                    '#d39b35';
-
-                minimapCtx.fillRect(
-                    px - 2,
-                    pz - 2,
-                    5,
-                    5
-                );
-            }
-
-            // Spelare
-
-            const playerX =
-                worldToMinimapX(
-                    camera.position.x
-                );
-
-            const playerZ =
-                worldToMinimapZ(
-                    camera.position.z
-                );
-
-            minimapCtx.beginPath();
-
-            minimapCtx.arc(
-                playerX,
-                playerZ,
-                5,
-                0,
-                Math.PI * 2
-            );
-
-            minimapCtx.fillStyle =
-                '#e53935';
-
-            minimapCtx.fill();
-
-            minimapCtx.strokeStyle =
-                '#ffffff';
-
-            minimapCtx.lineWidth = 2;
-
-            minimapCtx.stroke();
-
-            // Spelarens riktning
-
-            const directionLength =
-                10;
-
-            const directionX =
-                Math.sin(
-                    cameraYAngle
-                ) *
-                directionLength;
-
-            const directionZ =
-                Math.cos(
-                    cameraYAngle
-                ) *
-                directionLength;
-
-            minimapCtx.beginPath();
-
-            minimapCtx.moveTo(
-                playerX,
-                playerZ
-            );
-
-            minimapCtx.lineTo(
-                playerX + directionX,
-                playerZ + directionZ
-            );
-
-            minimapCtx.strokeStyle =
-                '#ffffff';
-
-            minimapCtx.lineWidth = 2;
-
-            minimapCtx.stroke();
-
-            // Tydlig ram
-
-            minimapCtx.strokeStyle =
-                '#fff0c7';
-
-            minimapCtx.lineWidth = 2;
-
-            minimapCtx.strokeRect(
-                1,
-                1,
-                minimapSize - 2,
-                minimapSize - 2
-            );
-        }
-
-        // ---------- ANIMATIONSLOOP ----------
-
-        function animate() {
-
-            requestAnimationFrame(
-                animate
-            );
-
-            const timeNow =
-                performance.now();
-
-            const delta =
-                Math.min(
-                    (timeNow - lastTime) /
-                    1000,
-                    0.1
-                );
-
-            lastTime =
-                timeNow;
-
-            if (isMouseLocked) {
-
-                let moveX = 0;
-                let moveZ = 0;
-
-                if (keys.w) {
-
-                    moveX +=
-                        Math.sin(
-                            cameraYAngle
-                        );
-
-                    moveZ +=
-                        Math.cos(
-                            cameraYAngle
-                        );
-                }
-
-                if (keys.s) {
-
-                    moveX -=
-                        Math.sin(
-                            cameraYAngle
-                        );
-
-                    moveZ -=
-                        Math.cos(
-                            cameraYAngle
-                        );
-                }
-
-                if (keys.a) {
-
-                    moveX +=
-                        Math.cos(
-                            cameraYAngle
-                        );
-
-                    moveZ -=
-                        Math.sin(
-                            cameraYAngle
-                        );
-                }
-
-                if (keys.d) {
-
-                    moveX -=
-                        Math.cos(
-                            cameraYAngle
-                        );
-
-                    moveZ +=
-                        Math.sin(
-                            cameraYAngle
-                        );
-                }
-
-                const speed =
-                    15 * delta;
-
-                const newX =
-                    camera.position.x +
-                    moveX * speed;
-
-                const newZ =
-                    camera.position.z +
-                    moveZ * speed;
-
-                // Kollisionskontroll separat
-                // för X och Z så man inte fastnar
-
-                if (
-                    canMoveTo(
-                        newX,
-                        camera.position.z
-                    )
-                ) {
-
-                    camera.position.x =
-                        newX;
-                }
-
-                if (
-                    canMoveTo(
-                        camera.position.x,
-                        newZ
-                    )
-                ) {
-
-                    camera.position.z =
-                        newZ;
-                }
-
-                velocityY -=
-                    28 * delta;
-
-                camera.position.y +=
-                    velocityY * delta;
-
-                if (
-                    keys.space &&
-                    isGrounded
-                ) {
-
-                    velocityY = 11;
-                    isGrounded = false;
-                }
-
-                if (
-                    camera.position.y < 2
-                ) {
-
-                    camera.position.y = 2;
-                    velocityY = 0;
-                    isGrounded = true;
-                }
-
-                // Liten "bob"-rörelse på vapnet man håller
-
-                const activeViewmodel =
-                    currentWeapon === 'Pistol'
-                        ? viewmodelPistol
-                        : currentWeapon === 'AR'
-                        ? viewmodelAR
-                        : null;
-
-                if (activeViewmodel) {
-
-                    const walking =
-                        (keys.w ||
-                        keys.a ||
-                        keys.s ||
-                        keys.d) &&
-                        isGrounded;
-
-                    viewmodelBobT +=
-                        delta *
-                        (walking ? 9 : 2);
-
-                    const bobAmount =
-                        walking
-                            ? 0.02
-                            : 0.006;
-
-                    const base =
-                        activeViewmodel.userData.basePos;
-
-                    activeViewmodel.position.y =
-                        base.y +
-                        Math.sin(
-                            viewmodelBobT
-                        ) *
-                        bobAmount;
-
-                    activeViewmodel.position.x =
-                        base.x +
-                        Math.cos(
-                            viewmodelBobT * 0.5
-                        ) *
-                        bobAmount * 0.5;
-                }
-            }
-
-            // ---------- KISTA E ----------
-
-            nearbyChest =
-                findNearbyChest();
-
-            if (
-                nearbyChest &&
-                keys.e &&
-                !nearbyChest.userData.opened
-            ) {
-
-                interaction.style.display =
-                    'block';
-
-                if (!chestHoldStart) {
-
-                    chestHoldStart =
-                        performance.now();
-                }
-
-                const heldFor =
-                    performance.now() -
-                    chestHoldStart;
-
-                const progress =
-                    Math.min(
-                        100,
-                        heldFor / 1000 * 100
-                    );
-
-                interactionFill.style.width =
-                    progress + '%';
-
-                if (
-                    heldFor >= 1000 &&
-                    !chestOpenedThisHold
-                ) {
-
-                    chestOpenedThisHold =
-                        true;
-
-                    openChest(
-                        nearbyChest
-                    );
-                }
-
-            } else if (!nearbyChest) {
-
-                interaction.style.display =
-                    'none';
-
-                interactionFill.style.width =
-                    '0%';
-
-                chestHoldStart =
-                    0;
-
-            } else if (!keys.e) {
-
-                interaction.style.display =
-                    'block';
-
-                interactionFill.style.width =
-                    '0%';
-
-                chestHoldStart =
-                    0;
-            }
-
-            // ---------- PICKUP AV SAKER ----------
-
-            pickUpNearbyItem();
-
-            // ---------- DAMM ----------
-
-            const pos =
-                dustGeo.attributes.position;
-
-            for (
-                let i = 0;
-                i < dustCount;
-                i++
-            ) {
-
-                pos.array[i * 3] +=
-                    0.15 *
-                    delta *
-                    10;
-
-                pos.array[i * 3 + 1] -=
-                    0.02 *
-                    delta *
-                    10;
-
-                if (
-                    pos.array[i * 3 + 1] <
-                    0
-                ) {
-
-                    pos.array[i * 3 + 1] =
-                        18;
-                }
-
-                if (
-                    pos.array[i * 3] >
-                    camera.position.x +
-                    100
-                ) {
-
-                    pos.array[i * 3] =
-                        camera.position.x -
-                        100;
-                }
-            }
-
-            pos.needsUpdate = true;
-
-            // ---------- KAMERA ----------
-
-            const target =
-                lookTarget;
-
-            target.x =
-                camera.position.x +
-                Math.sin(
-                    cameraYAngle
-                ) *
-                Math.cos(
-                    cameraXAngle
-                );
-
-            target.z =
-                camera.position.z +
-                Math.cos(
-                    cameraYAngle
-                ) *
-                Math.cos(
-                    cameraXAngle
-                );
-
-            target.y =
-                camera.position.y +
-                Math.sin(
-                    cameraXAngle
-                );
-
-            camera.lookAt(
-                target
-            );
-
-            // ---------- MINIMAP ----------
-
-            drawMinimap();
-
-            renderer.render(
-                scene,
-                camera
-            );
-        }
-
-        window.addEventListener(
-            'resize',
-            () => {
-
-                camera.aspect =
-                    window.innerWidth /
-                    window.innerHeight;
-
-                camera.updateProjectionMatrix();
-
-                renderer.setSize(
-                    window.innerWidth,
-                    window.innerHeight
-                );
-            }
-        );
-
-        animate();
-
-    </script>
-
-</body>
-</html>
+  
