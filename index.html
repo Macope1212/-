@@ -4,72 +4,245 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Desert War Zone</title>
+
     <style>
-        body { margin: 0; overflow: hidden; background-color: #000; font-family: sans-serif; user-select: none; }
-        canvas { display: block; }
-        #crosshair {
-            position: absolute; top: 50%; left: 50%; width: 10px; height: 10px;
-            margin: -5px 0 0 -5px;
-            pointer-events: none; opacity: 0.9; z-index: 10; display: none;
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+            font-family: sans-serif;
+            user-select: none;
         }
-        #crosshair::before, #crosshair::after {
-            content: ""; position: absolute; background: #fff;
+
+        canvas {
+            display: block;
+        }
+
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            margin: -5px 0 0 -5px;
+            pointer-events: none;
+            opacity: 0.9;
+            z-index: 10;
+            display: none;
+        }
+
+        #crosshair::before,
+        #crosshair::after {
+            content: "";
+            position: absolute;
+            background: #fff;
             box-shadow: 0 0 2px rgba(0,0,0,0.8);
         }
-        #crosshair::before { left: 4px; top: 0; width: 2px; height: 10px; }
-        #crosshair::after { top: 4px; left: 0; width: 10px; height: 2px; }
 
-        /* ---------- MINI MAP ---------- */
+        #crosshair::before {
+            left: 4px;
+            top: 0;
+            width: 2px;
+            height: 10px;
+        }
+
+        #crosshair::after {
+            top: 4px;
+            left: 0;
+            width: 10px;
+            height: 2px;
+        }
+
+        #start-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(60,40,20,0.85), rgba(0,0,0,0.95));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            color: white;
+            cursor: pointer;
+        }
+
+        .start-text {
+            padding: 20px 40px;
+            font-size: 24px;
+            font-weight: bold;
+            background: #d35400;
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hint {
+            margin-top: 18px;
+            font-size: 13px;
+            opacity: 0.7;
+            letter-spacing: 1px;
+        }
+
+        #loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            color: #d35400;
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+
+        /* ---------- MINIMAP ---------- */
+
         #minimap {
             position: absolute;
             top: 15px;
             right: 15px;
             width: 180px;
             height: 180px;
-            background: rgba(45, 35, 25, 0.88);
-            border: 3px solid rgba(255, 230, 190, 0.85);
+            background: #b99a68;
+            border: 3px solid rgba(255, 230, 190, 0.95);
             border-radius: 8px;
             z-index: 20;
             pointer-events: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.55);
         }
 
-        #start-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, rgba(60,40,20,0.85), rgba(0,0,0,0.95));
-            display: flex; flex-direction: column; justify-content: center;
-            align-items: center; z-index: 100; color: white; cursor: pointer;
+        /* ---------- HP ---------- */
+
+        #health-ui {
+            position: absolute;
+            left: 20px;
+            bottom: 20px;
+            width: 260px;
+            z-index: 20;
+            pointer-events: none;
         }
-        .start-text {
-            padding: 20px 40px; font-size: 24px; font-weight: bold; background: #d35400;
-            border-radius: 10px; box-shadow: 0 5px 25px rgba(0,0,0,0.6); text-transform: uppercase;
-            letter-spacing: 1px;
+
+        #health-label {
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 3px #000;
         }
-        .hint { margin-top: 18px; font-size: 13px; opacity: 0.7; letter-spacing: 1px; }
-        #loading {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; display: flex; justify-content: center; align-items: center;
-            z-index: 200; color: #d35400; font-size: 18px; letter-spacing: 2px;
+
+        #health-bar-bg {
+            width: 100%;
+            height: 22px;
+            background: rgba(0,0,0,0.65);
+            border: 2px solid white;
+            border-radius: 5px;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        #health-bar {
+            width: 100%;
+            height: 100%;
+            background: #39b54a;
+            transition: width 0.12s linear;
+        }
+
+        /* ---------- INTERACTION ---------- */
+
+        #interaction {
+            position: absolute;
+            left: 50%;
+            bottom: 27%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 17px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px #000;
+            z-index: 25;
+            pointer-events: none;
+            display: none;
+            text-align: center;
+        }
+
+        #interaction-progress {
+            width: 190px;
+            height: 8px;
+            margin-top: 7px;
+            background: rgba(0,0,0,0.7);
+            border: 1px solid white;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        #interaction-fill {
+            width: 0%;
+            height: 100%;
+            background: #e6b84f;
+        }
+
+        /* ---------- WEAPON UI ---------- */
+
+        #weapon-ui {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            text-shadow: 2px 2px 4px #000;
+            z-index: 20;
+            pointer-events: none;
+            text-align: right;
         }
     </style>
 </head>
+
 <body>
 
     <div id="loading">LADDAR ÖKENSTAD...</div>
 
     <div id="start-overlay" style="display:none;">
         <div class="start-text">STARTA ÖKENKRIGET (KLICKA HÄR)</div>
-        <div class="hint">WASD för att röra dig &nbsp;·&nbsp; MELLANSLAG för att hoppa &nbsp;·&nbsp; MUS för att titta</div>
+        <div class="hint">
+            WASD för att röra dig · MELLANSLAG för att hoppa · MUS för att titta · VÄNSTERKLICK för att skjuta
+        </div>
     </div>
 
     <div id="crosshair"></div>
 
     <canvas id="minimap" width="180" height="180"></canvas>
 
+    <div id="interaction">
+        HÅLL E FÖR ATT ÖPPNA KISTAN
+        <div id="interaction-progress">
+            <div id="interaction-fill"></div>
+        </div>
+    </div>
+
+    <div id="health-ui">
+        <div id="health-label">HP: 100 / 100</div>
+        <div id="health-bar-bg">
+            <div id="health-bar"></div>
+        </div>
+    </div>
+
+    <div id="weapon-ui">
+        Vapen: Händer
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
         // ---------- GRUNDUPPSÄTTNING ----------
+
         const scene = new THREE.Scene();
 
         const camera = new THREE.PerspectiveCamera(
@@ -92,7 +265,14 @@
 
         document.body.appendChild(renderer.domElement);
 
+        const lookTarget = new THREE.Vector3();
+
+        // ---------- OSYNLIG MAP-GRÄNS ----------
+
+        const MAP_BOUNDARY = 100;
+
         // ---------- HIMMEL ----------
+
         function createSkyTexture() {
             const canvas = document.createElement('canvas');
 
@@ -112,7 +292,6 @@
             ctx.fillRect(0, 0, 2, 256);
 
             const tex = new THREE.CanvasTexture(canvas);
-
             tex.magFilter = THREE.LinearFilter;
 
             return tex;
@@ -131,6 +310,7 @@
         scene.fog = new THREE.FogExp2(0xd8b788, 0.016);
 
         // ---------- SOL ----------
+
         const sunSprite = new THREE.Sprite(
             new THREE.SpriteMaterial({
                 color: 0xfff4d6,
@@ -146,6 +326,7 @@
         scene.add(sunSprite);
 
         // ---------- LJUS ----------
+
         const sun = new THREE.DirectionalLight(0xffe9c4, 1.3);
 
         sun.position.set(-150, 90, -250);
@@ -157,8 +338,8 @@
         sun.shadow.camera.right = 120;
         sun.shadow.camera.top = 120;
         sun.shadow.camera.bottom = -120;
-
         sun.shadow.camera.far = 500;
+
         sun.shadow.bias = -0.0015;
 
         scene.add(sun);
@@ -179,6 +360,7 @@
         scene.add(ambient);
 
         // ---------- MARK ----------
+
         function createSandTexture() {
             const size = 512;
 
@@ -193,8 +375,10 @@
             ctx.fillRect(0, 0, size, size);
 
             for (let i = 0; i < 9000; i++) {
+
                 const x = Math.random() * size;
                 const y = Math.random() * size;
+
                 const shade = Math.random() * 40 - 20;
 
                 const r = 148 + shade;
@@ -213,6 +397,7 @@
             }
 
             for (let i = 0; i < 14; i++) {
+
                 const x = Math.random() * size;
                 const y = Math.random() * size;
                 const r = 8 + Math.random() * 22;
@@ -267,6 +452,7 @@
         scene.add(floor);
 
         // ---------- MATERIAL ----------
+
         const matBuilding = [
             0x6b6455,
             0x5a5347,
@@ -274,69 +460,93 @@
             0x554f42,
             0x8f3a2c,
             0x4d4438
-        ].map(c =>
-            new THREE.MeshStandardMaterial({
+        ].map(
+            c => new THREE.MeshStandardMaterial({
                 color: c,
                 roughness: 0.95,
                 metalness: 0.02
             })
         );
 
-        const matRubble = new THREE.MeshStandardMaterial({
-            color: 0x453f34,
-            roughness: 1
-        });
+        const matRubble =
+            new THREE.MeshStandardMaterial({
+                color: 0x453f34,
+                roughness: 1
+            });
 
-        const matConcreteHole = new THREE.MeshStandardMaterial({
-            color: 0x2e2a24,
-            roughness: 1
-        });
+        const matConcreteHole =
+            new THREE.MeshStandardMaterial({
+                color: 0x2e2a24,
+                roughness: 1
+            });
 
-        const matSandbag = new THREE.MeshStandardMaterial({
-            color: 0x9c8656,
-            roughness: 1
-        });
+        const matSandbag =
+            new THREE.MeshStandardMaterial({
+                color: 0x9c8656,
+                roughness: 1
+            });
 
-        const matMetal = new THREE.MeshStandardMaterial({
-            color: 0x3a3a3a,
-            roughness: 0.6,
-            metalness: 0.4
-        });
+        const matMetal =
+            new THREE.MeshStandardMaterial({
+                color: 0x3a3a3a,
+                roughness: 0.6,
+                metalness: 0.4
+            });
 
-        const matMetalRust = new THREE.MeshStandardMaterial({
-            color: 0x6b3a20,
-            roughness: 0.8,
-            metalness: 0.2
-        });
+        const matMetalRust =
+            new THREE.MeshStandardMaterial({
+                color: 0x6b3a20,
+                roughness: 0.8,
+                metalness: 0.2
+            });
 
-        // ---------- EXTRA DETALJMATERIAL ----------
-        const matDetail = new THREE.MeshStandardMaterial({
-            color: 0x38342d,
-            roughness: 1
-        });
+        // ---------- KIST-MATERIAL ----------
 
-        const matWood = new THREE.MeshStandardMaterial({
-            color: 0x5b4632,
-            roughness: 1
-        });
+        const matChestWood =
+            new THREE.MeshStandardMaterial({
+                color: 0x6b3f20,
+                roughness: 0.9
+            });
 
-        // ---------- LÄGENHETSMATERIAL ----------
-        const matApartment = [
-            0x70685a,
-            0x817565,
-            0x625b50,
-            0x8a765e
-        ].map(c => new THREE.MeshStandardMaterial({
-            color: c,
-            roughness: 0.9,
-            metalness: 0.02
-        }));
+        const matChestDark =
+            new THREE.MeshStandardMaterial({
+                color: 0x39251a,
+                roughness: 0.9
+            });
 
-        const matWindow = new THREE.MeshStandardMaterial({
-            color: 0x25343a,
-            roughness: 0.35,
-            metalness: 0.15
-        });
+        const matChestMetal =
+            new THREE.MeshStandardMaterial({
+                color: 0xd09a35,
+                roughness: 0.45,
+                metalness: 0.65
+            });
+
+        // ---------- VAPENSMATERIAL ----------
+
+        const matGun =
+            new THREE.MeshStandardMaterial({
+                color: 0x171717,
+                roughness: 0.45,
+                metalness: 0.65
+            });
+
+        const matGunGrip =
+            new THREE.MeshStandardMaterial({
+                color: 0x493426,
+                roughness: 0.9
+            });
+
+        const matHeal =
+            new THREE.MeshStandardMaterial({
+                color: 0x4caf50,
+                roughness: 0.8
+            });
+
+        const matHealWhite =
+            new THREE.MeshStandardMaterial({
+                color: 0xe8e8e8,
+                roughness: 0.8
+            });
 
         function addShadowMesh(mesh) {
             mesh.castShadow = true;
@@ -344,8 +554,56 @@
             return mesh;
         }
 
-        // ---------- BYGGNADER / RUINER ----------
+        // ---------- COLLIDERS ----------
+
+        const buildingColliders = [];
+
+        const playerRadius = 0.65;
+
+        function canMoveTo(x, z) {
+
+            if (
+                x < -MAP_BOUNDARY + playerRadius ||
+                x > MAP_BOUNDARY - playerRadius ||
+                z < -MAP_BOUNDARY + playerRadius ||
+                z > MAP_BOUNDARY - playerRadius
+            ) {
+                return false;
+            }
+
+            for (const c of buildingColliders) {
+
+                const dx = x - c.x;
+                const dz = z - c.z;
+
+                const angle = -c.rotationZ;
+
+                const cos = Math.cos(angle);
+                const sin = Math.sin(angle);
+
+                const localX =
+                    dx * cos - dz * sin;
+
+                const localZ =
+                    dx * sin + dz * cos;
+
+                if (
+                    Math.abs(localX) <
+                    c.halfW + playerRadius &&
+                    Math.abs(localZ) <
+                    c.halfD + playerRadius
+                ) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // ---------- BYGGNADER ----------
+
         function buildRuin(x, z) {
+
             const group = new THREE.Group();
 
             const w = 7 + Math.random() * 6;
@@ -354,12 +612,15 @@
 
             const mat =
                 matBuilding[
-                    Math.floor(Math.random() * matBuilding.length)
+                    Math.floor(
+                        Math.random() * matBuilding.length
+                    )
                 ];
 
             const dmg = Math.random();
 
             if (dmg > 0.55) {
+
                 const wall = addShadowMesh(
                     new THREE.Mesh(
                         new THREE.BoxGeometry(w, h, d),
@@ -368,12 +629,16 @@
                 );
 
                 wall.position.y = h / 2;
+
                 group.add(wall);
 
-                const holes = 2 + Math.floor(Math.random() * 3);
+                const holes =
+                    2 + Math.floor(Math.random() * 3);
 
                 for (let i = 0; i < holes; i++) {
-                    const hs = 1.2 + Math.random() * 1.8;
+
+                    const hs =
+                        1.2 + Math.random() * 1.8;
 
                     const hole = addShadowMesh(
                         new THREE.Mesh(
@@ -387,8 +652,10 @@
                     );
 
                     hole.position.set(
-                        (Math.random() - 0.5) * (w - hs),
-                        (Math.random() * 0.6 + 0.25) * h,
+                        (Math.random() - 0.5) *
+                            (w - hs),
+                        (Math.random() * 0.6 + 0.25) *
+                            h,
                         0
                     );
 
@@ -396,6 +663,7 @@
                 }
 
                 if (Math.random() > 0.5) {
+
                     const chunk = addShadowMesh(
                         new THREE.Mesh(
                             new THREE.BoxGeometry(
@@ -435,7 +703,8 @@
                     )
                 );
 
-                wall.position.y = (h * 0.65) / 2;
+                wall.position.y =
+                    (h * 0.65) / 2;
 
                 group.add(wall);
 
@@ -448,12 +717,18 @@
             } else {
 
                 for (let j = 0; j < 4; j++) {
+
                     const rubble = addShadowMesh(
                         new THREE.Mesh(
                             new THREE.BoxGeometry(
-                                w * (0.3 + Math.random() * 0.35),
-                                1.2 + Math.random() * 2,
-                                d * (0.3 + Math.random() * 0.35)
+                                w *
+                                    (0.3 +
+                                    Math.random() * 0.35),
+                                1.2 +
+                                    Math.random() * 2,
+                                d *
+                                    (0.3 +
+                                    Math.random() * 0.35)
                             ),
                             matRubble
                         )
@@ -476,6 +751,7 @@
                     j < 2 + Math.floor(Math.random() * 2);
                     j++
                 ) {
+
                     const beam = addShadowMesh(
                         new THREE.Mesh(
                             new THREE.CylinderGeometry(
@@ -504,96 +780,16 @@
                 }
             }
 
-            // ---------- LÄTTA DETALJER ----------
-            if (Math.random() > 0.45) {
-                const door = addShadowMesh(
-                    new THREE.Mesh(
-                        new THREE.BoxGeometry(
-                            1.3,
-                            2.4,
-                            0.12
-                        ),
-                        matDetail
-                    )
-                );
-
-                door.position.set(
-                    0,
-                    1.2,
-                    d / 2 + 0.08
-                );
-
-                group.add(door);
-            }
-
-            if (
-                dmg > 0.25 &&
-                Math.random() > 0.55
-            ) {
-                const roofHeight =
-                    dmg > 0.55
-                        ? h
-                        : h * 0.65;
-
-                const roofPiece = addShadowMesh(
-                    new THREE.Mesh(
-                        new THREE.BoxGeometry(
-                            w * 0.45,
-                            0.25,
-                            d * 0.25
-                        ),
-                        matWood
-                    )
-                );
-
-                roofPiece.position.set(
-                    (Math.random() - 0.5) * w * 0.4,
-                    roofHeight + 0.15,
-                    (Math.random() - 0.5) * d * 0.3
-                );
-
-                roofPiece.rotation.z =
-                    (Math.random() - 0.5) * 0.5;
-
-                roofPiece.rotation.y =
-                    Math.random() * Math.PI;
-
-                group.add(roofPiece);
-            }
-
-            if (Math.random() > 0.65) {
-                const smallRubble = addShadowMesh(
-                    new THREE.Mesh(
-                        new THREE.BoxGeometry(
-                            0.7,
-                            0.7,
-                            0.7
-                        ),
-                        matRubble
-                    )
-                );
-
-                smallRubble.position.set(
-                    (Math.random() - 0.5) * (w + 2),
-                    0.35,
-                    (Math.random() - 0.5) * (d + 2)
-                );
-
-                smallRubble.rotation.set(
-                    Math.random(),
-                    Math.random(),
-                    Math.random()
-                );
-
-                group.add(smallRubble);
-            }
+            // Detaljer
 
             if (Math.random() > 0.6) {
+
                 for (
                     let i = 0;
                     i < 2 + Math.floor(Math.random() * 3);
                     i++
                 ) {
+
                     const bag = addShadowMesh(
                         new THREE.Mesh(
                             new THREE.SphereGeometry(
@@ -608,7 +804,9 @@
                     bag.scale.set(1, 0.6, 0.7);
 
                     bag.position.set(
-                        w / 2 + 0.5 + Math.random() * 1.5,
+                        w / 2 +
+                            0.5 +
+                            Math.random() * 1.5,
                         0.3,
                         (Math.random() - 0.5) * d
                     );
@@ -618,6 +816,7 @@
             }
 
             if (Math.random() > 0.75) {
+
                 const barrel = addShadowMesh(
                     new THREE.Mesh(
                         new THREE.CylinderGeometry(
@@ -633,7 +832,9 @@
                 );
 
                 barrel.position.set(
-                    -w / 2 - 1 - Math.random(),
+                    -w / 2 -
+                        1 -
+                        Math.random(),
                     0.65,
                     (Math.random() - 0.5) * d
                 );
@@ -644,6 +845,35 @@
                         : 0;
 
                 group.add(barrel);
+            }
+
+            // Takdetalj bara när det faktiskt finns ett tak
+
+            if (dmg > 0.25 && Math.random() > 0.55) {
+
+                const roofHeight =
+                    dmg > 0.55
+                        ? h
+                        : h * 0.65;
+
+                const roof = addShadowMesh(
+                    new THREE.Mesh(
+                        new THREE.BoxGeometry(
+                            w * 0.55,
+                            0.35,
+                            d * 0.55
+                        ),
+                        mat
+                    )
+                );
+
+                roof.position.y =
+                    roofHeight + 0.15;
+
+                roof.rotation.z =
+                    (Math.random() - 0.5) * 0.2;
+
+                group.add(roof);
             }
 
             group.position.set(x, 0, z);
@@ -659,9 +889,108 @@
             return group;
         }
 
+        // ---------- LÄGENHETER ----------
+
+        const matApartment = [
+            0x6b6254,
+            0x75634d,
+            0x65584b,
+            0x80624a
+        ].map(
+            c => new THREE.MeshStandardMaterial({
+                color: c,
+                roughness: 0.95
+            })
+        );
+
+        const matWindow =
+            new THREE.MeshStandardMaterial({
+                color: 0x27343b,
+                roughness: 0.35,
+                metalness: 0.15
+            });
+
+        function buildApartment(
+            x,
+            z,
+            rotationY
+        ) {
+
+            const group = new THREE.Group();
+
+            const width = 10;
+            const depth = 18;
+            const height = 8;
+
+            const building = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(
+                        width,
+                        height,
+                        depth
+                    ),
+                    matApartment[
+                        Math.floor(
+                            Math.random() *
+                            matApartment.length
+                        )
+                    ]
+                )
+            );
+
+            building.position.y =
+                height / 2;
+
+            group.add(building);
+
+            for (let floor = 0; floor < 4; floor++) {
+
+                const y =
+                    1.1 + floor * 1.8;
+
+                for (let side = -1; side <= 1; side += 2) {
+
+                    const window = new THREE.Mesh(
+                        new THREE.BoxGeometry(
+                            1.2,
+                            0.8,
+                            0.08
+                        ),
+                        matWindow
+                    );
+
+                    window.position.set(
+                        side * (width / 2 + 0.04),
+                        y,
+                        0
+                    );
+
+                    group.add(window);
+                }
+            }
+
+            group.position.set(x, 0, z);
+            group.rotation.y = rotationY;
+
+            const collider = {
+                x: x,
+                z: z,
+                halfW: width / 2 + 0.2,
+                halfD: depth / 2 + 0.2,
+                rotationZ: rotationY
+            };
+
+            group.userData.collider = collider;
+
+            return group;
+        }
+
         // ---------- KRATRAR ----------
+
         function buildCrater(x, z) {
-            const r = 2 + Math.random() * 3;
+
+            const r =
+                2 + Math.random() * 3;
 
             const ring = new THREE.Mesh(
                 new THREE.RingGeometry(
@@ -676,15 +1005,24 @@
                 })
             );
 
-            ring.rotation.x = -Math.PI / 2;
-            ring.position.set(x, 0.02, z);
+            ring.rotation.x =
+                -Math.PI / 2;
+
+            ring.position.set(
+                x,
+                0.02,
+                z
+            );
+
             ring.receiveShadow = true;
 
             return ring;
         }
 
         // ---------- ELSTOLPAR ----------
+
         function buildPylon(x, z) {
+
             const group = new THREE.Group();
 
             const pole = addShadowMesh(
@@ -700,6 +1038,7 @@
             );
 
             pole.position.y = 4.5;
+
             pole.rotation.z =
                 (Math.random() - 0.5) * 0.25;
 
@@ -725,41 +1064,381 @@
             return group;
         }
 
-        // ---------- KOLLISION ----------
-        const usedSpots = [];
-        const buildingColliders = [];
-        const playerRadius = 0.65;
+        // ---------- KISTOR ----------
 
-        function canMoveTo(x, z) {
-            for (const c of buildingColliders) {
-                const dx = x - c.x;
-                const dz = z - c.z;
+        const chests = [];
 
-                const angle = -c.rotationZ;
+        function buildChest(x, z) {
 
-                const cos = Math.cos(angle);
-                const sin = Math.sin(angle);
+            const group = new THREE.Group();
 
-                const localX =
-                    dx * cos - dz * sin;
+            const base = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(
+                        2.2,
+                        1.15,
+                        1.45
+                    ),
+                    matChestWood
+                )
+            );
 
-                const localZ =
-                    dx * sin + dz * cos;
+            base.position.y = 0.58;
 
-                if (
-                    Math.abs(localX) <
-                        c.halfW + playerRadius &&
-                    Math.abs(localZ) <
-                        c.halfD + playerRadius
-                ) {
-                    return false;
-                }
+            group.add(base);
+
+            const lid = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(
+                        2.28,
+                        0.25,
+                        1.52
+                    ),
+                    matChestWood
+                )
+            );
+
+            lid.position.y = 1.25;
+
+            group.add(lid);
+
+            // Metallband
+
+            for (const px of [-0.7, 0.7]) {
+
+                const band = addShadowMesh(
+                    new THREE.Mesh(
+                        new THREE.BoxGeometry(
+                            0.13,
+                            1.28,
+                            1.55
+                        ),
+                        matChestMetal
+                    )
+                );
+
+                band.position.set(
+                    px,
+                    0.65,
+                    0
+                );
+
+                group.add(band);
             }
 
-            return true;
+            // Lås
+
+            const lock = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(
+                        0.35,
+                        0.4,
+                        0.12
+                    ),
+                    matChestMetal
+                )
+            );
+
+            lock.position.set(
+                0,
+                0.83,
+                -0.77
+            );
+
+            group.add(lock);
+
+            // Extra trälist
+
+            const frontBar = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(
+                        2.15,
+                        0.13,
+                        0.13
+                    ),
+                    matChestDark
+                )
+            );
+
+            frontBar.position.set(
+                0,
+                0.75,
+                -0.76
+            );
+
+            group.add(frontBar);
+
+            group.position.set(
+                x,
+                0,
+                z
+            );
+
+            group.rotation.y =
+                Math.random() * Math.PI;
+
+            group.userData.chest = true;
+            group.userData.opened = false;
+            group.userData.lid = lid;
+
+            chests.push(group);
+
+            scene.add(group);
+
+            return group;
         }
 
-        function spotFree(x, z, minDist) {
+        // ---------- VAPEN ----------
+
+        function createPistol() {
+
+            const group = new THREE.Group();
+
+            const body = new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    0.8,
+                    0.25,
+                    0.32
+                ),
+                matGun
+            );
+
+            body.position.y = 0.3;
+
+            group.add(body);
+
+            const barrel = new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    0.55,
+                    0.13,
+                    0.13
+                ),
+                matGun
+            );
+
+            barrel.position.set(
+                0.6,
+                0.32,
+                0
+            );
+
+            group.add(barrel);
+
+            const grip = new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    0.22,
+                    0.55,
+                    0.25
+                ),
+                matGunGrip
+            );
+
+            grip.position.set(
+                -0.18,
+                0.03,
+                0
+            );
+
+            grip.rotation.z =
+                -0.25;
+
+            group.add(grip);
+
+            group.rotation.z =
+                -Math.PI / 2;
+
+            return group;
+        }
+
+        function createAR() {
+
+            const group = new THREE.Group();
+
+            const body = new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    1.65,
+                    0.25,
+                    0.3
+                ),
+                matGun
+            );
+
+            body.position.y = 0.3;
+
+            group.add(body);
+
+            const barrel = new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    1.1,
+                    0.11,
+                    0.11
+                ),
+                matGun
+            );
+
+            barrel.position.x =
+                1.2;
+
+            barrel.position.y =
+                0.3;
+
+            group.add(barrel);
+
+            const stock = new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    0.6,
+                    0.25,
+                    0.28
+                ),
+                matGunGrip
+            );
+
+            stock.position.x =
+                -1;
+
+            stock.position.y =
+                0.32;
+
+            group.add(stock);
+
+            const grip = new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    0.25,
+                    0.55,
+                    0.25
+                ),
+                matGunGrip
+            );
+
+            grip.position.set(
+                -0.25,
+                0,
+                0
+            );
+
+            grip.rotation.z =
+                -0.25;
+
+            group.add(grip);
+
+            group.rotation.z =
+                -Math.PI / 2;
+
+            return group;
+        }
+
+        function createHeal() {
+
+            const group = new THREE.Group();
+
+            const bottle = new THREE.Mesh(
+                new THREE.CylinderGeometry(
+                    0.25,
+                    0.25,
+                    0.65,
+                    8
+                ),
+                matHeal
+            );
+
+            bottle.position.y =
+                0.4;
+
+            group.add(bottle);
+
+            const cross1 = new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    0.28,
+                    0.07,
+                    0.05
+                ),
+                matHealWhite
+            );
+
+            cross1.position.set(
+                0,
+                0.4,
+                -0.26
+            );
+
+            group.add(cross1);
+
+            const cross2 = new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    0.07,
+                    0.28,
+                    0.05
+                ),
+                matHealWhite
+            );
+
+            cross2.position.set(
+                0,
+                0.4,
+                -0.26
+            );
+
+            group.add(cross2);
+
+            return group;
+        }
+
+        const groundItems = [];
+
+        function spawnChestLoot(chest) {
+
+            const weaponIsAR =
+                Math.random() > 0.5;
+
+            const weapon =
+                weaponIsAR
+                    ? createAR()
+                    : createPistol();
+
+            weapon.position.set(
+                chest.position.x + 2.0,
+                0,
+                chest.position.z
+            );
+
+            weapon.rotation.y =
+                Math.random() * Math.PI;
+
+            weapon.userData.pickupType =
+                weaponIsAR
+                    ? 'AR'
+                    : 'Pistol';
+
+            groundItems.push(weapon);
+
+            scene.add(weapon);
+
+            const heal = createHeal();
+
+            heal.position.set(
+                chest.position.x - 2.0,
+                0,
+                chest.position.z
+            );
+
+            heal.userData.pickupType =
+                'Heal';
+
+            groundItems.push(heal);
+
+            scene.add(heal);
+        }
+
+        // ---------- VÄRLD ----------
+
+        const usedSpots = [];
+
+        function spotFree(
+            x,
+            z,
+            minDist
+        ) {
+
             if (
                 Math.abs(x) < 12 &&
                 Math.abs(z) < 12
@@ -768,6 +1447,7 @@
             }
 
             for (const s of usedSpots) {
+
                 if (
                     Math.hypot(
                         s.x - x,
@@ -781,14 +1461,26 @@
             return true;
         }
 
-        // ---------- SKAPA VÄRLD ----------
+        // 85 vanliga hus
+
         for (let i = 0; i < 85; i++) {
-            let x, z, tries = 0;
+
+            let x;
+            let z;
+            let tries = 0;
 
             do {
-                x = (Math.random() - 0.5) * 180;
-                z = (Math.random() - 0.5) * 180;
+
+                x =
+                    (Math.random() - 0.5) *
+                    180;
+
+                z =
+                    (Math.random() - 0.5) *
+                    180;
+
                 tries++;
+
             } while (
                 !spotFree(x, z, 9) &&
                 tries < 20
@@ -796,200 +1488,124 @@
 
             if (tries >= 20) continue;
 
-            usedSpots.push({ x, z });
+            usedSpots.push({
+                x,
+                z
+            });
 
-            const ruin = buildRuin(x, z);
+            const ruin =
+                buildRuin(x, z);
+
             scene.add(ruin);
-            buildingColliders.push(ruin.userData.collider);
+
+            buildingColliders.push(
+                ruin.userData.collider
+            );
 
             if (Math.random() > 0.6) {
+
                 scene.add(
                     buildCrater(
-                        x + (Math.random() - 0.5) * 6,
-                        z + (Math.random() - 0.5) * 6
+                        x +
+                            (Math.random() - 0.5) * 6,
+                        z +
+                            (Math.random() - 0.5) * 6
                     )
                 );
             }
         }
 
-        // ---------- LÄGENHETER ----------
-        function buildApartment(x, z, rotationY) {
-            const group = new THREE.Group();
+        // Lägenheter runt barriären
 
-            const width = 10;
-            const depth = 8;
-            const height = 18;
-
-            const mat =
-                matApartment[
-                    Math.floor(
-                        Math.random() * matApartment.length
-                    )
-                ];
-
-            const building = addShadowMesh(
-                new THREE.Mesh(
-                    new THREE.BoxGeometry(
-                        width,
-                        height,
-                        depth
-                    ),
-                    mat
-                )
-            );
-
-            building.position.y =
-                height / 2;
-
-            group.add(building);
-
-            for (let floor = 0; floor < 4; floor++) {
-                for (
-                    let window = 0;
-                    window < 3;
-                    window++
-                ) {
-                    const win = addShadowMesh(
-                        new THREE.Mesh(
-                            new THREE.BoxGeometry(
-                                1.8,
-                                2.2,
-                                0.12
-                            ),
-                            matWindow
-                        )
-                    );
-
-                    win.position.set(
-                        -3.2 +
-                            window * 3.2,
-                        3 +
-                            floor * 4,
-                        -depth / 2 -
-                            0.08
-                    );
-
-                    group.add(win);
-                }
-            }
-
-            for (let floor = 0; floor < 4; floor++) {
-                for (
-                    let window = 0;
-                    window < 3;
-                    window++
-                ) {
-                    const win = addShadowMesh(
-                        new THREE.Mesh(
-                            new THREE.BoxGeometry(
-                                1.8,
-                                2.2,
-                                0.12
-                            ),
-                            matWindow
-                        )
-                    );
-
-                    win.position.set(
-                        -3.2 +
-                            window * 3.2,
-                        3 +
-                            floor * 4,
-                        depth / 2 +
-                            0.08
-                    );
-
-                    group.add(win);
-                }
-            }
-
-            group.position.set(x, 0, z);
-            group.rotation.y = rotationY;
-
-            group.userData.collider = {
-                x: x,
-                z: z,
-                halfW: width / 2 + 0.25,
-                halfD: depth / 2 + 0.25,
-                rotationZ: 0
-            };
-
-            return group;
-        }
-
-        // Norra och södra sidan
         for (
             let x = -95;
             x <= 95;
             x += 10
         ) {
-            const northApartment =
-                buildApartment(x, -96, 0);
 
-            scene.add(northApartment);
+            const north =
+                buildApartment(
+                    x,
+                    -96,
+                    0
+                );
+
+            scene.add(north);
 
             buildingColliders.push(
-                northApartment.userData.collider
+                north.userData.collider
             );
 
-            const southApartment =
-                buildApartment(x, 96, 0);
+            const south =
+                buildApartment(
+                    x,
+                    96,
+                    0
+                );
 
-            scene.add(southApartment);
+            scene.add(south);
 
             buildingColliders.push(
-                southApartment.userData.collider
+                south.userData.collider
             );
         }
 
-        // Östra och västra sidan
         for (
             let z = -86;
             z <= 86;
             z += 10
         ) {
-            const eastApartment =
+
+            const east =
                 buildApartment(
                     96,
                     z,
                     Math.PI / 2
                 );
 
-            scene.add(eastApartment);
+            scene.add(east);
 
             buildingColliders.push(
-                eastApartment.userData.collider
+                east.userData.collider
             );
 
-            const westApartment =
+            const west =
                 buildApartment(
                     -96,
                     z,
                     Math.PI / 2
                 );
 
-            scene.add(westApartment);
+            scene.add(west);
 
             buildingColliders.push(
-                westApartment.userData.collider
+                west.userData.collider
             );
         }
 
+        // Elstolpar
+
         for (let i = 0; i < 6; i++) {
+
             const x =
                 (Math.random() - 0.5) * 170;
 
             const z =
                 (Math.random() - 0.5) * 170;
 
-            if (spotFree(x, z, 6)) {
+            if (
+                spotFree(x, z, 6)
+            ) {
                 scene.add(
                     buildPylon(x, z)
                 );
             }
         }
 
+        // Kratrar
+
         for (let i = 0; i < 10; i++) {
+
             scene.add(
                 buildCrater(
                     (Math.random() - 0.5) * 190,
@@ -998,194 +1614,38 @@
             );
         }
 
-        // ---------- MINI MAP ----------
-        const minimap =
-            document.getElementById('minimap');
+        // ---------- KISTOR ----------
 
-        const minimapCtx =
-            minimap.getContext('2d');
+        const chestPositions = [
+            [-55, -40],
+            [45, -55],
+            [-60, 35],
+            [50, 45],
+            [15, -70],
+            [-20, 65],
+            [70, 10],
+            [-72, -5]
+        ];
 
-        const minimapSize = 180;
+        for (const pos of chestPositions) {
 
-        function worldToMinimapX(x) {
-            return (
-                (x + 100) /
-                200 *
-                minimapSize
-            );
-        }
-
-        function worldToMinimapZ(z) {
-            return (
-                (z + 100) /
-                200 *
-                minimapSize
-            );
-        }
-
-        function drawMinimap() {
-            minimapCtx.clearRect(
-                0,
-                0,
-                minimapSize,
-                minimapSize
-            );
-
-            // Bakgrund
-            minimapCtx.fillStyle = '#b99a68';
-            minimapCtx.fillRect(
-                0,
-                0,
-                minimapSize,
-                minimapSize
-            );
-
-            // Svag rutstruktur
-            minimapCtx.strokeStyle =
-                'rgba(70,55,35,0.18)';
-            minimapCtx.lineWidth = 1;
-
-            for (let i = 1; i < 10; i++) {
-                const p =
-                    i * minimapSize / 10;
-
-                minimapCtx.beginPath();
-                minimapCtx.moveTo(p, 0);
-                minimapCtx.lineTo(
-                    p,
-                    minimapSize
-                );
-                minimapCtx.stroke();
-
-                minimapCtx.beginPath();
-                minimapCtx.moveTo(0, p);
-                minimapCtx.lineTo(
-                    minimapSize,
-                    p
-                );
-                minimapCtx.stroke();
-            }
-
-            // Kartgräns
-            minimapCtx.strokeStyle =
-                'rgba(255,245,210,0.9)';
-            minimapCtx.lineWidth = 2;
-
-            minimapCtx.strokeRect(
-                1,
-                1,
-                minimapSize - 2,
-                minimapSize - 2
-            );
-
-            // Alla byggnader
-            for (const c of buildingColliders) {
-                const px =
-                    worldToMinimapX(c.x);
-
-                const pz =
-                    worldToMinimapZ(c.z);
-
-                const width =
-                    (c.halfW * 2) /
-                    200 *
-                    minimapSize;
-
-                const depth =
-                    (c.halfD * 2) /
-                    200 *
-                    minimapSize;
-
-                minimapCtx.save();
-
-                minimapCtx.translate(
-                    px,
-                    pz
+            const chest =
+                buildChest(
+                    pos[0],
+                    pos[1]
                 );
 
-                minimapCtx.rotate(
-                    c.rotationZ || 0
-                );
+            // Kistan får enkel osynlig plats
+            // så minimapen kan visa den
+            chest.userData.mapX =
+                pos[0];
 
-                minimapCtx.fillStyle =
-                    '#4b4032';
-
-                minimapCtx.fillRect(
-                    -width / 2,
-                    -depth / 2,
-                    width,
-                    depth
-                );
-
-                minimapCtx.restore();
-            }
-
-            // Spelarens position
-            const playerX =
-                worldToMinimapX(
-                    camera.position.x
-                );
-
-            const playerZ =
-                worldToMinimapZ(
-                    camera.position.z
-                );
-
-            minimapCtx.beginPath();
-
-            minimapCtx.arc(
-                playerX,
-                playerZ,
-                5,
-                0,
-                Math.PI * 2
-            );
-
-            minimapCtx.fillStyle =
-                '#e53935';
-
-            minimapCtx.fill();
-
-            // Vit kant runt spelaren
-            minimapCtx.strokeStyle =
-                '#ffffff';
-
-            minimapCtx.lineWidth = 2;
-
-            minimapCtx.stroke();
-
-            // Riktning spelaren tittar åt
-            const directionLength = 9;
-
-            const directionX =
-                Math.sin(cameraYAngle) *
-                directionLength;
-
-            const directionZ =
-                Math.cos(cameraYAngle) *
-                directionLength;
-
-            minimapCtx.beginPath();
-
-            minimapCtx.moveTo(
-                playerX,
-                playerZ
-            );
-
-            minimapCtx.lineTo(
-                playerX + directionX,
-                playerZ + directionZ
-            );
-
-            minimapCtx.strokeStyle =
-                '#ffffff';
-
-            minimapCtx.lineWidth = 2;
-
-            minimapCtx.stroke();
+            chest.userData.mapZ =
+                pos[1];
         }
 
         // ---------- DAMMPARTIKLAR ----------
+
         const dustCount = 350;
 
         const dustGeo =
@@ -1196,15 +1656,22 @@
                 dustCount * 3
             );
 
-        for (let i = 0; i < dustCount; i++) {
+        for (
+            let i = 0;
+            i < dustCount;
+            i++
+        ) {
+
             dustPos[i * 3] =
-                (Math.random() - 0.5) * 200;
+                (Math.random() - 0.5) *
+                200;
 
             dustPos[i * 3 + 1] =
                 Math.random() * 20;
 
             dustPos[i * 3 + 2] =
-                (Math.random() - 0.5) * 200;
+                (Math.random() - 0.5) *
+                200;
         }
 
         dustGeo.setAttribute(
@@ -1233,8 +1700,10 @@
         scene.add(dust);
 
         // ---------- KONTROLLER ----------
+
         let cameraYAngle = 0;
         let cameraXAngle = 0;
+
         let isMouseLocked = false;
 
         const startOverlay =
@@ -1252,19 +1721,49 @@
                 'loading'
             );
 
+        const interaction =
+            document.getElementById(
+                'interaction'
+            );
+
+        const interactionFill =
+            document.getElementById(
+                'interaction-fill'
+            );
+
+        const healthBar =
+            document.getElementById(
+                'health-bar'
+            );
+
+        const healthLabel =
+            document.getElementById(
+                'health-label'
+            );
+
+        const weaponUI =
+            document.getElementById(
+                'weapon-ui'
+            );
+
         loading.style.display = 'none';
-        startOverlay.style.display = 'flex';
+
+        startOverlay.style.display =
+            'flex';
 
         startOverlay.addEventListener(
             'click',
             () => {
+
                 renderer.domElement.requestPointerLock();
+
             }
         );
 
         document.addEventListener(
             'pointerlockchange',
             () => {
+
                 isMouseLocked =
                     document.pointerLockElement ===
                     renderer.domElement;
@@ -1283,22 +1782,26 @@
 
         document.addEventListener(
             'mousemove',
-            (e) => {
-                if (isMouseLocked) {
-                    cameraYAngle -=
-                        e.movementX * 0.002;
+            e => {
 
-                    cameraXAngle -=
-                        e.movementY * 0.002;
+                if (!isMouseLocked) {
+                    return;
+                }
 
-                    cameraXAngle = Math.max(
+                cameraYAngle -=
+                    e.movementX * 0.002;
+
+                cameraXAngle -=
+                    e.movementY * 0.002;
+
+                cameraXAngle =
+                    Math.max(
                         -Math.PI / 2.2,
                         Math.min(
                             Math.PI / 2.2,
                             cameraXAngle
                         )
                     );
-                }
             }
         );
 
@@ -1307,19 +1810,372 @@
             a: false,
             s: false,
             d: false,
-            space: false
+            space: false,
+            e: false
         };
 
         let velocityY = 0;
         let isGrounded = true;
-        let lastTime = performance.now();
 
-        // ---------- OSYNLIG MAPPGRÄNS ----------
-        const MAP_BOUNDARY = 100;
+        let lastTime =
+            performance.now();
+
+        // ---------- HP ----------
+
+        let playerHP = 100;
+        const maxHP = 100;
+
+        function updateHealth() {
+
+            playerHP =
+                Math.max(
+                    0,
+                    Math.min(
+                        maxHP,
+                        playerHP
+                    )
+                );
+
+            const percentage =
+                playerHP / maxHP * 100;
+
+            healthBar.style.width =
+                percentage + '%';
+
+            healthLabel.textContent =
+                'HP: ' +
+                Math.round(playerHP) +
+                ' / ' +
+                maxHP;
+        }
+
+        updateHealth();
+
+        // ---------- VAPEN ----------
+
+        let currentWeapon = null;
+
+        function setWeapon(type) {
+
+            currentWeapon = type;
+
+            if (!type) {
+
+                weaponUI.textContent =
+                    'Vapen: Händer';
+
+                return;
+            }
+
+            weaponUI.textContent =
+                'Vapen: ' +
+                type +
+                ' · VÄNSTERKLICK';
+
+        }
+
+        // ---------- E-INTERAKTION ----------
+
+        let nearbyChest = null;
+        let chestHoldStart = 0;
+        let chestOpenedThisHold = false;
+
+        function findNearbyChest() {
+
+            let closest = null;
+            let closestDistance = 4;
+
+            for (const chest of chests) {
+
+                if (
+                    chest.userData.opened
+                ) {
+                    continue;
+                }
+
+                const dx =
+                    camera.position.x -
+                    chest.position.x;
+
+                const dz =
+                    camera.position.z -
+                    chest.position.z;
+
+                const distance =
+                    Math.sqrt(
+                        dx * dx +
+                        dz * dz
+                    );
+
+                if (
+                    distance <
+                    closestDistance
+                ) {
+
+                    closest =
+                        chest;
+
+                    closestDistance =
+                        distance;
+                }
+            }
+
+            return closest;
+        }
+
+        function openChest(chest) {
+
+            if (
+                !chest ||
+                chest.userData.opened
+            ) {
+                return;
+            }
+
+            chest.userData.opened =
+                true;
+
+            const lid =
+                chest.userData.lid;
+
+            lid.rotation.x =
+                -Math.PI / 2.4;
+
+            lid.position.z =
+                -0.35;
+
+            spawnChestLoot(chest);
+
+            interaction.style.display =
+                'none';
+
+            interactionFill.style.width =
+                '0%';
+
+            nearbyChest = null;
+        }
+
+        // ---------- PICKUPS ----------
+
+        function pickUpNearbyItem() {
+
+            let closest = null;
+            let closestDistance = 2.4;
+
+            for (
+                const item of groundItems
+            ) {
+
+                if (
+                    !item.parent
+                ) {
+                    continue;
+                }
+
+                const dx =
+                    camera.position.x -
+                    item.position.x;
+
+                const dz =
+                    camera.position.z -
+                    item.position.z;
+
+                const distance =
+                    Math.sqrt(
+                        dx * dx +
+                        dz * dz
+                    );
+
+                if (
+                    distance <
+                    closestDistance
+                ) {
+
+                    closest =
+                        item;
+
+                    closestDistance =
+                        distance;
+                }
+            }
+
+            if (!closest) {
+                return;
+            }
+
+            if (
+                closest.userData.pickupType ===
+                'Heal'
+            ) {
+
+                if (playerHP >= maxHP) {
+                    return;
+                }
+
+                playerHP =
+                    Math.min(
+                        maxHP,
+                        playerHP + 35
+                    );
+
+                updateHealth();
+
+                scene.remove(
+                    closest
+                );
+
+                return;
+            }
+
+            if (
+                closest.userData.pickupType ===
+                'Pistol'
+            ) {
+
+                setWeapon(
+                    'Pistol'
+                );
+
+                scene.remove(
+                    closest
+                );
+
+                return;
+            }
+
+            if (
+                closest.userData.pickupType ===
+                'AR'
+            ) {
+
+                setWeapon(
+                    'AR'
+                );
+
+                scene.remove(
+                    closest
+                );
+            }
+        }
+
+        // ---------- SKJUTA ----------
+
+        const raycaster =
+            new THREE.Raycaster();
+
+        const shootDirection =
+            new THREE.Vector3();
+
+        const tracerMaterial =
+            new THREE.LineBasicMaterial({
+                color: 0xffe38a,
+                transparent: true,
+                opacity: 0.9
+            });
+
+        function shoot() {
+
+            if (
+                !isMouseLocked ||
+                !currentWeapon
+            ) {
+                return;
+            }
+
+            camera.getWorldDirection(
+                shootDirection
+            );
+
+            raycaster.set(
+                camera.position,
+                shootDirection
+            );
+
+            // Själva skottet
+
+            const endPoint =
+                camera.position.clone().add(
+                    shootDirection.clone().multiplyScalar(100)
+                );
+
+            const points = [
+                camera.position.clone(),
+                endPoint
+            ];
+
+            const geometry =
+                new THREE.BufferGeometry().setFromPoints(
+                    points
+                );
+
+            const tracer =
+                new THREE.Line(
+                    geometry,
+                    tracerMaterial
+                );
+
+            scene.add(tracer);
+
+            // Ta bort spår snabbt så det inte laggar
+
+            setTimeout(
+                () => {
+
+                    scene.remove(
+                        tracer
+                    );
+
+                    geometry.dispose();
+
+                },
+                35
+            );
+
+            // Olika eldhastighet
+
+            if (
+                currentWeapon ===
+                'Pistol'
+            ) {
+
+                nextShotTime =
+                    performance.now() +
+                    300;
+
+            } else if (
+                currentWeapon ===
+                'AR'
+            ) {
+
+                nextShotTime =
+                    performance.now() +
+                    110;
+            }
+        }
+
+        let nextShotTime = 0;
+
+        document.addEventListener(
+            'mousedown',
+            e => {
+
+                if (
+                    e.button === 0 &&
+                    performance.now() >=
+                    nextShotTime
+                ) {
+
+                    shoot();
+                }
+            }
+        );
+
+        // ---------- TANGENTBINDNINGAR ----------
 
         document.addEventListener(
             'keydown',
-            (e) => {
+            e => {
+
                 if (e.code === 'KeyW')
                     keys.w = true;
 
@@ -1334,12 +2190,29 @@
 
                 if (e.code === 'Space')
                     keys.space = true;
+
+                if (e.code === 'KeyE') {
+
+                    keys.e = true;
+
+                    if (
+                        !chestHoldStart
+                    ) {
+
+                        chestHoldStart =
+                            performance.now();
+
+                        chestOpenedThisHold =
+                            false;
+                    }
+                }
             }
         );
 
         document.addEventListener(
             'keyup',
-            (e) => {
+            e => {
+
                 if (e.code === 'KeyW')
                     keys.w = false;
 
@@ -1354,75 +2227,384 @@
 
                 if (e.code === 'Space')
                     keys.space = false;
+
+                if (e.code === 'KeyE') {
+
+                    keys.e = false;
+
+                    chestHoldStart =
+                        0;
+
+                    chestOpenedThisHold =
+                        false;
+
+                    interactionFill.style.width =
+                        '0%';
+                }
             }
         );
 
+        // ---------- MINIMAP ----------
+
+        const minimap =
+            document.getElementById(
+                'minimap'
+            );
+
+        const minimapCtx =
+            minimap.getContext(
+                '2d'
+            );
+
+        const minimapSize =
+            180;
+
+        function worldToMinimapX(x) {
+
+            return (
+                (x + MAP_BOUNDARY) /
+                (MAP_BOUNDARY * 2) *
+                minimapSize
+            );
+        }
+
+        function worldToMinimapZ(z) {
+
+            return (
+                (z + MAP_BOUNDARY) /
+                (MAP_BOUNDARY * 2) *
+                minimapSize
+            );
+        }
+
+        function drawMinimap() {
+
+            minimapCtx.clearRect(
+                0,
+                0,
+                minimapSize,
+                minimapSize
+            );
+
+            // Sand
+
+            minimapCtx.fillStyle =
+                '#b99a68';
+
+            minimapCtx.fillRect(
+                0,
+                0,
+                minimapSize,
+                minimapSize
+            );
+
+            // Rutnät
+
+            minimapCtx.strokeStyle =
+                'rgba(70,55,35,0.18)';
+
+            minimapCtx.lineWidth = 1;
+
+            for (
+                let i = 1;
+                i < 10;
+                i++
+            ) {
+
+                const p =
+                    i *
+                    minimapSize /
+                    10;
+
+                minimapCtx.beginPath();
+
+                minimapCtx.moveTo(
+                    p,
+                    0
+                );
+
+                minimapCtx.lineTo(
+                    p,
+                    minimapSize
+                );
+
+                minimapCtx.stroke();
+
+                minimapCtx.beginPath();
+
+                minimapCtx.moveTo(
+                    0,
+                    p
+                );
+
+                minimapCtx.lineTo(
+                    minimapSize,
+                    p
+                );
+
+                minimapCtx.stroke();
+            }
+
+            // Alla byggnader
+
+            minimapCtx.fillStyle =
+                '#40372d';
+
+            for (
+                const c of buildingColliders
+            ) {
+
+                const px =
+                    worldToMinimapX(
+                        c.x
+                    );
+
+                const pz =
+                    worldToMinimapZ(
+                        c.z
+                    );
+
+                const width =
+                    Math.max(
+                        2,
+                        (c.halfW * 2) /
+                        (MAP_BOUNDARY * 2) *
+                        minimapSize
+                    );
+
+                const depth =
+                    Math.max(
+                        2,
+                        (c.halfD * 2) /
+                        (MAP_BOUNDARY * 2) *
+                        minimapSize
+                    );
+
+                minimapCtx.fillRect(
+                    px - width / 2,
+                    pz - depth / 2,
+                    width,
+                    depth
+                );
+            }
+
+            // Kistor
+
+            for (
+                const chest of chests
+            ) {
+
+                if (
+                    chest.userData.opened
+                ) {
+                    continue;
+                }
+
+                const px =
+                    worldToMinimapX(
+                        chest.position.x
+                    );
+
+                const pz =
+                    worldToMinimapZ(
+                        chest.position.z
+                    );
+
+                minimapCtx.fillStyle =
+                    '#d39b35';
+
+                minimapCtx.fillRect(
+                    px - 2,
+                    pz - 2,
+                    5,
+                    5
+                );
+            }
+
+            // Spelare
+
+            const playerX =
+                worldToMinimapX(
+                    camera.position.x
+                );
+
+            const playerZ =
+                worldToMinimapZ(
+                    camera.position.z
+                );
+
+            minimapCtx.beginPath();
+
+            minimapCtx.arc(
+                playerX,
+                playerZ,
+                5,
+                0,
+                Math.PI * 2
+            );
+
+            minimapCtx.fillStyle =
+                '#e53935';
+
+            minimapCtx.fill();
+
+            minimapCtx.strokeStyle =
+                '#ffffff';
+
+            minimapCtx.lineWidth = 2;
+
+            minimapCtx.stroke();
+
+            // Spelarens riktning
+
+            const directionLength =
+                10;
+
+            const directionX =
+                Math.sin(
+                    cameraYAngle
+                ) *
+                directionLength;
+
+            const directionZ =
+                Math.cos(
+                    cameraYAngle
+                ) *
+                directionLength;
+
+            minimapCtx.beginPath();
+
+            minimapCtx.moveTo(
+                playerX,
+                playerZ
+            );
+
+            minimapCtx.lineTo(
+                playerX + directionX,
+                playerZ + directionZ
+            );
+
+            minimapCtx.strokeStyle =
+                '#ffffff';
+
+            minimapCtx.lineWidth = 2;
+
+            minimapCtx.stroke();
+
+            // Tydlig ram
+
+            minimapCtx.strokeStyle =
+                '#fff0c7';
+
+            minimapCtx.lineWidth = 2;
+
+            minimapCtx.strokeRect(
+                1,
+                1,
+                minimapSize - 2,
+                minimapSize - 2
+            );
+        }
+
         // ---------- ANIMATIONSLOOP ----------
+
         function animate() {
-            requestAnimationFrame(animate);
+
+            requestAnimationFrame(
+                animate
+            );
 
             const timeNow =
                 performance.now();
 
-            const delta = Math.min(
-                (timeNow - lastTime) / 1000,
-                0.1
-            );
+            const delta =
+                Math.min(
+                    (timeNow - lastTime) /
+                    1000,
+                    0.1
+                );
 
-            lastTime = timeNow;
+            lastTime =
+                timeNow;
 
             if (isMouseLocked) {
+
                 let moveX = 0;
                 let moveZ = 0;
 
                 if (keys.w) {
+
                     moveX +=
-                        Math.sin(cameraYAngle);
+                        Math.sin(
+                            cameraYAngle
+                        );
 
                     moveZ +=
-                        Math.cos(cameraYAngle);
+                        Math.cos(
+                            cameraYAngle
+                        );
                 }
 
                 if (keys.s) {
+
                     moveX -=
-                        Math.sin(cameraYAngle);
+                        Math.sin(
+                            cameraYAngle
+                        );
 
                     moveZ -=
-                        Math.cos(cameraYAngle);
+                        Math.cos(
+                            cameraYAngle
+                        );
                 }
 
                 if (keys.a) {
+
                     moveX +=
-                        Math.cos(cameraYAngle);
+                        Math.cos(
+                            cameraYAngle
+                        );
 
                     moveZ -=
-                        Math.sin(cameraYAngle);
+                        Math.sin(
+                            cameraYAngle
+                        );
                 }
 
                 if (keys.d) {
+
                     moveX -=
-                        Math.cos(cameraYAngle);
+                        Math.cos(
+                            cameraYAngle
+                        );
 
                     moveZ +=
-                        Math.sin(cameraYAngle);
+                        Math.sin(
+                            cameraYAngle
+                        );
                 }
+
+                const speed =
+                    15 * delta;
 
                 const newX =
                     camera.position.x +
-                    moveX * 15 * delta;
+                    moveX * speed;
 
                 const newZ =
                     camera.position.z +
-                    moveZ * 15 * delta;
+                    moveZ * speed;
+
+                // Kollisionskontroll separat
+                // för X och Z så man inte fastnar
 
                 if (
                     canMoveTo(
                         newX,
                         camera.position.z
-                    ) &&
-                    Math.abs(newX) <=
-                        MAP_BOUNDARY
+                    )
                 ) {
+
                     camera.position.x =
                         newX;
                 }
@@ -1431,15 +2613,13 @@
                     canMoveTo(
                         camera.position.x,
                         newZ
-                    ) &&
-                    Math.abs(newZ) <=
-                        MAP_BOUNDARY
+                    )
                 ) {
+
                     camera.position.z =
                         newZ;
                 }
 
-                // ---------- HOPPA ----------
                 velocityY -=
                     28 * delta;
 
@@ -1450,6 +2630,7 @@
                     keys.space &&
                     isGrounded
                 ) {
+
                     velocityY = 11;
                     isGrounded = false;
                 }
@@ -1457,16 +2638,88 @@
                 if (
                     camera.position.y < 2
                 ) {
+
                     camera.position.y = 2;
                     velocityY = 0;
                     isGrounded = true;
                 }
             }
 
-            // ---------- MINI MAP ----------
-            drawMinimap();
+            // ---------- KISTA E ----------
+
+            nearbyChest =
+                findNearbyChest();
+
+            if (
+                nearbyChest &&
+                keys.e &&
+                !nearbyChest.userData.opened
+            ) {
+
+                interaction.style.display =
+                    'block';
+
+                if (!chestHoldStart) {
+
+                    chestHoldStart =
+                        performance.now();
+                }
+
+                const heldFor =
+                    performance.now() -
+                    chestHoldStart;
+
+                const progress =
+                    Math.min(
+                        100,
+                        heldFor / 1000 * 100
+                    );
+
+                interactionFill.style.width =
+                    progress + '%';
+
+                if (
+                    heldFor >= 1000 &&
+                    !chestOpenedThisHold
+                ) {
+
+                    chestOpenedThisHold =
+                        true;
+
+                    openChest(
+                        nearbyChest
+                    );
+                }
+
+            } else if (!nearbyChest) {
+
+                interaction.style.display =
+                    'none';
+
+                interactionFill.style.width =
+                    '0%';
+
+                chestHoldStart =
+                    0;
+
+            } else if (!keys.e) {
+
+                interaction.style.display =
+                    'block';
+
+                interactionFill.style.width =
+                    '0%';
+
+                chestHoldStart =
+                    0;
+            }
+
+            // ---------- PICKUP AV SAKER ----------
+
+            pickUpNearbyItem();
 
             // ---------- DAMM ----------
+
             const pos =
                 dustGeo.attributes.position;
 
@@ -1475,47 +2728,76 @@
                 i < dustCount;
                 i++
             ) {
+
                 pos.array[i * 3] +=
-                    0.15 * delta * 10;
+                    0.15 *
+                    delta *
+                    10;
 
                 pos.array[i * 3 + 1] -=
-                    0.02 * delta * 10;
+                    0.02 *
+                    delta *
+                    10;
 
                 if (
-                    pos.array[i * 3 + 1] < 0
+                    pos.array[i * 3 + 1] <
+                    0
                 ) {
-                    pos.array[i * 3 + 1] = 18;
+
+                    pos.array[i * 3 + 1] =
+                        18;
                 }
 
                 if (
                     pos.array[i * 3] >
-                    camera.position.x + 100
+                    camera.position.x +
+                    100
                 ) {
+
                     pos.array[i * 3] =
-                        camera.position.x - 100;
+                        camera.position.x -
+                        100;
                 }
             }
 
             pos.needsUpdate = true;
 
+            // ---------- KAMERA ----------
+
             const target =
-                new THREE.Vector3();
+                lookTarget;
 
             target.x =
                 camera.position.x +
-                Math.sin(cameraYAngle) *
-                Math.cos(cameraXAngle);
+                Math.sin(
+                    cameraYAngle
+                ) *
+                Math.cos(
+                    cameraXAngle
+                );
 
             target.z =
                 camera.position.z +
-                Math.cos(cameraYAngle) *
-                Math.cos(cameraXAngle);
+                Math.cos(
+                    cameraYAngle
+                ) *
+                Math.cos(
+                    cameraXAngle
+                );
 
             target.y =
                 camera.position.y +
-                Math.sin(cameraXAngle);
+                Math.sin(
+                    cameraXAngle
+                );
 
-            camera.lookAt(target);
+            camera.lookAt(
+                target
+            );
+
+            // ---------- MINIMAP ----------
+
+            drawMinimap();
 
             renderer.render(
                 scene,
@@ -1526,6 +2808,7 @@
         window.addEventListener(
             'resize',
             () => {
+
                 camera.aspect =
                     window.innerWidth /
                     window.innerHeight;
@@ -1540,6 +2823,7 @@
         );
 
         animate();
+
     </script>
 
 </body>
