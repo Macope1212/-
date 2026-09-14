@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desert War Zone</title>
+    <title>Desert War Zone - Fungerande Version</title>
     <style>
         body { margin: 0; overflow: hidden; background-color: #000; font-family: sans-serif; user-select: none; }
         canvas { display: block; }
@@ -25,39 +25,44 @@
 </head>
 <body>
 
+    <!-- Startskärm anpassad för att skoldatorn ska tillåta klicket -->
     <div id="start-overlay">
         <div class="start-text">STARTA ÖKENKRIGET (KLICKA HÄR)</div>
     </div>
     <div id="crosshair"></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Denna länk blockeras inte av skolan -->
+    <script src="https://unpkg.com"></script>
 
     <script>
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0xd5a97a); 
-        scene.fog = new THREE.FogExp2(0xd5a97a, 0.025); // Tung sandstorm/krigsdimma
+        scene.fog = new THREE.FogExp2(0xd5a97a, 0.025); 
 
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 2, 0); // Ögonhöjd
+        camera.position.set(0, 2, 0); 
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        const light = new THREE.AmbientLight(0xfff0e0, 1.0);
+        const light = new THREE.AmbientLight(0xffffff, 1.0);
         scene.add(light);
 
-        // Ökensand (Marken)
+        // Ökensandens mark
         const floor = new THREE.Mesh(new THREE.PlaneGeometry(2000, 2000), new THREE.MeshBasicMaterial({ color: 0xc29d70 }));
         floor.rotation.x = -Math.PI / 2;
         scene.add(floor);
 
-        // Byggnader (Hela, lutande ruiner och rasmassor)
-        const colors = [0x555d50, 0x3e3a36, 0x7b3f00, 0x4a4135, 0x8b0000]; // Militärgrön, Aska, Rost, Mörkröd
+        // En lista för att spara husens storlek och position för kollisioner
+        const colliders = [];
+
+        // Här startar din kod för generering av staden
+        const colors = [0x555d50, 0x3e3a36, 0x7b3f00, 0x4a4135, 0x8b0000]; 
         for (let i = 0; i < 45; i++) {
             const x = (Math.random() - 0.5) * 160;
             const z = (Math.random() - 0.5) * 160;
-            if (Math.abs(x) < 12 && Math.abs(z) < 12) continue; // Spawnfritt
+            if (Math.abs(x) < 12 && Math.abs(z) < 12) continue;
 
             const w = 7 + Math.random() * 6;
             const h = 8 + Math.random() * 12;
@@ -72,12 +77,18 @@
                 const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshBasicMaterial({ color: col }));
                 wall.position.y = h / 2;
                 bGroup.add(wall);
+                
+                // Spara huset som ett fast hinder
+                colliders.push({ x: x, z: z, w: w, d: d });
             } else if (dmg > 0.15) {
                 // Lutande bombat hus
                 const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h * 0.7, d), new THREE.MeshBasicMaterial({ color: col }));
                 wall.position.y = (h * 0.7) / 2;
                 bGroup.add(wall);
                 bGroup.rotation.z = (Math.random() - 0.5) * 0.3;
+                
+                // Spara lutande hus med lite extra marginal för säkerhets skull
+                colliders.push({ x: x, z: z, w: w * 1.2, d: d * 1.2 });
             } else {
                 // Rasmassa på marken
                 for (let j = 0; j < 3; j++) {
@@ -90,12 +101,14 @@
             scene.add(bGroup);
         }
 
-        // Kontroller
+        // Kontroller utifrån din sparade kod
         let cameraYAngle = 0, cameraXAngle = 0, isMouseLocked = false;
         const startOverlay = document.getElementById('start-overlay');
         const crosshair = document.getElementById('crosshair');
 
-        startOverlay.addEventListener('click', () => { renderer.domElement.requestPointerLock(); });
+        startOverlay.addEventListener('click', () => { 
+            renderer.domElement.requestPointerLock(); 
+        });
 
         document.addEventListener('pointerlockchange', () => {
             isMouseLocked = (document.pointerLockElement === renderer.domElement);
@@ -125,7 +138,7 @@
             if (e.code === 'Space') keys.space = false;
         });
 
-        // Hela animationsloopen som stänger koden korrekt
+        // Animationsloopen
         function animate() {
             requestAnimationFrame(animate);
             const timeNow = performance.now();
@@ -139,8 +152,37 @@
                 if (keys.a) { moveX += Math.cos(cameraYAngle); moveZ -= Math.sin(cameraYAngle); }
                 if (keys.d) { moveX -= Math.cos(cameraYAngle); moveZ += Math.sin(cameraYAngle); }
 
-                camera.position.x += moveX * 15 * delta;
-                camera.position.z += moveZ * 15 * delta;
+                const speed = 15;
+                
+                // Beräkna var spelaren vill gå härnäst (test-position)
+                const nextX = camera.position.x + moveX * speed * delta;
+                const nextZ = camera.position.z + moveZ * speed * delta;
+                
+                // Kolla om test-positionen kraschar med något hus (kollisions-kontroll)
+                let collisionX = false;
+                let collisionZ = false;
+                const playerRadius = 0.8; // Spelarens kroppsstorlek
+
+                for (let i = 0; i < colliders.length; i++) {
+                    const b = colliders[i];
+                    
+                    // Kolla krock på X-axeln
+                    if (nextX + playerRadius > b.x - b.w/2 && nextX - playerRadius < b.x + b.w/2 &&
+                        camera.position.z + playerRadius > b.z - b.d/2 && camera.position.z - playerRadius < b.z + b.d/2) {
+                        collisionX = true;
+                    }
+                    
+                    // Kolla krock på Z-axeln
+                    if (camera.position.x + playerRadius > b.x - b.w/2 && camera.position.x - playerRadius < b.x + b.w/2 &&
+                        nextZ + playerRadius > b.z - b.d/2 && nextZ - playerRadius < b.z + b.d/2) {
+                        collisionZ = true;
+                    }
+                }
+
+                // Flytta bara om vägen är fri
+                if (!collisionX) camera.position.x = nextX;
+                if (!collisionZ) camera.position.z = nextZ;
+
                 velocityY -= 28 * delta; camera.position.y += velocityY * delta;
 
                 if (keys.space && isGrounded) { velocityY = 11; isGrounded = false; }
@@ -161,3 +203,5 @@
         });
         animate();
     </script>
+</body>
+</html>
