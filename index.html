@@ -1,427 +1,517 @@
+```html
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desert War Zone</title>
-    <style>
-        body { margin: 0; overflow: hidden; background-color: #000; font-family: sans-serif; user-select: none; }
-        canvas { display: block; }
-        #crosshair {
-            position: absolute; top: 50%; left: 50%; width: 10px; height: 10px;
-            margin: -5px 0 0 -5px;
-            pointer-events: none; opacity: 0.9; z-index: 10; display: none;
-        }
-        #crosshair::before, #crosshair::after {
-            content: ""; position: absolute; background: #fff;
-            box-shadow: 0 0 2px rgba(0,0,0,0.8);
-        }
-        #crosshair::before { left: 4px; top: 0; width: 2px; height: 10px; }
-        #crosshair::after { top: 4px; left: 0; width: 10px; height: 2px; }
-        #start-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, rgba(60,40,20,0.85), rgba(0,0,0,0.95));
-            display: flex; flex-direction: column; justify-content: center;
-            align-items: center; z-index: 100; color: white; cursor: pointer;
-        }
-        .start-text {
-            padding: 20px 40px; font-size: 24px; font-weight: bold; background: #d35400;
-            border-radius: 10px; box-shadow: 0 5px 25px rgba(0,0,0,0.6); text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .hint { margin-top: 18px; font-size: 13px; opacity: 0.7; letter-spacing: 1px; }
-        #loading {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; display: flex; justify-content: center; align-items: center;
-            z-index: 200; color: #d35400; font-size: 18px; letter-spacing: 2px;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desert War Zone</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #000; font-family: sans-serif; user-select: none; }
+        canvas { display: block; }
+        #crosshair {
+            position: absolute; top: 50%; left: 50%; width: 10px; height: 10px;
+            margin: -5px 0 0 -5px;
+            pointer-events: none; opacity: 0.9; z-index: 10; display: none;
+        }
+        #crosshair::before, #crosshair::after {
+            content: ""; position: absolute; background: #fff;
+            box-shadow: 0 0 2px rgba(0,0,0,0.8);
+        }
+        #crosshair::before { left: 4px; top: 0; width: 2px; height: 10px; }
+        #crosshair::after { top: 4px; left: 0; width: 10px; height: 2px; }
+        #start-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, rgba(60,40,20,0.85), rgba(0,0,0,0.95));
+            display: flex; flex-direction: column; justify-content: center;
+            align-items: center; z-index: 100; color: white; cursor: pointer;
+        }
+        .start-text {
+            padding: 20px 40px; font-size: 24px; font-weight: bold; background: #d35400;
+            border-radius: 10px; box-shadow: 0 5px 25px rgba(0,0,0,0.6); text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .hint { margin-top: 18px; font-size: 13px; opacity: 0.7; letter-spacing: 1px; }
+        #loading {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; display: flex; justify-content: center; align-items: center;
+            z-index: 200; color: #d35400; font-size: 18px; letter-spacing: 2px;
+        }
+    </style>
 </head>
 <body>
 
-    <div id="loading">LADDAR ÖKENSTAD...</div>
-    <div id="start-overlay" style="display:none;">
-        <div class="start-text">STARTA ÖKENKRIGET (KLICKA HÄR)</div>
-        <div class="hint">WASD för att röra dig &nbsp;·&nbsp; MELLANSLAG för att hoppa &nbsp;·&nbsp; MUS för att titta</div>
-    </div>
-    <div id="crosshair"></div>
+    <div id="loading">LADDAR ÖKENSTAD...</div>
+    <div id="start-overlay" style="display:none;">
+        <div class="start-text">STARTA ÖKENKRIGET (KLICKA HÄR)</div>
+        <div class="hint">WASD för att röra dig &nbsp;·&nbsp; MELLANSLAG för att hoppa &nbsp;·&nbsp; MUS för att titta</div>
+    </div>
+    <div id="crosshair"></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-    <script>
-        // ---------- GRUNDUPPSÄTTNING ----------
-        const scene = new THREE.Scene();
+    <script>
+        // ---------- GRUNDUPPSÄTTNING ----------
+        const scene = new THREE.Scene();
 
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 2, 0);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 2, 0);
 
-        const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        renderer.outputEncoding = THREE.sRGBEncoding;
-        document.body.appendChild(renderer.domElement);
+        const renderer = new THREE.WebGLRenderer({ antialias: false });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.BasicShadowMap;
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        document.body.appendChild(renderer.domElement);
 
-        // ---------- HIMMEL (gradient-skybox) ----------
-        function createSkyTexture() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 2; canvas.height = 256;
-            const ctx = canvas.getContext('2d');
-            const grad = ctx.createLinearGradient(0, 0, 0, 256);
-            grad.addColorStop(0, '#8fa8c9');   // blek zenit-blå genom damm
-            grad.addColorStop(0.35, '#cfa878'); // dis
-            grad.addColorStop(0.65, '#e8c896'); // het horisont
-            grad.addColorStop(1, '#f2d9a8');    // sanddis vid horisonten
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, 2, 256);
-            const tex = new THREE.CanvasTexture(canvas);
-            tex.magFilter = THREE.LinearFilter;
-            return tex;
-        }
-        const skyGeo = new THREE.SphereGeometry(500, 32, 15);
-        const skyMat = new THREE.MeshBasicMaterial({ map: createSkyTexture(), side: THREE.BackSide, fog: false });
-        scene.add(new THREE.Mesh(skyGeo, skyMat));
+        // ---------- HIMMEL (gradient-skybox) ----------
+        function createSkyTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 2; canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            const grad = ctx.createLinearGradient(0, 0, 0, 256);
+            grad.addColorStop(0, '#8fa8c9');
+            grad.addColorStop(0.35, '#cfa878');
+            grad.addColorStop(0.65, '#e8c896');
+            grad.addColorStop(1, '#f2d9a8');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 2, 256);
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.magFilter = THREE.LinearFilter;
+            return tex;
+        }
 
-        scene.fog = new THREE.FogExp2(0xd8b788, 0.016); // sandstorm/krigsdimma
+        const skyGeo = new THREE.SphereGeometry(500, 32, 15);
+        const skyMat = new THREE.MeshBasicMaterial({ map: createSkyTexture(), side: THREE.BackSide, fog: false });
+        scene.add(new THREE.Mesh(skyGeo, skyMat));
 
-        // Sol-skiva (synlig ljuskälla på himlen)
-        const sunSprite = new THREE.Sprite(new THREE.SpriteMaterial({
-            color: 0xfff4d6, transparent: true, opacity: 0.9, fog: false
-        }));
-        sunSprite.scale.set(40, 40, 1);
-        sunSprite.position.set(-150, 90, -250);
-        scene.add(sunSprite);
+        scene.fog = new THREE.FogExp2(0xd8b788, 0.016);
 
-        // ---------- LJUS ----------
-        const sun = new THREE.DirectionalLight(0xffe9c4, 1.3);
-        sun.position.set(-150, 90, -250);
-        sun.castShadow = true;
-        sun.shadow.mapSize.set(1024, 1024);
-        sun.shadow.camera.left = -120;
-        sun.shadow.camera.right = 120;
-        sun.shadow.camera.top = 120;
-        sun.shadow.camera.bottom = -120;
-        sun.shadow.camera.far = 500;
-        sun.shadow.bias = -0.0015;
-        scene.add(sun);
+        const sunSprite = new THREE.Sprite(new THREE.SpriteMaterial({
+            color: 0xfff4d6, transparent: true, opacity: 0.9, fog: false
+        }));
+        sunSprite.scale.set(40, 40, 1);
+        sunSprite.position.set(-150, 90, -250);
+        scene.add(sunSprite);
 
-        const hemi = new THREE.HemisphereLight(0xcbd8ea, 0x8a6b45, 0.55);
-        scene.add(hemi);
+        // ---------- LJUS ----------
+        const sun = new THREE.DirectionalLight(0xffe9c4, 1.3);
+        sun.position.set(-150, 90, -250);
+        sun.castShadow = true;
+        sun.shadow.mapSize.set(1024, 1024);
+        sun.shadow.camera.left = -120;
+        sun.shadow.camera.right = 120;
+        sun.shadow.camera.top = 120;
+        sun.shadow.camera.bottom = -120;
+        sun.shadow.camera.far = 500;
+        sun.shadow.bias = -0.0015;
+        scene.add(sun);
 
-        const ambient = new THREE.AmbientLight(0xfff0e0, 0.25);
-        scene.add(ambient);
+        const hemi = new THREE.HemisphereLight(0xcbd8ea, 0x8a6b45, 0.55);
+        scene.add(hemi);
 
-        // ---------- MARK (procedurell sandtextur) ----------
-        function createSandTexture() {
-            const size = 512;
-            const canvas = document.createElement('canvas');
-            canvas.width = size; canvas.height = size;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#c9a874';
-            ctx.fillRect(0, 0, size, size);
-            for (let i = 0; i < 9000; i++) {
-                const x = Math.random() * size, y = Math.random() * size;
-                const shade = Math.random() * 40 - 20;
-                const r = 148 + shade, g = 122 + shade, b = 82 + shade;
-                ctx.fillStyle = `rgba(${r},${g},${b},${0.15 + Math.random() * 0.2})`;
-                ctx.fillRect(x, y, 1 + Math.random() * 2, 1 + Math.random() * 2);
-            }
-            // Några mörkare krater/slag-märken
-            for (let i = 0; i < 14; i++) {
-                const x = Math.random() * size, y = Math.random() * size, r = 8 + Math.random() * 22;
-                const grad = ctx.createRadialGradient(x, y, 0, x, y, r);
-                grad.addColorStop(0, 'rgba(60,45,30,0.45)');
-                grad.addColorStop(1, 'rgba(60,45,30,0)');
-                ctx.fillStyle = grad;
-                ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
-            }
-            const tex = new THREE.CanvasTexture(canvas);
-            tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-            tex.repeat.set(80, 80);
-            tex.encoding = THREE.sRGBEncoding;
-            return tex;
-        }
-        const floor = new THREE.Mesh(
-            new THREE.PlaneGeometry(2000, 2000),
-            new THREE.MeshStandardMaterial({ map: createSandTexture(), roughness: 1, metalness: 0 })
-        );
-        floor.rotation.x = -Math.PI / 2;
-        floor.receiveShadow = true;
-        scene.add(floor);
+        const ambient = new THREE.AmbientLight(0xfff0e0, 0.25);
+        scene.add(ambient);
 
-        // ---------- MATERIAL ----------
-        const matBuilding = [0x6b6455, 0x5a5347, 0x7a4a2e, 0x554f42, 0x8f3a2c, 0x4d4438]
-            .map(c => new THREE.MeshStandardMaterial({ color: c, roughness: 0.95, metalness: 0.02 }));
-        const matRubble = new THREE.MeshStandardMaterial({ color: 0x453f34, roughness: 1 });
-        const matConcreteHole = new THREE.MeshStandardMaterial({ color: 0x2e2a24, roughness: 1 });
-        const matSandbag = new THREE.MeshStandardMaterial({ color: 0x9c8656, roughness: 1 });
-        const matMetal = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.6, metalness: 0.4 });
-        const matMetalRust = new THREE.MeshStandardMaterial({ color: 0x6b3a20, roughness: 0.8, metalness: 0.2 });
-
-        function addShadowMesh(mesh) {
-            mesh.castShadow = true;
-            mesh.receiveShadow = true;
-            return mesh;
-        }
-
-        // ---------- BYGGNADER / RUINER ----------
-        function buildRuin(x, z) {
-            const group = new THREE.Group();
-            const w = 7 + Math.random() * 6;
-            const h = 8 + Math.random() * 12;
-            const d = 7 + Math.random() * 6;
-            const mat = matBuilding[Math.floor(Math.random() * matBuilding.length)];
-            const dmg = Math.random();
-
-            if (dmg > 0.55) {
-                // Skadat men stående hus, med håligheter (fönster/hål från granater)
-                const wall = addShadowMesh(new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat));
-                wall.position.y = h / 2;
-                group.add(wall);
-                const holes = 2 + Math.floor(Math.random() * 3);
-                for (let i = 0; i < holes; i++) {
-                    const hs = 1.2 + Math.random() * 1.8;
-                    const hole = addShadowMesh(new THREE.Mesh(new THREE.BoxGeometry(hs, hs, d + 0.4), matConcreteHole));
-                    hole.position.set((Math.random() - 0.5) * (w - hs), (Math.random() * 0.6 + 0.25) * h, 0);
-                    group.add(hole);
-                }
-                // Trasigt tak-hörn
-                if (Math.random() > 0.5) {
-                    const chunk = addShadowMesh(new THREE.Mesh(new THREE.BoxGeometry(w * 0.4, h * 0.35, d * 0.4), mat));
-                    chunk.position.set(w * 0.25, h * 0.15, d * 0.2);
-                    chunk.rotation.set(0.3, 0.4, 0.2);
-                    group.add(chunk);
-                }
-            } else if (dmg > 0.25) {
-                // Lutande, halvt raserat hus
-                const wall = addShadowMesh(new THREE.Mesh(new THREE.BoxGeometry(w, h * 0.65, d), mat));
-                wall.position.y = (h * 0.65) / 2;
-                group.add(wall);
-                group.rotation.z = (Math.random() - 0.5) * 0.35;
-                group.rotation.x = (Math.random() - 0.5) * 0.08;
-            } else {
-                // Rasmassor + exponerad armering (pelare)
-                for (let j = 0; j < 4; j++) {
-                    const rubble = addShadowMesh(new THREE.Mesh(
-                        new THREE.BoxGeometry(w * (0.3 + Math.random() * 0.35), 1.2 + Math.random() * 2, d * (0.3 + Math.random() * 0.35)),
-                        matRubble
-                    ));
-                    rubble.position.set((Math.random() - 0.5) * w, 0.8, (Math.random() - 0.5) * d);
-                    rubble.rotation.y = Math.random() * Math.PI;
-                    group.add(rubble);
-                }
-                for (let j = 0; j < 2 + Math.floor(Math.random() * 2); j++) {
-                    const beam = addShadowMesh(new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 3 + Math.random() * 3, 6), matMetal));
-                    beam.position.set((Math.random() - 0.5) * w, 1.5, (Math.random() - 0.5) * d);
-                    beam.rotation.set(Math.random() * 0.8, 0, Math.random() * 0.8);
-                    group.add(beam);
-                }
-            }
-
-            // Slumpmässiga extra-detaljer runt byggnaden
-            if (Math.random() > 0.6) {
-                for (let i = 0; i < 2 + Math.floor(Math.random() * 3); i++) {
-                    const bag = addShadowMesh(new THREE.Mesh(new THREE.SphereGeometry(0.5, 6, 5), matSandbag));
-                    bag.scale.set(1, 0.6, 0.7);
-                    bag.position.set(
-                        w / 2 + 0.5 + Math.random() * 1.5,
-                        0.3,
-                        (Math.random() - 0.5) * d
-                    );
-                    group.add(bag);
-                }
-            }
-            if (Math.random() > 0.75) {
-                const barrel = addShadowMesh(new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 1.3, 10), Math.random() > 0.5 ? matMetalRust : matMetal));
-                barrel.position.set(-w / 2 - 1 - Math.random(), 0.65, (Math.random() - 0.5) * d);
-                barrel.rotation.z = Math.random() > 0.8 ? Math.PI / 2 : 0;
-                group.add(barrel);
-            }
-
-            group.position.set(x, 0, z);
-            return group;
-        }
-
-        // Bombkrater i marken (platta ringar, ingen geometri-krock med marken tack vare offset)
-        function buildCrater(x, z) {
-            const r = 2 + Math.random() * 3;
-            const ring = new THREE.Mesh(
-                new THREE.RingGeometry(r * 0.4, r, 24),
-                new THREE.MeshStandardMaterial({ color: 0x2e2a20, roughness: 1, side: THREE.DoubleSide })
-            );
-            ring.rotation.x = -Math.PI / 2;
-            ring.position.set(x, 0.02, z);
-            ring.receiveShadow = true;
-            return ring;
-        }
-
-        // Elstolpe med hängande, trasiga ledningar (enkel geometrisk representation)
-        function buildPylon(x, z) {
-            const group = new THREE.Group();
-            const pole = addShadowMesh(new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.2, 9, 6), matMetalRust));
-            pole.position.y = 4.5;
-            pole.rotation.z = (Math.random() - 0.5) * 0.25;
-            group.add(pole);
-            const crossbar = addShadowMesh(new THREE.Mesh(new THREE.BoxGeometry(3, 0.15, 0.15), matMetal));
-            crossbar.position.y = 8.5;
-            group.add(crossbar);
-            group.position.set(x, 0, z);
-            return group;
-        }
-
-        const usedSpots = [];
-        const buildingColliders = [];
-        const playerRadius = 0.65;
-
-        function canMoveTo(x, z) {
-            for (const box of buildingColliders) {
-                if (
-                    x > box.min.x - playerRadius &&
-                    x < box.max.x + playerRadius &&
-                    z > box.min.z - playerRadius &&
-                    z < box.max.z + playerRadius
-                ) return false;
+        // ---------- MARK (procedurell sandtextur) ----------
+        function createSandTexture() {
+            const size = 512;
+            const canvas = document.createElement('canvas');
+            canvas.width = size; canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#c9a874';
+            ctx.fillRect(0, 0, size, size);
+            for (let i = 0; i < 9000; i++) {
+                const x = Math.random() * size, y = Math.random() * size;
+                const shade = Math.random() * 40 - 20;
+                const r = 148 + shade, g = 122 + shade, b = 82 + shade;
+                ctx.fillStyle = `rgba(${r},${g},${b},${0.15 + Math.random() * 0.2})`;
+                ctx.fillRect(x, y, 1 + Math.random() * 2, 1 + Math.random() * 2);
             }
+
+            for (let i = 0; i < 14; i++) {
+                const x = Math.random() * size, y = Math.random() * size, r = 8 + Math.random() * 22;
+                const grad = ctx.createRadialGradient(x, y, 0, x, y, r);
+                grad.addColorStop(0, 'rgba(60,45,30,0.45)');
+                grad.addColorStop(1, 'rgba(60,45,30,0)');
+                ctx.fillStyle = grad;
+                ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+            }
+
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(80, 80);
+            tex.encoding = THREE.sRGBEncoding;
+            return tex;
+        }
+
+        const floor = new THREE.Mesh(
+            new THREE.PlaneGeometry(2000, 2000),
+            new THREE.MeshStandardMaterial({ map: createSandTexture(), roughness: 1, metalness: 0 })
+        );
+        floor.rotation.x = -Math.PI / 2;
+        floor.receiveShadow = true;
+        scene.add(floor);
+
+        // ---------- MATERIAL ----------
+        const matBuilding = [0x6b6455, 0x5a5347, 0x7a4a2e, 0x554f42, 0x8f3a2c, 0x4d4438]
+            .map(c => new THREE.MeshStandardMaterial({ color: c, roughness: 0.95, metalness: 0.02 }));
+        const matRubble = new THREE.MeshStandardMaterial({ color: 0x453f34, roughness: 1 });
+        const matConcreteHole = new THREE.MeshStandardMaterial({ color: 0x2e2a24, roughness: 1 });
+        const matSandbag = new THREE.MeshStandardMaterial({ color: 0x9c8656, roughness: 1 });
+        const matMetal = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.6, metalness: 0.4 });
+        const matMetalRust = new THREE.MeshStandardMaterial({ color: 0x6b3a20, roughness: 0.8, metalness: 0.2 });
+
+        function addShadowMesh(mesh) {
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            return mesh;
+        }
+
+        // ---------- KOLLISIONER FÖR HUS ----------
+        const buildingColliders = [];
+
+        function collidesWithBuilding(x, z) {
+            for (const building of buildingColliders) {
+                const dx = x - building.x;
+                const dz = z - building.z;
+
+                if (dx * dx + dz * dz < building.radius * building.radius) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // ---------- BYGGNADER / RUINER ----------
+        function buildRuin(x, z) {
+            const group = new THREE.Group();
+            const w = 7 + Math.random() * 6;
+            const h = 8 + Math.random() * 12;
+            const d = 7 + Math.random() * 6;
+            const mat = matBuilding[Math.floor(Math.random() * matBuilding.length)];
+            const dmg = Math.random();
+
+            if (dmg > 0.55) {
+                const wall = addShadowMesh(new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat));
+                wall.position.y = h / 2;
+                group.add(wall);
+
+                const holes = 2 + Math.floor(Math.random() * 3);
+                for (let i = 0; i < holes; i++) {
+                    const hs = 1.2 + Math.random() * 1.8;
+                    const hole = addShadowMesh(new THREE.Mesh(new THREE.BoxGeometry(hs, hs, d + 0.4), matConcreteHole));
+                    hole.position.set((Math.random() - 0.5) * (w - hs), (Math.random() * 0.6 + 0.25) * h, 0);
+                    group.add(hole);
+                }
+
+                if (Math.random() > 0.5) {
+                    const chunk = addShadowMesh(new THREE.Mesh(new THREE.BoxGeometry(w * 0.4, h * 0.35, d * 0.4), mat));
+                    chunk.position.set(w * 0.25, h * 0.15, d * 0.2);
+                    chunk.rotation.set(0.3, 0.4, 0.2);
+                    group.add(chunk);
+                }
+            } else if (dmg > 0.25) {
+                const wall = addShadowMesh(new THREE.Mesh(new THREE.BoxGeometry(w, h * 0.65, d), mat));
+                wall.position.y = (h * 0.65) / 2;
+                group.add(wall);
+                group.rotation.z = (Math.random() - 0.5) * 0.35;
+                group.rotation.x = (Math.random() - 0.5) * 0.08;
+            } else {
+                for (let j = 0; j < 4; j++) {
+                    const rubble = addShadowMesh(new THREE.Mesh(
+                        new THREE.BoxGeometry(w * (0.3 + Math.random() * 0.35), 1.2 + Math.random() * 2, d * (0.3 + Math.random() * 0.35)),
+                        matRubble
+                    ));
+                    rubble.position.set((Math.random() - 0.5) * w, 0.8, (Math.random() - 0.5) * d);
+                    rubble.rotation.y = Math.random() * Math.PI;
+                    group.add(rubble);
+                }
+
+                for (let j = 0; j < 2 + Math.floor(Math.random() * 2); j++) {
+                    const beam = addShadowMesh(new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 3 + Math.random() * 3, 6), matMetal));
+                    beam.position.set((Math.random() - 0.5) * w, 1.5, (Math.random() - 0.5) * d);
+                    beam.rotation.set(Math.random() * 0.8, 0, Math.random() * 0.8);
+                    group.add(beam);
+                }
+            }
+
+            if (Math.random() > 0.6) {
+                for (let i = 0; i < 2 + Math.floor(Math.random() * 3); i++) {
+                    const bag = addShadowMesh(new THREE.Mesh(new THREE.SphereGeometry(0.5, 6, 5), matSandbag));
+                    bag.scale.set(1, 0.6, 0.7);
+                    bag.position.set(
+                        w / 2 + 0.5 + Math.random() * 1.5,
+                        0.3,
+                        (Math.random() - 0.5) * d
+                    );
+                    group.add(bag);
+                }
+            }
+
+            if (Math.random() > 0.75) {
+                const barrel = addShadowMesh(new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 1.3, 10), Math.random() > 0.5 ? matMetalRust : matMetal));
+                barrel.position.set(-w / 2 - 1 - Math.random(), 0.65, (Math.random() - 0.5) * d);
+                barrel.rotation.z = Math.random() > 0.8 ? Math.PI / 2 : 0;
+                group.add(barrel);
+            }
+
+            group.position.set(x, 0, z);
+
+            // Kollisionsradie runt varje ruin
+            buildingColliders.push({
+                x: x,
+                z: z,
+                radius: Math.sqrt(w * w + d * d) / 2 + 0.8
+            });
+
+            return group;
+        }
+
+        // Bombkrater
+        function buildCrater(x, z) {
+            const r = 2 + Math.random() * 3;
+            const ring = new THREE.Mesh(
+                new THREE.RingGeometry(r * 0.4, r, 24),
+                new THREE.MeshStandardMaterial({ color: 0x2e2a20, roughness: 1, side: THREE.DoubleSide })
+            );
+            ring.rotation.x = -Math.PI / 2;
+            ring.position.set(x, 0.02, z);
+            ring.receiveShadow = true;
+            return ring;
+        }
+
+        // Elstolpe
+        function buildPylon(x, z) {
+            const group = new THREE.Group();
+            const pole = addShadowMesh(new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.2, 9, 6), matMetalRust));
+            pole.position.y = 4.5;
+            pole.rotation.z = (Math.random() - 0.5) * 0.25;
+            group.add(pole);
+
+            const crossbar = addShadowMesh(new THREE.Mesh(new THREE.BoxGeometry(3, 0.15, 0.15), matMetal));
+            crossbar.position.y = 8.5;
+            group.add(crossbar);
+
+            group.position.set(x, 0, z);
+            return group;
+        }
+
+        const usedSpots = [];
+
+        function spotFree(x, z, minDist) {
+            if (Math.abs(x) < 12 && Math.abs(z) < 12) return false;
+
+            for (const s of usedSpots) {
+                if (Math.hypot(s.x - x, s.z - z) < minDist) return false;
+            }
+
             return true;
         }
-        function spotFree(x, z, minDist) {
-            if (Math.abs(x) < 12 && Math.abs(z) < 12) return false;
-            for (const s of usedSpots) {
-                if (Math.hypot(s.x - x, s.z - z) < minDist) return false;
-            }
-            return true;
-        }
 
-        for (let i = 0; i < 45; i++) {
-            let x, z, tries = 0;
-            do {
-                x = (Math.random() - 0.5) * 180;
-                z = (Math.random() - 0.5) * 180;
-                tries++;
-            } while (!spotFree(x, z, 9) && tries < 20);
-            if (tries >= 20) continue;
-            usedSpots.push({ x, z });
-            const ruin = buildRuin(x, z);
-            scene.add(ruin);
-            scene.updateMatrixWorld(true);
-            buildingColliders.push(new THREE.Box3().setFromObject(ruin));
-            if (Math.random() > 0.6) scene.add(buildCrater(x + (Math.random() - 0.5) * 6, z + (Math.random() - 0.5) * 6));
-        }
-        for (let i = 0; i < 6; i++) {
-            const x = (Math.random() - 0.5) * 170;
-            const z = (Math.random() - 0.5) * 170;
-            if (spotFree(x, z, 6)) scene.add(buildPylon(x, z));
-        }
-        // Fristående bombkratrar mitt i gator
-        for (let i = 0; i < 10; i++) {
-            scene.add(buildCrater((Math.random() - 0.5) * 190, (Math.random() - 0.5) * 190));
-        }
+        for (let i = 0; i < 55; i++) {
+            let x, z, tries = 0;
 
-        // ---------- DAMMPARTIKLAR ----------
-        const dustCount = 350;
-        const dustGeo = new THREE.BufferGeometry();
-        const dustPos = new Float32Array(dustCount * 3);
-        for (let i = 0; i < dustCount; i++) {
-            dustPos[i * 3] = (Math.random() - 0.5) * 200;
-            dustPos[i * 3 + 1] = Math.random() * 20;
-            dustPos[i * 3 + 2] = (Math.random() - 0.5) * 200;
-        }
-        dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
-        const dustMat = new THREE.PointsMaterial({ color: 0xe8d9b5, size: 0.18, transparent: true, opacity: 0.5, depthWrite: false });
-        const dust = new THREE.Points(dustGeo, dustMat);
-        scene.add(dust);
+            do {
+                x = (Math.random() - 0.5) * 180;
+                z = (Math.random() - 0.5) * 180;
+                tries++;
+            } while (!spotFree(x, z, 9) && tries < 20);
 
-        // ---------- KONTROLLER ----------
-        let cameraYAngle = 0, cameraXAngle = 0, isMouseLocked = false;
-        const startOverlay = document.getElementById('start-overlay');
-        const crosshair = document.getElementById('crosshair');
-        const loading = document.getElementById('loading');
+            if (tries >= 20) continue;
 
-        loading.style.display = 'none';
-        startOverlay.style.display = 'flex';
+            usedSpots.push({ x, z });
+            scene.add(buildRuin(x, z));
 
-        startOverlay.addEventListener('click', () => { renderer.domElement.requestPointerLock(); });
+            if (Math.random() > 0.6) {
+                scene.add(buildCrater(
+                    x + (Math.random() - 0.5) * 6,
+                    z + (Math.random() - 0.5) * 6
+                ));
+            }
+        }
 
-        document.addEventListener('pointerlockchange', () => {
-            isMouseLocked = (document.pointerLockElement === renderer.domElement);
-            startOverlay.style.display = isMouseLocked ? 'none' : 'flex';
-            crosshair.style.display = isMouseLocked ? 'block' : 'none';
-        });
+        for (let i = 0; i < 6; i++) {
+            const x = (Math.random() - 0.5) * 170;
+            const z = (Math.random() - 0.5) * 170;
 
-        document.addEventListener('mousemove', (e) => {
-            if (isMouseLocked) {
-                cameraYAngle -= e.movementX * 0.002;
-                cameraXAngle -= e.movementY * 0.002;
-                cameraXAngle = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, cameraXAngle));
-            }
-        });
+            if (spotFree(x, z, 6)) scene.add(buildPylon(x, z));
+        }
 
-        const keys = { w: false, a: false, s: false, d: false, space: false };
-        const lookTarget = new THREE.Vector3();
-        let velocityY = 0, isGrounded = true, lastTime = performance.now();
+        for (let i = 0; i < 10; i++) {
+            scene.add(buildCrater(
+                (Math.random() - 0.5) * 190,
+                (Math.random() - 0.5) * 190
+            ));
+        }
 
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'KeyW') keys.w = true; if (e.code === 'KeyA') keys.a = true;
-            if (e.code === 'KeyS') keys.s = true; if (e.code === 'KeyD') keys.d = true;
-            if (e.code === 'Space') keys.space = true;
-        });
-        document.addEventListener('keyup', (e) => {
-            if (e.code === 'KeyW') keys.w = false; if (e.code === 'KeyA') keys.a = false;
-            if (e.code === 'KeyS') keys.s = false; if (e.code === 'KeyD') keys.d = false;
-            if (e.code === 'Space') keys.space = false;
-        });
+        // ---------- DAMMPARTIKLAR ----------
+        const dustCount = 700;
+        const dustGeo = new THREE.BufferGeometry();
+        const dustPos = new Float32Array(dustCount * 3);
 
-        // ---------- ANIMATIONSLOOP ----------
-        function animate() {
-            requestAnimationFrame(animate);
-            const timeNow = performance.now();
-            const delta = Math.min((timeNow - lastTime) / 1000, 0.1);
-            lastTime = timeNow;
+        for (let i = 0; i < dustCount; i++) {
+            dustPos[i * 3] = (Math.random() - 0.5) * 200;
+            dustPos[i * 3 + 1] = Math.random() * 20;
+            dustPos[i * 3 + 2] = (Math.random() - 0.5) * 200;
+        }
 
-            if (isMouseLocked) {
-                let moveX = 0, moveZ = 0;
-                if (keys.w) { moveX += Math.sin(cameraYAngle); moveZ += Math.cos(cameraYAngle); }
-                if (keys.s) { moveX -= Math.sin(cameraYAngle); moveZ -= Math.cos(cameraYAngle); }
-                if (keys.a) { moveX += Math.cos(cameraYAngle); moveZ -= Math.sin(cameraYAngle); }
-                if (keys.d) { moveX -= Math.cos(cameraYAngle); moveZ += Math.sin(cameraYAngle); }
+        dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
 
-                camera.position.x += moveX * 15 * delta;
-                camera.position.z += moveZ * 15 * delta;
-                velocityY -= 28 * delta;
-                camera.position.y += velocityY * delta;
+        const dustMat = new THREE.PointsMaterial({
+            color: 0xe8d9b5,
+            size: 0.18,
+            transparent: true,
+            opacity: 0.5,
+            depthWrite: false
+        });
 
-                if (keys.space && isGrounded) { velocityY = 11; isGrounded = false; }
-                if (camera.position.y < 2) { camera.position.y = 2; velocityY = 0; isGrounded = true; }
-            }
+        const dust = new THREE.Points(dustGeo, dustMat);
+        scene.add(dust);
 
-            // Sakta drivande damm
-            const pos = dustGeo.attributes.position;
-            for (let i = 0; i < dustCount; i++) {
-                pos.array[i * 3] += 0.15 * delta * 10;
-                pos.array[i * 3 + 1] -= 0.02 * delta * 10;
-                if (pos.array[i * 3 + 1] < 0) pos.array[i * 3 + 1] = 18;
-                if (pos.array[i * 3] > camera.position.x + 100) pos.array[i * 3] = camera.position.x - 100;
-            }
-            pos.needsUpdate = true;
+        // ---------- KONTROLLER ----------
+        let cameraYAngle = 0, cameraXAngle = 0, isMouseLocked = false;
+        const startOverlay = document.getElementById('start-overlay');
+        const crosshair = document.getElementById('crosshair');
+        const loading = document.getElementById('loading');
 
-            const target = lookTarget;
-            target.x = camera.position.x + Math.sin(cameraYAngle) * Math.cos(cameraXAngle);
-            target.z = camera.position.z + Math.cos(cameraYAngle) * Math.cos(cameraXAngle);
-            target.y = camera.position.y + Math.sin(cameraXAngle);
-            camera.lookAt(target);
+        loading.style.display = 'none';
+        startOverlay.style.display = 'flex';
 
-            renderer.render(scene, camera);
-        }
+        startOverlay.addEventListener('click', () => {
+            renderer.domElement.requestPointerLock();
+        });
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+        document.addEventListener('pointerlockchange', () => {
+            isMouseLocked = (document.pointerLockElement === renderer.domElement);
+            startOverlay.style.display = isMouseLocked ? 'none' : 'flex';
+            crosshair.style.display = isMouseLocked ? 'block' : 'none';
+        });
 
-        animate();
-    </script>
+        document.addEventListener('mousemove', (e) => {
+            if (isMouseLocked) {
+                cameraYAngle -= e.movementX * 0.002;
+                cameraXAngle -= e.movementY * 0.002;
+                cameraXAngle = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, cameraXAngle));
+            }
+        });
+
+        const keys = { w: false, a: false, s: false, d: false, space: false };
+        let velocityY = 0, isGrounded = true, lastTime = performance.now();
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'KeyW') keys.w = true;
+            if (e.code === 'KeyA') keys.a = true;
+            if (e.code === 'KeyS') keys.s = true;
+            if (e.code === 'KeyD') keys.d = true;
+            if (e.code === 'Space') keys.space = true;
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.code === 'KeyW') keys.w = false;
+            if (e.code === 'KeyA') keys.a = false;
+            if (e.code === 'KeyS') keys.s = false;
+            if (e.code === 'KeyD') keys.d = false;
+            if (e.code === 'Space') keys.space = false;
+        });
+
+        // ---------- ANIMATIONSLOOP ----------
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const timeNow = performance.now();
+            const delta = Math.min((timeNow - lastTime) / 1000, 0.1);
+            lastTime = timeNow;
+
+            if (isMouseLocked) {
+                let moveX = 0, moveZ = 0;
+
+                if (keys.w) {
+                    moveX += Math.sin(cameraYAngle);
+                    moveZ += Math.cos(cameraYAngle);
+                }
+
+                if (keys.s) {
+                    moveX -= Math.sin(cameraYAngle);
+                    moveZ -= Math.cos(cameraYAngle);
+                }
+
+                if (keys.a) {
+                    moveX += Math.cos(cameraYAngle);
+                    moveZ -= Math.sin(cameraYAngle);
+                }
+
+                if (keys.d) {
+                    moveX -= Math.cos(cameraYAngle);
+                    moveZ += Math.sin(cameraYAngle);
+                }
+
+                const moveSpeed = 15 * delta;
+
+                // Kollision testas separat i X och Z så att man kan glida längs väggar
+                const newX = camera.position.x + moveX * moveSpeed;
+                if (!collidesWithBuilding(newX, camera.position.z)) {
+                    camera.position.x = newX;
+                }
+
+                const newZ = camera.position.z + moveZ * moveSpeed;
+                if (!collidesWithBuilding(camera.position.x, newZ)) {
+                    camera.position.z = newZ;
+                }
+
+                velocityY -= 28 * delta;
+                camera.position.y += velocityY * delta;
+
+                if (keys.space && isGrounded) {
+                    velocityY = 11;
+                    isGrounded = false;
+                }
+
+                if (camera.position.y < 2) {
+                    camera.position.y = 2;
+                    velocityY = 0;
+                    isGrounded = true;
+                }
+            }
+
+            // Sakta drivande damm
+            const pos = dustGeo.attributes.position;
+
+            for (let i = 0; i < dustCount; i++) {
+                pos.array[i * 3] += 0.15 * delta * 10;
+                pos.array[i * 3 + 1] -= 0.02 * delta * 10;
+
+                if (pos.array[i * 3 + 1] < 0) {
+                    pos.array[i * 3 + 1] = 18;
+                }
+
+                if (pos.array[i * 3] > camera.position.x + 100) {
+                    pos.array[i * 3] = camera.position.x - 100;
+                }
+            }
+
+            pos.needsUpdate = true;
+
+            const target = new THREE.Vector3();
+
+            target.x = camera.position.x + Math.sin(cameraYAngle) * Math.cos(cameraXAngle);
+            target.z = camera.position.z + Math.cos(cameraYAngle) * Math.cos(cameraXAngle);
+            target.y = camera.position.y + Math.sin(cameraXAngle);
+
+            camera.lookAt(target);
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
 
 </body>
 </html>
+```
