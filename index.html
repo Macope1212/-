@@ -8,36 +8,29 @@
     <style>
         body { margin: 0; overflow: hidden; background-color: #000; font-family: sans-serif; user-select: none; }
         canvas { display: block; }
-
         #crosshair {
             position: absolute; top: 50%; left: 50%; width: 10px; height: 10px;
             margin: -5px 0 0 -5px;
             pointer-events: none; opacity: 0.9; z-index: 10; display: none;
         }
-
         #crosshair::before, #crosshair::after {
             content: ""; position: absolute; background: #fff;
             box-shadow: 0 0 2px rgba(0,0,0,0.8);
         }
-
         #crosshair::before { left: 4px; top: 0; width: 2px; height: 10px; }
         #crosshair::after { top: 4px; left: 0; width: 10px; height: 2px; }
-
         #start-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at center, rgba(60,40,20,0.85), rgba(0,0,0,0.95));
             display: flex; flex-direction: column; justify-content: center;
             align-items: center; z-index: 100; color: white; cursor: pointer;
         }
-
         .start-text {
             padding: 20px 40px; font-size: 24px; font-weight: bold; background: #d35400;
             border-radius: 10px; box-shadow: 0 5px 25px rgba(0,0,0,0.6); text-transform: uppercase;
             letter-spacing: 1px;
         }
-
         .hint { margin-top: 18px; font-size: 13px; opacity: 0.7; letter-spacing: 1px; }
-
         #loading {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; display: flex; justify-content: center; align-items: center;
@@ -48,12 +41,10 @@
 <body>
 
     <div id="loading">LADDAR ÖKENSTAD...</div>
-
     <div id="start-overlay" style="display:none;">
         <div class="start-text">STARTA ÖKENKRIGET (KLICKA HÄR)</div>
         <div class="hint">WASD för att röra dig &nbsp;·&nbsp; MELLANSLAG för att hoppa &nbsp;·&nbsp; MUS för att titta</div>
     </div>
-
     <div id="crosshair"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -62,174 +53,118 @@
         // ---------- GRUNDUPPSÄTTNING ----------
         const scene = new THREE.Scene();
 
-        const camera = new THREE.PerspectiveCamera(
-            75,
-            window.innerWidth / window.innerHeight,
-            0.1,
-            1000
-        );
-
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 2, 0);
 
-        // MINDRE LAGG
-        const renderer = new THREE.WebGLRenderer({
-            antialias: false,
-            powerPreference: "high-performance"
-        });
-
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-
         renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.BasicShadowMap;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         renderer.outputEncoding = THREE.sRGBEncoding;
-
         document.body.appendChild(renderer.domElement);
-
 
         // ---------- HIMMEL ----------
         function createSkyTexture() {
             const canvas = document.createElement('canvas');
             canvas.width = 2;
-            canvas.height = 128;
-
+            canvas.height = 256;
             const ctx = canvas.getContext('2d');
 
-            const grad = ctx.createLinearGradient(0, 0, 0, 128);
+            const grad = ctx.createLinearGradient(0, 0, 0, 256);
             grad.addColorStop(0, '#8fa8c9');
             grad.addColorStop(0.35, '#cfa878');
             grad.addColorStop(0.65, '#e8c896');
             grad.addColorStop(1, '#f2d9a8');
 
             ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, 2, 128);
+            ctx.fillRect(0, 0, 2, 256);
 
             const tex = new THREE.CanvasTexture(canvas);
             tex.magFilter = THREE.LinearFilter;
-
             return tex;
         }
 
-        const skyGeo = new THREE.SphereGeometry(500, 24, 12);
-
+        const skyGeo = new THREE.SphereGeometry(500, 32, 15);
         const skyMat = new THREE.MeshBasicMaterial({
             map: createSkyTexture(),
             side: THREE.BackSide,
             fog: false
         });
-
         scene.add(new THREE.Mesh(skyGeo, skyMat));
 
         scene.fog = new THREE.FogExp2(0xd8b788, 0.016);
 
-
         // ---------- SOL ----------
-        const sunSprite = new THREE.Sprite(
-            new THREE.SpriteMaterial({
-                color: 0xfff4d6,
-                transparent: true,
-                opacity: 0.9,
-                fog: false
-            })
-        );
+        const sunSprite = new THREE.Sprite(new THREE.SpriteMaterial({
+            color: 0xfff4d6,
+            transparent: true,
+            opacity: 0.9,
+            fog: false
+        }));
 
         sunSprite.scale.set(40, 40, 1);
         sunSprite.position.set(-150, 90, -250);
-
         scene.add(sunSprite);
-
 
         // ---------- LJUS ----------
         const sun = new THREE.DirectionalLight(0xffe9c4, 1.3);
-
         sun.position.set(-150, 90, -250);
         sun.castShadow = true;
-
-        // MINDRE SKUGG-LAGG
         sun.shadow.mapSize.set(1024, 1024);
-
         sun.shadow.camera.left = -120;
         sun.shadow.camera.right = 120;
         sun.shadow.camera.top = 120;
         sun.shadow.camera.bottom = -120;
         sun.shadow.camera.far = 500;
         sun.shadow.bias = -0.0015;
-
         scene.add(sun);
 
-        const hemi = new THREE.HemisphereLight(
-            0xcbd8ea,
-            0x8a6b45,
-            0.55
-        );
-
+        const hemi = new THREE.HemisphereLight(0xcbd8ea, 0x8a6b45, 0.55);
         scene.add(hemi);
 
-        const ambient = new THREE.AmbientLight(
-            0xfff0e0,
-            0.25
-        );
-
+        const ambient = new THREE.AmbientLight(0xfff0e0, 0.25);
         scene.add(ambient);
-
 
         // ---------- MARK ----------
         function createSandTexture() {
-            const size = 256;
-
+            const size = 512;
             const canvas = document.createElement('canvas');
             canvas.width = size;
             canvas.height = size;
-
             const ctx = canvas.getContext('2d');
 
             ctx.fillStyle = '#c9a874';
             ctx.fillRect(0, 0, size, size);
 
-            // MINDRE TEXTURBERÄKNING
-            for (let i = 0; i < 3000; i++) {
+            for (let i = 0; i < 9000; i++) {
                 const x = Math.random() * size;
                 const y = Math.random() * size;
-
                 const shade = Math.random() * 40 - 20;
 
                 const r = 148 + shade;
                 const g = 122 + shade;
                 const b = 82 + shade;
 
-                ctx.fillStyle =
-                    `rgba(${r},${g},${b},${0.15 + Math.random() * 0.2})`;
-
-                ctx.fillRect(
-                    x,
-                    y,
-                    1 + Math.random() * 2,
-                    1 + Math.random() * 2
-                );
+                ctx.fillStyle = `rgba(${r},${g},${b},${0.15 + Math.random() * 0.2})`;
+                ctx.fillRect(x, y, 1 + Math.random() * 2, 1 + Math.random() * 2);
             }
 
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 14; i++) {
                 const x = Math.random() * size;
                 const y = Math.random() * size;
                 const r = 8 + Math.random() * 22;
 
-                const grad = ctx.createRadialGradient(
-                    x, y, 0,
-                    x, y, r
-                );
-
+                const grad = ctx.createRadialGradient(x, y, 0, x, y, r);
                 grad.addColorStop(0, 'rgba(60,45,30,0.45)');
                 grad.addColorStop(1, 'rgba(60,45,30,0)');
 
                 ctx.fillStyle = grad;
-
                 ctx.beginPath();
                 ctx.arc(x, y, r, 0, Math.PI * 2);
                 ctx.fill();
             }
 
             const tex = new THREE.CanvasTexture(canvas);
-
             tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
             tex.repeat.set(80, 80);
             tex.encoding = THREE.sRGBEncoding;
@@ -248,74 +183,54 @@
 
         floor.rotation.x = -Math.PI / 2;
         floor.receiveShadow = true;
-
         scene.add(floor);
 
-
         // ---------- MATERIAL ----------
-        // FLER FÄRGER PÅ BYGGNADER
         const matBuilding = [
             0x6b6455,
             0x5a5347,
             0x7a4a2e,
             0x554f42,
             0x8f3a2c,
-            0x4d4438,
-            0x806044,
-            0x6e5540,
-            0x927457,
-            0x70503a,
-            0x665f51,
-            0x815c3e,
-            0x594b40,
-            0x8b6b4c
-        ].map(c =>
-            new THREE.MeshStandardMaterial({
-                color: c,
-                roughness: 0.95,
-                metalness: 0.02
-            })
-        );
+            0x4d4438
+        ].map(c => new THREE.MeshStandardMaterial({
+            color: c,
+            roughness: 0.95,
+            metalness: 0.02
+        }));
 
-        const matRubble =
-            new THREE.MeshStandardMaterial({
-                color: 0x453f34,
-                roughness: 1
-            });
+        const matRubble = new THREE.MeshStandardMaterial({
+            color: 0x453f34,
+            roughness: 1
+        });
 
-        const matConcreteHole =
-            new THREE.MeshStandardMaterial({
-                color: 0x2e2a24,
-                roughness: 1
-            });
+        const matConcreteHole = new THREE.MeshStandardMaterial({
+            color: 0x2e2a24,
+            roughness: 1
+        });
 
-        const matSandbag =
-            new THREE.MeshStandardMaterial({
-                color: 0x9c8656,
-                roughness: 1
-            });
+        const matSandbag = new THREE.MeshStandardMaterial({
+            color: 0x9c8656,
+            roughness: 1
+        });
 
-        const matMetal =
-            new THREE.MeshStandardMaterial({
-                color: 0x3a3a3a,
-                roughness: 0.6,
-                metalness: 0.4
-            });
+        const matMetal = new THREE.MeshStandardMaterial({
+            color: 0x3a3a3a,
+            roughness: 0.6,
+            metalness: 0.4
+        });
 
-        const matMetalRust =
-            new THREE.MeshStandardMaterial({
-                color: 0x6b3a20,
-                roughness: 0.8,
-                metalness: 0.2
-            });
-
+        const matMetalRust = new THREE.MeshStandardMaterial({
+            color: 0x6b3a20,
+            roughness: 0.8,
+            metalness: 0.2
+        });
 
         function addShadowMesh(mesh) {
             mesh.castShadow = true;
             mesh.receiveShadow = true;
             return mesh;
         }
-
 
         // ---------- BYGGNADER / RUINER ----------
         function buildRuin(x, z) {
@@ -325,15 +240,10 @@
             const h = 8 + Math.random() * 12;
             const d = 7 + Math.random() * 6;
 
-            const mat =
-                matBuilding[Math.floor(Math.random() * matBuilding.length)];
-
+            const mat = matBuilding[Math.floor(Math.random() * matBuilding.length)];
             const dmg = Math.random();
 
-
             if (dmg > 0.55) {
-
-                // Skadat men stående hus
                 const wall = addShadowMesh(
                     new THREE.Mesh(
                         new THREE.BoxGeometry(w, h, d),
@@ -344,20 +254,31 @@
                 wall.position.y = h / 2;
                 group.add(wall);
 
+                const holes = 2 + Math.floor(Math.random() * 3);
 
-                // FIX: inga lösa/flygande kvadrater
-                // De gamla "hålen" var BoxGeometry-bitar som stack ut
-                // ur väggen och kunde se ut som flygande kvadrater.
+                for (let i = 0; i < holes; i++) {
+                    const hs = 1.2 + Math.random() * 1.8;
 
+                    const hole = addShadowMesh(
+                        new THREE.Mesh(
+                            new THREE.BoxGeometry(hs, hs, d + 0.4),
+                            matConcreteHole
+                        )
+                    );
+
+                    hole.position.set(
+                        (Math.random() - 0.5) * (w - hs),
+                        (Math.random() * 0.6 + 0.25) * h,
+                        0
+                    );
+
+                    group.add(hole);
+                }
 
                 if (Math.random() > 0.5) {
                     const chunk = addShadowMesh(
                         new THREE.Mesh(
-                            new THREE.BoxGeometry(
-                                w * 0.4,
-                                h * 0.35,
-                                d * 0.4
-                            ),
+                            new THREE.BoxGeometry(w * 0.4, h * 0.35, d * 0.4),
                             mat
                         )
                     );
@@ -368,44 +289,28 @@
                         d * 0.2
                     );
 
-                    chunk.rotation.set(
-                        0.3,
-                        0.4,
-                        0.2
-                    );
-
+                    chunk.rotation.set(0.3, 0.4, 0.2);
                     group.add(chunk);
                 }
 
             } else if (dmg > 0.25) {
 
-                // Lutande, halvt raserat hus
                 const wall = addShadowMesh(
                     new THREE.Mesh(
-                        new THREE.BoxGeometry(
-                            w,
-                            h * 0.65,
-                            d
-                        ),
+                        new THREE.BoxGeometry(w, h * 0.65, d),
                         mat
                     )
                 );
 
                 wall.position.y = (h * 0.65) / 2;
-
                 group.add(wall);
 
-                group.rotation.z =
-                    (Math.random() - 0.5) * 0.35;
-
-                group.rotation.x =
-                    (Math.random() - 0.5) * 0.08;
+                group.rotation.z = (Math.random() - 0.5) * 0.35;
+                group.rotation.x = (Math.random() - 0.5) * 0.08;
 
             } else {
 
-                // Rasmassor + armering
                 for (let j = 0; j < 4; j++) {
-
                     const rubble = addShadowMesh(
                         new THREE.Mesh(
                             new THREE.BoxGeometry(
@@ -423,14 +328,11 @@
                         (Math.random() - 0.5) * d
                     );
 
-                    rubble.rotation.y =
-                        Math.random() * Math.PI;
-
+                    rubble.rotation.y = Math.random() * Math.PI;
                     group.add(rubble);
                 }
 
                 for (let j = 0; j < 2 + Math.floor(Math.random() * 2); j++) {
-
                     const beam = addShadowMesh(
                         new THREE.Mesh(
                             new THREE.CylinderGeometry(
@@ -459,12 +361,8 @@
                 }
             }
 
-
-            // Sandbags
             if (Math.random() > 0.6) {
-
                 for (let i = 0; i < 2 + Math.floor(Math.random() * 3); i++) {
-
                     const bag = addShadowMesh(
                         new THREE.Mesh(
                             new THREE.SphereGeometry(0.5, 6, 5),
@@ -484,21 +382,11 @@
                 }
             }
 
-
-            // Barrel
             if (Math.random() > 0.75) {
-
                 const barrel = addShadowMesh(
                     new THREE.Mesh(
-                        new THREE.CylinderGeometry(
-                            0.5,
-                            0.5,
-                            1.3,
-                            8
-                        ),
-                        Math.random() > 0.5
-                            ? matMetalRust
-                            : matMetal
+                        new THREE.CylinderGeometry(0.5, 0.5, 1.3, 10),
+                        Math.random() > 0.5 ? matMetalRust : matMetal
                     )
                 );
 
@@ -508,32 +396,29 @@
                     (Math.random() - 0.5) * d
                 );
 
-                barrel.rotation.z =
-                    Math.random() > 0.8
-                        ? Math.PI / 2
-                        : 0;
-
+                barrel.rotation.z = Math.random() > 0.8 ? Math.PI / 2 : 0;
                 group.add(barrel);
             }
 
-
             group.position.set(x, 0, z);
+
+            group.userData.collider = {
+                x: x,
+                z: z,
+                halfW: w / 2 + 0.25,
+                halfD: d / 2 + 0.25,
+                rotationZ: group.rotation.z
+            };
 
             return group;
         }
 
-
-        // ---------- KRATER ----------
+        // ---------- KRATRAR ----------
         function buildCrater(x, z) {
-
             const r = 2 + Math.random() * 3;
 
             const ring = new THREE.Mesh(
-                new THREE.RingGeometry(
-                    r * 0.4,
-                    r,
-                    16
-                ),
+                new THREE.RingGeometry(r * 0.4, r, 24),
                 new THREE.MeshStandardMaterial({
                     color: 0x2e2a20,
                     roughness: 1,
@@ -548,44 +433,29 @@
             return ring;
         }
 
-
-        // ---------- ELPYLON ----------
+        // ---------- ELSTOLPAR ----------
         function buildPylon(x, z) {
-
             const group = new THREE.Group();
 
             const pole = addShadowMesh(
                 new THREE.Mesh(
-                    new THREE.CylinderGeometry(
-                        0.15,
-                        0.2,
-                        9,
-                        6
-                    ),
+                    new THREE.CylinderGeometry(0.15, 0.2, 9, 6),
                     matMetalRust
                 )
             );
 
             pole.position.y = 4.5;
-            pole.rotation.z =
-                (Math.random() - 0.5) * 0.25;
-
+            pole.rotation.z = (Math.random() - 0.5) * 0.25;
             group.add(pole);
-
 
             const crossbar = addShadowMesh(
                 new THREE.Mesh(
-                    new THREE.BoxGeometry(
-                        3,
-                        0.15,
-                        0.15
-                    ),
+                    new THREE.BoxGeometry(3, 0.15, 0.15),
                     matMetal
                 )
             );
 
             crossbar.position.y = 8.5;
-
             group.add(crossbar);
 
             group.position.set(x, 0, z);
@@ -593,22 +463,26 @@
             return group;
         }
 
-
-        // ---------- GENERERA VÄRLD ----------
+        // ---------- KOLLISION ----------
         const usedSpots = [];
+        const buildingColliders = [];
+        const playerRadius = 0.65;
 
-        function spotFree(x, z, minDist) {
+        function canMoveTo(x, z) {
+            for (const c of buildingColliders) {
+                const dx = x - c.x;
+                const dz = z - c.z;
 
-            if (Math.abs(x) < 12 && Math.abs(z) < 12)
-                return false;
+                const angle = -c.rotationZ;
+                const cos = Math.cos(angle);
+                const sin = Math.sin(angle);
 
-            for (const s of usedSpots) {
+                const localX = dx * cos - dz * sin;
+                const localZ = dx * sin + dz * cos;
 
                 if (
-                    Math.hypot(
-                        s.x - x,
-                        s.z - z
-                    ) < minDist
+                    Math.abs(localX) < c.halfW + playerRadius &&
+                    Math.abs(localZ) < c.halfD + playerRadius
                 ) {
                     return false;
                 }
@@ -617,37 +491,38 @@
             return true;
         }
 
+        function spotFree(x, z, minDist) {
+            if (Math.abs(x) < 12 && Math.abs(z) < 12) return false;
 
+            for (const s of usedSpots) {
+                if (Math.hypot(s.x - x, s.z - z) < minDist) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // ---------- SKAPA VÄRLD ----------
         for (let i = 0; i < 55; i++) {
-
             let x, z, tries = 0;
 
             do {
-
-                x =
-                    (Math.random() - 0.5) * 180;
-
-                z =
-                    (Math.random() - 0.5) * 180;
-
+                x = (Math.random() - 0.5) * 180;
+                z = (Math.random() - 0.5) * 180;
                 tries++;
+            } while (!spotFree(x, z, 9) && tries < 20);
 
-            } while (
-                !spotFree(x, z, 9) &&
-                tries < 20
-            );
-
-            if (tries >= 20)
-                continue;
+            if (tries >= 20) continue;
 
             usedSpots.push({ x, z });
 
-            scene.add(
-                buildRuin(x, z)
-            );
+            const ruin = buildRuin(x, z);
+            scene.add(ruin);
+
+            buildingColliders.push(ruin.userData.collider);
 
             if (Math.random() > 0.6) {
-
                 scene.add(
                     buildCrater(
                         x + (Math.random() - 0.5) * 6,
@@ -657,26 +532,16 @@
             }
         }
 
-
         for (let i = 0; i < 6; i++) {
-
-            const x =
-                (Math.random() - 0.5) * 170;
-
-            const z =
-                (Math.random() - 0.5) * 170;
+            const x = (Math.random() - 0.5) * 170;
+            const z = (Math.random() - 0.5) * 170;
 
             if (spotFree(x, z, 6)) {
-
-                scene.add(
-                    buildPylon(x, z)
-                );
+                scene.add(buildPylon(x, z));
             }
         }
 
-
         for (let i = 0; i < 10; i++) {
-
             scene.add(
                 buildCrater(
                     (Math.random() - 0.5) * 190,
@@ -685,126 +550,71 @@
             );
         }
 
-
         // ---------- DAMMPARTIKLAR ----------
-        // MINDRE LAGG: 700 -> 350
         const dustCount = 350;
-
         const dustGeo = new THREE.BufferGeometry();
-
-        const dustPos =
-            new Float32Array(dustCount * 3);
+        const dustPos = new Float32Array(dustCount * 3);
 
         for (let i = 0; i < dustCount; i++) {
-
-            dustPos[i * 3] =
-                (Math.random() - 0.5) * 200;
-
-            dustPos[i * 3 + 1] =
-                Math.random() * 20;
-
-            dustPos[i * 3 + 2] =
-                (Math.random() - 0.5) * 200;
+            dustPos[i * 3] = (Math.random() - 0.5) * 200;
+            dustPos[i * 3 + 1] = Math.random() * 20;
+            dustPos[i * 3 + 2] = (Math.random() - 0.5) * 200;
         }
 
         dustGeo.setAttribute(
             'position',
-            new THREE.BufferAttribute(
-                dustPos,
-                3
-            )
+            new THREE.BufferAttribute(dustPos, 3)
         );
 
-        const dustMat =
-            new THREE.PointsMaterial({
-                color: 0xe8d9b5,
-                size: 0.18,
-                transparent: true,
-                opacity: 0.5,
-                depthWrite: false
-            });
+        const dustMat = new THREE.PointsMaterial({
+            color: 0xe8d9b5,
+            size: 0.18,
+            transparent: true,
+            opacity: 0.5,
+            depthWrite: false
+        });
 
-        const dust =
-            new THREE.Points(
-                dustGeo,
-                dustMat
-            );
-
+        const dust = new THREE.Points(dustGeo, dustMat);
         scene.add(dust);
-
 
         // ---------- KONTROLLER ----------
         let cameraYAngle = 0;
         let cameraXAngle = 0;
         let isMouseLocked = false;
 
-        const startOverlay =
-            document.getElementById('start-overlay');
-
-        const crosshair =
-            document.getElementById('crosshair');
-
-        const loading =
-            document.getElementById('loading');
-
+        const startOverlay = document.getElementById('start-overlay');
+        const crosshair = document.getElementById('crosshair');
+        const loading = document.getElementById('loading');
 
         loading.style.display = 'none';
         startOverlay.style.display = 'flex';
 
+        startOverlay.addEventListener('click', () => {
+            renderer.domElement.requestPointerLock();
+        });
 
-        startOverlay.addEventListener(
-            'click',
-            () => {
-                renderer.domElement.requestPointerLock();
+        document.addEventListener('pointerlockchange', () => {
+            isMouseLocked =
+                document.pointerLockElement === renderer.domElement;
+
+            startOverlay.style.display =
+                isMouseLocked ? 'none' : 'flex';
+
+            crosshair.style.display =
+                isMouseLocked ? 'block' : 'none';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isMouseLocked) {
+                cameraYAngle -= e.movementX * 0.002;
+                cameraXAngle -= e.movementY * 0.002;
+
+                cameraXAngle = Math.max(
+                    -Math.PI / 2.2,
+                    Math.min(Math.PI / 2.2, cameraXAngle)
+                );
             }
-        );
-
-
-        document.addEventListener(
-            'pointerlockchange',
-            () => {
-
-                isMouseLocked =
-                    document.pointerLockElement ===
-                    renderer.domElement;
-
-                startOverlay.style.display =
-                    isMouseLocked
-                        ? 'none'
-                        : 'flex';
-
-                crosshair.style.display =
-                    isMouseLocked
-                        ? 'block'
-                        : 'none';
-            }
-        );
-
-
-        document.addEventListener(
-            'mousemove',
-            (e) => {
-
-                if (isMouseLocked) {
-
-                    cameraYAngle -=
-                        e.movementX * 0.002;
-
-                    cameraXAngle -=
-                        e.movementY * 0.002;
-
-                    cameraXAngle =
-                        Math.max(
-                            -Math.PI / 2.2,
-                            Math.min(
-                                Math.PI / 2.2,
-                                cameraXAngle
-                            )
-                        );
-                }
-            }
-        );
-
+        });
 
         const keys = {
             w: false,
@@ -814,369 +624,152 @@
             space: false
         };
 
-
         let velocityY = 0;
         let isGrounded = true;
-
         let lastTime = performance.now();
 
-        // ---------- MJUKARE GÅNG ----------
-        let moveVelocityX = 0;
-        let moveVelocityZ = 0;
+        // ---------- OSYNLIG MAPPGRÄNS ----------
+        const MAP_BOUNDARY = 100;
 
-        let walkTime = 0;
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'KeyW') keys.w = true;
+            if (e.code === 'KeyA') keys.a = true;
+            if (e.code === 'KeyS') keys.s = true;
+            if (e.code === 'KeyD') keys.d = true;
 
-        const WALK_SPEED = 15;
-        const ACCELERATION = 70;
-        const DECELERATION = 90;
+            if (e.code === 'Space') keys.space = true;
+        });
 
+        document.addEventListener('keyup', (e) => {
+            if (e.code === 'KeyW') keys.w = false;
+            if (e.code === 'KeyA') keys.a = false;
+            if (e.code === 'KeyS') keys.s = false;
+            if (e.code === 'KeyD') keys.d = false;
 
-        document.addEventListener(
-            'keydown',
-            (e) => {
-
-                if (e.code === 'KeyW')
-                    keys.w = true;
-
-                if (e.code === 'KeyA')
-                    keys.a = true;
-
-                if (e.code === 'KeyS')
-                    keys.s = true;
-
-                if (e.code === 'KeyD')
-                    keys.d = true;
-
-                if (e.code === 'Space')
-                    keys.space = true;
-            }
-        );
-
-
-        document.addEventListener(
-            'keyup',
-            (e) => {
-
-                if (e.code === 'KeyW')
-                    keys.w = false;
-
-                if (e.code === 'KeyA')
-                    keys.a = false;
-
-                if (e.code === 'KeyS')
-                    keys.s = false;
-
-                if (e.code === 'KeyD')
-                    keys.d = false;
-
-                if (e.code === 'Space')
-                    keys.space = false;
-            }
-        );
-
+            if (e.code === 'Space') keys.space = false;
+        });
 
         // ---------- ANIMATIONSLOOP ----------
         function animate() {
-
             requestAnimationFrame(animate);
 
-            const timeNow =
-                performance.now();
-
-            const delta =
-                Math.min(
-                    (timeNow - lastTime) / 1000,
-                    0.05
-                );
+            const timeNow = performance.now();
+            const delta = Math.min(
+                (timeNow - lastTime) / 1000,
+                0.1
+            );
 
             lastTime = timeNow;
 
-
             if (isMouseLocked) {
-
-                let targetMoveX = 0;
-                let targetMoveZ = 0;
+                let moveX = 0;
+                let moveZ = 0;
 
                 if (keys.w) {
-
-                    targetMoveX +=
-                        Math.sin(cameraYAngle);
-
-                    targetMoveZ +=
-                        Math.cos(cameraYAngle);
+                    moveX += Math.sin(cameraYAngle);
+                    moveZ += Math.cos(cameraYAngle);
                 }
 
                 if (keys.s) {
-
-                    targetMoveX -=
-                        Math.sin(cameraYAngle);
-
-                    targetMoveZ -=
-                        Math.cos(cameraYAngle);
+                    moveX -= Math.sin(cameraYAngle);
+                    moveZ -= Math.cos(cameraYAngle);
                 }
 
                 if (keys.a) {
-
-                    targetMoveX +=
-                        Math.cos(cameraYAngle);
-
-                    targetMoveZ -=
-                        Math.sin(cameraYAngle);
+                    moveX += Math.cos(cameraYAngle);
+                    moveZ -= Math.sin(cameraYAngle);
                 }
 
                 if (keys.d) {
-
-                    targetMoveX -=
-                        Math.cos(cameraYAngle);
-
-                    targetMoveZ +=
-                        Math.sin(cameraYAngle);
+                    moveX -= Math.cos(cameraYAngle);
+                    moveZ += Math.sin(cameraYAngle);
                 }
 
-
-                // Normalisera diagonal rörelse
-                const moveLength =
-                    Math.hypot(
-                        targetMoveX,
-                        targetMoveZ
-                    );
-
-                if (moveLength > 0) {
-
-                    targetMoveX /=
-                        moveLength;
-
-                    targetMoveZ /=
-                        moveLength;
-
-                    targetMoveX *=
-                        WALK_SPEED;
-
-                    targetMoveZ *=
-                        WALK_SPEED;
-                }
-
-
-                // Mjuk acceleration
-                const acceleration =
-                    moveLength > 0
-                        ? ACCELERATION
-                        : DECELERATION;
-
-
-                moveVelocityX +=
-                    (targetMoveX - moveVelocityX) *
-                    Math.min(1, acceleration * delta / WALK_SPEED);
-
-                moveVelocityZ +=
-                    (targetMoveZ - moveVelocityZ) *
-                    Math.min(1, acceleration * delta / WALK_SPEED);
-
-
-                camera.position.x +=
-                    moveVelocityX * delta;
-
-                camera.position.z +=
-                    moveVelocityZ * delta;
-
-
-                // ---------- HOPP ----------
-                velocityY -=
-                    28 * delta;
-
-                camera.position.y +=
-                    velocityY * delta;
-
+                const newX = camera.position.x + moveX * 15 * delta;
+                const newZ = camera.position.z + moveZ * 15 * delta;
 
                 if (
-                    keys.space &&
-                    isGrounded
+                    canMoveTo(newX, camera.position.z) &&
+                    Math.abs(newX) <= MAP_BOUNDARY
                 ) {
+                    camera.position.x = newX;
+                }
 
+                if (
+                    canMoveTo(camera.position.x, newZ) &&
+                    Math.abs(newZ) <= MAP_BOUNDARY
+                ) {
+                    camera.position.z = newZ;
+                }
+
+                // ---------- HOPPA ----------
+                velocityY -= 28 * delta;
+                camera.position.y += velocityY * delta;
+
+                if (keys.space && isGrounded) {
                     velocityY = 11;
                     isGrounded = false;
                 }
 
-
-                if (
-                    camera.position.y < 2
-                ) {
-
+                if (camera.position.y < 2) {
                     camera.position.y = 2;
                     velocityY = 0;
                     isGrounded = true;
                 }
-
-
-                // ---------- GÅ-ANIMATION ----------
-                const horizontalSpeed =
-                    Math.hypot(
-                        moveVelocityX,
-                        moveVelocityZ
-                    );
-
-                if (
-                    horizontalSpeed > 0.5 &&
-                    isGrounded
-                ) {
-
-                    walkTime +=
-                        delta *
-                        8 *
-                        Math.min(
-                            horizontalSpeed / WALK_SPEED,
-                            1
-                        );
-
-                } else {
-
-                    // Mjuk återgång när man slutar gå
-                    walkTime += delta * 2;
-                }
-
-            } else {
-
-                // Ingen head-bob när spelet inte är igång
-                walkTime += delta * 2;
             }
-
-
-            // ---------- HEAD BOB ----------
-            const moving =
-                Math.hypot(
-                    moveVelocityX,
-                    moveVelocityZ
-                ) > 0.5 &&
-                isGrounded &&
-                isMouseLocked;
-
-
-            let bobX = 0;
-            let bobY = 0;
-
-            if (moving) {
-
-                const speedFactor =
-                    Math.min(
-                        Math.hypot(
-                            moveVelocityX,
-                            moveVelocityZ
-                        ) / WALK_SPEED,
-                        1
-                    );
-
-                bobX =
-                    Math.cos(walkTime) *
-                    0.025 *
-                    speedFactor;
-
-                bobY =
-                    Math.abs(
-                        Math.sin(walkTime)
-                    ) *
-                    0.045 *
-                    speedFactor;
-
-            } else {
-
-                // Lugn kamera när man står still
-                bobX =
-                    Math.sin(walkTime * 0.8) *
-                    0.003;
-
-                bobY =
-                    Math.sin(walkTime * 0.6) *
-                    0.002;
-            }
-
 
             // ---------- DAMM ----------
-            const pos =
-                dustGeo.attributes.position;
+            const pos = dustGeo.attributes.position;
 
-            for (
-                let i = 0;
-                i < dustCount;
-                i++
-            ) {
+            for (let i = 0; i < dustCount; i++) {
+                pos.array[i * 3] += 0.15 * delta * 10;
+                pos.array[i * 3 + 1] -= 0.02 * delta * 10;
 
-                pos.array[i * 3] +=
-                    0.15 * delta * 10;
-
-                pos.array[i * 3 + 1] -=
-                    0.02 * delta * 10;
-
-                if (
-                    pos.array[i * 3 + 1] < 0
-                ) {
-
+                if (pos.array[i * 3 + 1] < 0) {
                     pos.array[i * 3 + 1] = 18;
                 }
 
-                if (
-                    pos.array[i * 3] >
-                    camera.position.x + 100
-                ) {
-
-                    pos.array[i * 3] =
-                        camera.position.x - 100;
+                if (pos.array[i * 3] > camera.position.x + 100) {
+                    pos.array[i * 3] = camera.position.x - 100;
                 }
             }
 
             pos.needsUpdate = true;
 
+            const target = new THREE.Vector3();
 
-            // ---------- KAMERA ----------
-            const targetX =
+            target.x =
                 camera.position.x +
                 Math.sin(cameraYAngle) *
                 Math.cos(cameraXAngle);
 
-            const targetZ =
+            target.z =
                 camera.position.z +
                 Math.cos(cameraYAngle) *
                 Math.cos(cameraXAngle);
 
-            const targetY =
+            target.y =
                 camera.position.y +
                 Math.sin(cameraXAngle);
 
+            camera.lookAt(target);
 
-            camera.lookAt(
-                targetX + bobX,
-                targetY + bobY,
-                targetZ
-            );
-
-
-            renderer.render(
-                scene,
-                camera
-            );
+            renderer.render(scene, camera);
         }
 
+        window.addEventListener('resize', () => {
+            camera.aspect =
+                window.innerWidth / window.innerHeight;
 
-        // ---------- RESIZE ----------
-        window.addEventListener(
-            'resize',
-            () => {
+            camera.updateProjectionMatrix();
 
-                camera.aspect =
-                    window.innerWidth /
-                    window.innerHeight;
-
-                camera.updateProjectionMatrix();
-
-                renderer.setSize(
-                    window.innerWidth,
-                    window.innerHeight
-                );
-            }
-        );
-
+            renderer.setSize(
+                window.innerWidth,
+                window.innerHeight
+            );
+        });
 
         animate();
-
     </script>
 
 </body>
