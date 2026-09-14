@@ -60,24 +60,71 @@
         floor.rotation.x = -Math.PI / 2;
         scene.add(floor);
 
-        // 3. Stora färgade pelare så du ser när du går
-        const boxGeo = new THREE.BoxGeometry(4, 10, 4);
-        const colors = [0xff0000, 0xffff00, 0x0000ff, 0xff00ff]; // Röd, Gul, Blå, Lila
+        // 3. FUNKTION FÖR ATT SKAPA FINA BYGGNADER (Väggar, dörr och spetsigt tak)
+        function createBuilding(x, z, width, height, depth, wallColor, roofColor) {
+            const buildingGroup = new THREE.Group();
 
-        for (let i = 0; i < 50; i++) {
-            const randomColor = colors[Math.floor(Math.random() * colors.length)];
-            const boxMat = new THREE.MeshBasicMaterial({ color: randomColor });
-            const box = new THREE.Mesh(boxGeo, boxMat);
+            // Husets väggar
+            const wallGeo = new THREE.BoxGeometry(width, height, depth);
+            const wallMat = new THREE.MeshBasicMaterial({ color: wallColor });
+            const walls = new THREE.Mesh(wallGeo, wallMat);
+            walls.position.y = height / 2; // Sätt huset på marken
+            buildingGroup.add(walls);
+
+            // Spetsigt tak (Kon)
+            const roofHeight = width * 0.5;
+            const roofGeo = new THREE.ConeGeometry(Math.max(width, depth) * 0.75, roofHeight, 4);
+            const roofMat = new THREE.MeshBasicMaterial({ color: roofColor });
+            const roof = new THREE.Mesh(roofGeo, roofMat);
+            roof.position.y = height + (roofHeight / 2);
+            roof.rotation.y = Math.PI / 4; // Rotera taket så det passar dörren perfekt
+            buildingGroup.add(roof);
+
+            // En dörr (Svart rektangel)
+            const doorGeo = new THREE.BoxGeometry(width * 0.25, height * 0.25, 0.1);
+            const doorMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
+            const door = new THREE.Mesh(doorGeo, doorMat);
+            door.position.set(0, (height * 0.25) / 2, (depth / 2) + 0.01); 
+            buildingGroup.add(door);
+
+            // Placera ut hela huspaketet på gräset
+            buildingGroup.position.set(x, 0, z);
+            scene.add(buildingGroup);
+        }
+
+        // Färgpaletter till staden
+        const houseColors = [0xdd4b39, 0xf39c12, 0x3498db, 0x9b59b6, 0xe74c3c, 0x95a5a6]; // Röd, Orange, Blå, Lila, Mörkröd, Grå
+        const roofColors = [0x2c3e50, 0x7f8c8d, 0x111111, 0x34495e]; // Olika mörka takfärger
+
+        // Generera 35 fina hus utspridda på gräset
+        for (let i = 0; i < 35; i++) {
+            const x = (Math.random() - 0.5) * 160;
+            const z = (Math.random() - 0.5) * 160;
             
-            box.position.x = (Math.random() - 0.5) * 160;
-            box.position.z = (Math.random() - 0.5) * 160;
-            box.position.y = 5; // Placerade perfekt stående på gräset
-            
-            // Rensa startytan så inget block blockerar kameran vid start
-            if (Math.abs(box.position.x) < 8 && Math.abs(box.position.z) < 8) {
-                box.position.z -= 25;
+            // Slumpa storlekar på husen
+            const w = 6 + Math.random() * 5;
+            const h = 6 + Math.random() * 10;
+            const d = 6 + Math.random() * 5;
+
+            const randomWall = houseColors[Math.floor(Math.random() * houseColors.length)];
+            const randomRoof = roofColors[Math.floor(Math.random() * roofColors.length)];
+
+            // Se till att inga hus byggs precis där man spawnar (0,0)
+            if (Math.abs(x) < 10 && Math.abs(z) < 10) {
+                continue; 
             }
-            scene.add(box);
+
+            createBuilding(x, z, w, h, d, randomWall, randomRoof);
+        }
+
+        // Generera 6 stycken jättehöga skyskrapor i bakgrunden (med gula tak)
+        for (let i = 0; i < 6; i++) {
+            const x = (Math.random() - 0.5) * 240;
+            const z = (Math.random() - 0.5) * 240;
+
+            if (Math.abs(x) < 35 && Math.abs(z) < 35) continue; // Håll spawn-ytan ren
+
+            createBuilding(x, z, 12, 40 + Math.random() * 20, 12, 0x2c3e50, 0xf1c40f);
         }
 
         // 4. Hantering av mus och låsning
@@ -191,5 +238,3 @@
 
         animate();
     </script>
-</body>
-</html>
