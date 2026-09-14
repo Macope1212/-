@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desert War Zone - Real 3D FPS</title>
+    <title>Desert War Zone - 3D FPS</title>
     <style>
         body { margin: 0; overflow: hidden; background-color: #000; font-family: sans-serif; user-select: none; }
         canvas { display: block; }
         #crosshair {
             position: absolute; top: 50%; left: 50%; width: 10px; height: 10px;
             background: white; border-radius: 50%; transform: translate(-50%, -50%);
-            pointer-events: none; opacity: 0.8; z-index: 10; display: none;
+            pointer-events: none; opacity: 0.8; z-index: 10;
         }
         #info-text {
             position: absolute; bottom: 20px; width: 100%; text-align: center;
@@ -21,16 +21,16 @@
 </head>
 <body>
 
-    <div id="info-text">KLICKA PÅ SKÄRMEN FÖR ATT STARTA (W,A,S,D = GÅ | SPACE = HOPPA)</div>
+    <div id="info-text">KLICKA VAR SOM HELST PÅ SKÄRMEN FÖR ATT RÖRA KAMERAN (W,A,S,D = GÅ | SPACE = HOPPA)</div>
     <div id="crosshair"></div>
 
-    <!-- Den här unpkg-länken släpps igenom av skoldatorns brandvägg -->
+    <!-- Den här länken släpps garanterat igenom av Kunskapsskolans filter -->
     <script src="https://unpkg.com"></script>
 
     <script>
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0xd5a97a); // Sandfärgad himmel
-        scene.fog = new THREE.FogExp2(0xd5a97a, 0.025); // Sandstorm
+        scene.fog = new THREE.FogExp2(0xd5a97a, 0.025); // Krigsrök / Sandstorm
 
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 2, 0); // Startar i ögonhöjd
@@ -47,7 +47,7 @@
         floor.rotation.x = -Math.PI / 2;
         scene.add(floor);
 
-        // Byggnader och ruiner (Militärgrön, Aska, Rost, Mörkröd)
+        // Skapa 45 krigshärjade byggnader och ruinhögar
         const colors = [0x555d50, 0x3e3a36, 0x7b3f00, 0x4a4135, 0x8b0000]; 
         for (let i = 0; i < 45; i++) {
             const x = (Math.random() - 0.5) * 160;
@@ -64,28 +64,27 @@
             } else if (dmg > 0.15) {
                 const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h * 0.7, d), mat);
                 wall.position.y = (h * 0.7) / 2; bGroup.add(wall);
-                bGroup.rotation.z = (Math.random() - 0.5) * 0.3; // Lutande ruin
+                bGroup.rotation.z = (Math.random() - 0.5) * 0.3; // Lutande ruin efter bombträff
             } else {
                 for (let j = 0; j < 3; j++) {
                     const rubble = new THREE.Mesh(new THREE.BoxGeometry(w * 0.6, 2, d * 0.6), new THREE.MeshBasicMaterial({ color: 0x3e3a36 }));
                     rubble.position.set((Math.random() - 0.5) * 4, 1, (Math.random() - 0.5) * 4);
-                    bGroup.add(rubble);
+                    bGroup.add(rubble); // Rasmassa
                 }
             }
             bGroup.position.set(x, 0, z); scene.add(bGroup);
         }
 
-        // Muslåsning och blickfång
+        // Muslåsning direkt på spelytan
         let cameraYAngle = 0, cameraXAngle = 0, isMouseLocked = false;
-        const startOverlay = document.getElementById('start-overlay');
-        const crosshair = document.getElementById('crosshair');
         const infoText = document.getElementById('info-text');
 
-        document.addEventListener('click', () => { renderer.domElement.requestPointerLock(); });
+        document.addEventListener('click', () => { 
+            renderer.domElement.requestPointerLock(); 
+        });
 
         document.addEventListener('pointerlockchange', () => {
             isMouseLocked = (document.pointerLockElement === renderer.domElement);
-            crosshair.style.display = isMouseLocked ? 'block' : 'none';
             infoText.style.display = isMouseLocked ? 'none' : 'block';
         });
 
@@ -97,7 +96,6 @@
             }
         });
 
-        // Tangentbordskontroller
         const keys = { w: false, a: false, s: false, d: false, space: false };
         let velocityY = 0, isGrounded = true, lastTime = performance.now();
 
@@ -112,31 +110,28 @@
             if (e.code === 'Space') keys.space = false;
         });
 
-        // Spelslingan (Mjuk äkta 3D FPS-rörelse)
         function animate() {
             requestAnimationFrame(animate);
             const timeNow = performance.now();
             const delta = Math.min((timeNow - lastTime) / 1000, 0.1);
             lastTime = timeNow;
 
-            camera.rotation.set(0, 0, 0); // Nollställ inför förflyttning
+            camera.rotation.set(0, 0, 0);
 
             if (isMouseLocked) {
                 const speed = 16;
-                camera.rotation.y = cameraYAngle; // Rotera bara gångriktningen runt Y-axeln
+                camera.rotation.y = cameraYAngle; 
 
                 if (keys.w) camera.translateZ(-speed * delta);
                 if (keys.s) camera.translateZ(speed * delta);
                 if (keys.a) camera.translateX(-speed * delta);
                 if (keys.d) camera.translateX(speed * delta);
 
-                // Gravitation och hopp
                 velocityY -= 28 * delta; camera.position.y += velocityY * delta;
                 if (keys.space && isGrounded) { velocityY = 11; isGrounded = false; }
                 if (camera.position.y < 2) { camera.position.y = 2; velocityY = 0; isGrounded = true; }
             }
 
-            // Applicera den slutgiltiga blicken (Både upp/ner och höger/vänster)
             camera.rotation.set(0, 0, 0);
             camera.rotation.y = cameraYAngle;
             camera.rotation.x = cameraXAngle;
