@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="sv">
 <head>
@@ -44,7 +45,6 @@
         }
     </style>
 </head>
-
 <body>
 
     <div id="loading">LADDAR ÖKENSTAD...</div>
@@ -59,9 +59,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
-
         // ---------- GRUNDUPPSÄTTNING ----------
-
         const scene = new THREE.Scene();
 
         const camera = new THREE.PerspectiveCamera(
@@ -73,8 +71,9 @@
 
         camera.position.set(0, 2, 0);
 
+        // MINDRE LAGG
         const renderer = new THREE.WebGLRenderer({
-            antialias: true,
+            antialias: false,
             powerPreference: "high-performance"
         });
 
@@ -82,41 +81,36 @@
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 
         renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.shadowMap.type = THREE.BasicShadowMap;
         renderer.outputEncoding = THREE.sRGBEncoding;
 
         document.body.appendChild(renderer.domElement);
 
 
         // ---------- HIMMEL ----------
-
         function createSkyTexture() {
-
             const canvas = document.createElement('canvas');
-
             canvas.width = 2;
-            canvas.height = 256;
+            canvas.height = 128;
 
             const ctx = canvas.getContext('2d');
 
-            const grad = ctx.createLinearGradient(0, 0, 0, 256);
-
+            const grad = ctx.createLinearGradient(0, 0, 0, 128);
             grad.addColorStop(0, '#8fa8c9');
             grad.addColorStop(0.35, '#cfa878');
             grad.addColorStop(0.65, '#e8c896');
             grad.addColorStop(1, '#f2d9a8');
 
             ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, 2, 256);
+            ctx.fillRect(0, 0, 2, 128);
 
             const tex = new THREE.CanvasTexture(canvas);
-
             tex.magFilter = THREE.LinearFilter;
 
             return tex;
         }
 
-        const skyGeo = new THREE.SphereGeometry(500, 32, 15);
+        const skyGeo = new THREE.SphereGeometry(500, 24, 12);
 
         const skyMat = new THREE.MeshBasicMaterial({
             map: createSkyTexture(),
@@ -130,7 +124,6 @@
 
 
         // ---------- SOL ----------
-
         const sunSprite = new THREE.Sprite(
             new THREE.SpriteMaterial({
                 color: 0xfff4d6,
@@ -147,24 +140,22 @@
 
 
         // ---------- LJUS ----------
-
         const sun = new THREE.DirectionalLight(0xffe9c4, 1.3);
 
         sun.position.set(-150, 90, -250);
         sun.castShadow = true;
 
-        sun.shadow.mapSize.set(512, 512);
+        // MINDRE SKUGG-LAGG
+        sun.shadow.mapSize.set(1024, 1024);
 
         sun.shadow.camera.left = -120;
         sun.shadow.camera.right = 120;
         sun.shadow.camera.top = 120;
         sun.shadow.camera.bottom = -120;
-
         sun.shadow.camera.far = 500;
         sun.shadow.bias = -0.0015;
 
         scene.add(sun);
-
 
         const hemi = new THREE.HemisphereLight(
             0xcbd8ea,
@@ -173,7 +164,6 @@
         );
 
         scene.add(hemi);
-
 
         const ambient = new THREE.AmbientLight(
             0xfff0e0,
@@ -184,13 +174,10 @@
 
 
         // ---------- MARK ----------
-
         function createSandTexture() {
-
-            const size = 512;
+            const size = 256;
 
             const canvas = document.createElement('canvas');
-
             canvas.width = size;
             canvas.height = size;
 
@@ -199,8 +186,8 @@
             ctx.fillStyle = '#c9a874';
             ctx.fillRect(0, 0, size, size);
 
-            for (let i = 0; i < 9000; i++) {
-
+            // MINDRE TEXTURBERÄKNING
+            for (let i = 0; i < 3000; i++) {
                 const x = Math.random() * size;
                 const y = Math.random() * size;
 
@@ -221,30 +208,18 @@
                 );
             }
 
-            for (let i = 0; i < 14; i++) {
-
+            for (let i = 0; i < 10; i++) {
                 const x = Math.random() * size;
                 const y = Math.random() * size;
                 const r = 8 + Math.random() * 22;
 
                 const grad = ctx.createRadialGradient(
-                    x,
-                    y,
-                    0,
-                    x,
-                    y,
-                    r
+                    x, y, 0,
+                    x, y, r
                 );
 
-                grad.addColorStop(
-                    0,
-                    'rgba(60,45,30,0.45)'
-                );
-
-                grad.addColorStop(
-                    1,
-                    'rgba(60,45,30,0)'
-                );
+                grad.addColorStop(0, 'rgba(60,45,30,0.45)');
+                grad.addColorStop(1, 'rgba(60,45,30,0)');
 
                 ctx.fillStyle = grad;
 
@@ -262,7 +237,6 @@
             return tex;
         }
 
-
         const floor = new THREE.Mesh(
             new THREE.PlaneGeometry(2000, 2000),
             new THREE.MeshStandardMaterial({
@@ -279,14 +253,22 @@
 
 
         // ---------- MATERIAL ----------
-
+        // FLER FÄRGER PÅ BYGGNADER
         const matBuilding = [
             0x6b6455,
             0x5a5347,
             0x7a4a2e,
             0x554f42,
             0x8f3a2c,
-            0x4d4438
+            0x4d4438,
+            0x806044,
+            0x6e5540,
+            0x927457,
+            0x70503a,
+            0x665f51,
+            0x815c3e,
+            0x594b40,
+            0x8b6b4c
         ].map(c =>
             new THREE.MeshStandardMaterial({
                 color: c,
@@ -328,35 +310,15 @@
             });
 
 
-        // ---------- KISTMATERIAL ----------
-
-        const matChestWood =
-            new THREE.MeshStandardMaterial({
-                color: 0x5b321c,
-                roughness: 0.9
-            });
-
-        const matChestMetal =
-            new THREE.MeshStandardMaterial({
-                color: 0x2e2923,
-                roughness: 0.7,
-                metalness: 0.5
-            });
-
-
         function addShadowMesh(mesh) {
-
             mesh.castShadow = true;
             mesh.receiveShadow = true;
-
             return mesh;
         }
 
 
         // ---------- BYGGNADER / RUINER ----------
-
         function buildRuin(x, z) {
-
             const group = new THREE.Group();
 
             const w = 7 + Math.random() * 6;
@@ -364,15 +326,14 @@
             const d = 7 + Math.random() * 6;
 
             const mat =
-                matBuilding[
-                    Math.floor(Math.random() * matBuilding.length)
-                ];
+                matBuilding[Math.floor(Math.random() * matBuilding.length)];
 
             const dmg = Math.random();
 
 
             if (dmg > 0.55) {
 
+                // Skadat men stående hus
                 const wall = addShadowMesh(
                     new THREE.Mesh(
                         new THREE.BoxGeometry(w, h, d),
@@ -381,57 +342,29 @@
                 );
 
                 wall.position.y = h / 2;
-
                 group.add(wall);
 
 
-                const holes =
-                    2 + Math.floor(Math.random() * 3);
-
-                for (let i = 0; i < holes; i++) {
-
-                    const hs =
-                        1.2 + Math.random() * 1.8;
-
-                    const hole = new THREE.Mesh(
-                        new THREE.BoxGeometry(
-                            hs,
-                            hs,
-                            d + 0.4
-                        ),
-                        matConcreteHole
-                    );
-
-                    hole.position.set(
-                        (Math.random() - 0.5) * (w - hs),
-                        Math.min(
-                            h - hs / 2 - 0.2,
-                            (Math.random() * 0.6 + 0.25) * h
-                        ),
-                        0
-                    );
-
-                    group.add(hole);
-                }
+                // FIX: inga lösa/flygande kvadrater
+                // De gamla "hålen" var BoxGeometry-bitar som stack ut
+                // ur väggen och kunde se ut som flygande kvadrater.
 
 
                 if (Math.random() > 0.5) {
-
-                    const chunk = new THREE.Mesh(
-                        new THREE.BoxGeometry(
-                            w * 0.4,
-                            h * 0.35,
-                            d * 0.4
-                        ),
-                        mat
+                    const chunk = addShadowMesh(
+                        new THREE.Mesh(
+                            new THREE.BoxGeometry(
+                                w * 0.4,
+                                h * 0.35,
+                                d * 0.4
+                            ),
+                            mat
+                        )
                     );
 
                     chunk.position.set(
                         w * 0.25,
-                        Math.max(
-                            h * 0.15,
-                            chunk.geometry.parameters.height / 2
-                        ),
+                        h * 0.15,
                         d * 0.2
                     );
 
@@ -446,6 +379,7 @@
 
             } else if (dmg > 0.25) {
 
+                // Lutande, halvt raserat hus
                 const wall = addShadowMesh(
                     new THREE.Mesh(
                         new THREE.BoxGeometry(
@@ -457,8 +391,7 @@
                     )
                 );
 
-                wall.position.y =
-                    (h * 0.65) / 2;
+                wall.position.y = (h * 0.65) / 2;
 
                 group.add(wall);
 
@@ -470,23 +403,23 @@
 
             } else {
 
+                // Rasmassor + armering
                 for (let j = 0; j < 4; j++) {
 
-                    const rubbleHeight =
-                        1.2 + Math.random() * 2;
-
-                    const rubble = new THREE.Mesh(
-                        new THREE.BoxGeometry(
-                            w * (0.3 + Math.random() * 0.35),
-                            rubbleHeight,
-                            d * (0.3 + Math.random() * 0.35)
-                        ),
-                        matRubble
+                    const rubble = addShadowMesh(
+                        new THREE.Mesh(
+                            new THREE.BoxGeometry(
+                                w * (0.3 + Math.random() * 0.35),
+                                1.2 + Math.random() * 2,
+                                d * (0.3 + Math.random() * 0.35)
+                            ),
+                            matRubble
+                        )
                     );
 
                     rubble.position.set(
                         (Math.random() - 0.5) * w,
-                        rubbleHeight / 2,
+                        0.8,
                         (Math.random() - 0.5) * d
                     );
 
@@ -496,29 +429,23 @@
                     group.add(rubble);
                 }
 
+                for (let j = 0; j < 2 + Math.floor(Math.random() * 2); j++) {
 
-                for (
-                    let j = 0;
-                    j < 2 + Math.floor(Math.random() * 2);
-                    j++
-                ) {
-
-                    const beamHeight =
-                        3 + Math.random() * 3;
-
-                    const beam = new THREE.Mesh(
-                        new THREE.CylinderGeometry(
-                            0.12,
-                            0.12,
-                            beamHeight,
-                            6
-                        ),
-                        matMetal
+                    const beam = addShadowMesh(
+                        new THREE.Mesh(
+                            new THREE.CylinderGeometry(
+                                0.12,
+                                0.12,
+                                3 + Math.random() * 3,
+                                6
+                            ),
+                            matMetal
+                        )
                     );
 
                     beam.position.set(
                         (Math.random() - 0.5) * w,
-                        beamHeight / 2,
+                        1.5,
                         (Math.random() - 0.5) * d
                     );
 
@@ -533,89 +460,19 @@
             }
 
 
-            // ---------- DÖRRAR OCH FÖNSTER ----------
-
-            if (Math.random() > 0.25) {
-
-                const door = new THREE.Mesh(
-                    new THREE.BoxGeometry(
-                        1.5,
-                        3,
-                        0.18
-                    ),
-                    matConcreteHole
-                );
-
-                door.position.set(
-                    0,
-                    1.5,
-                    d / 2 + 0.1
-                );
-
-                group.add(door);
-            }
-
-
-            if (Math.random() > 0.2) {
-
-                const windowCount =
-                    2 + Math.floor(Math.random() * 3);
-
-                for (let i = 0; i < windowCount; i++) {
-
-                    const windowHeight = 1.3;
-
-                    const windowY = Math.min(
-                        h - windowHeight / 2 - 0.3,
-                        3 + Math.random() * Math.max(1, h * 0.35)
-                    );
-
-                    const windowMesh = new THREE.Mesh(
-                        new THREE.BoxGeometry(
-                            1.4,
-                            windowHeight,
-                            0.15
-                        ),
-                        matConcreteHole
-                    );
-
-                    windowMesh.position.set(
-                        -w / 2 +
-                        1.5 +
-                        i * Math.max(1.8, (w - 3) / windowCount),
-                        windowY,
-                        d / 2 + 0.08
-                    );
-
-                    group.add(windowMesh);
-                }
-            }
-
-
-            // ---------- EXTRA DETALJER ----------
-
+            // Sandbags
             if (Math.random() > 0.6) {
 
-                for (
-                    let i = 0;
-                    i < 2 + Math.floor(Math.random() * 3);
-                    i++
-                ) {
+                for (let i = 0; i < 2 + Math.floor(Math.random() * 3); i++) {
 
-                    const bag = new THREE.Mesh(
-                        new THREE.SphereGeometry(
-                            0.5,
-                            6,
-                            5
-                        ),
-                        matSandbag
+                    const bag = addShadowMesh(
+                        new THREE.Mesh(
+                            new THREE.SphereGeometry(0.5, 6, 5),
+                            matSandbag
+                        )
                     );
 
-                    bag.scale.set(
-                        1,
-                        0.6,
-                        0.7
-                    );
+                    bag.scale.set(1, 0.6, 0.7);
 
                     bag.position.set(
                         w / 2 + 0.5 + Math.random() * 1.5,
@@ -628,39 +485,21 @@
             }
 
 
-            if (Math.random() > 0.55) {
-
-                const box = new THREE.Mesh(
-                    new THREE.BoxGeometry(
-                        1.2,
-                        0.8,
-                        1.2
-                    ),
-                    matRubble
-                );
-
-                box.position.set(
-                    -w / 2 - 0.7,
-                    0.4,
-                    d / 2 + 0.7
-                );
-
-                group.add(box);
-            }
-
-
+            // Barrel
             if (Math.random() > 0.75) {
 
-                const barrel = new THREE.Mesh(
-                    new THREE.CylinderGeometry(
-                        0.5,
-                        0.5,
-                        1.3,
-                        10
-                    ),
-                    Math.random() > 0.5
-                        ? matMetalRust
-                        : matMetal
+                const barrel = addShadowMesh(
+                    new THREE.Mesh(
+                        new THREE.CylinderGeometry(
+                            0.5,
+                            0.5,
+                            1.3,
+                            8
+                        ),
+                        Math.random() > 0.5
+                            ? matMetalRust
+                            : matMetal
+                    )
                 );
 
                 barrel.position.set(
@@ -680,166 +519,11 @@
 
             group.position.set(x, 0, z);
 
-            group.userData.colliderWidth = w;
-            group.userData.colliderDepth = d;
-            group.userData.colliderHeight = h;
-
             return group;
         }
 
 
-        // ---------- TRAPPOR ----------
-
-        function buildStairs(x, z) {
-
-            const group = new THREE.Group();
-
-            const steps = 7;
-
-            for (let i = 0; i < steps; i++) {
-
-                const step = new THREE.Mesh(
-                    new THREE.BoxGeometry(
-                        4,
-                        0.45,
-                        1.2
-                    ),
-                    matBuilding[2]
-                );
-
-                step.castShadow = true;
-                step.receiveShadow = true;
-
-                step.position.set(
-                    0,
-                    0.225 + i * 0.45,
-                    i * 1.05
-                );
-
-                group.add(step);
-            }
-
-            group.position.set(x, 0, z);
-
-            return group;
-        }
-
-
-        // ---------- KISTAR ----------
-
-        const chests = [];
-
-        function buildChest(x, z) {
-
-            const group = new THREE.Group();
-
-            const body = addShadowMesh(
-                new THREE.Mesh(
-                    new THREE.BoxGeometry(
-                        2.2,
-                        1.1,
-                        1.4
-                    ),
-                    matChestWood
-                )
-            );
-
-            body.position.y = 0.55;
-
-            group.add(body);
-
-
-            const lid = addShadowMesh(
-                new THREE.Mesh(
-                    new THREE.BoxGeometry(
-                        2.25,
-                        0.25,
-                        1.45
-                    ),
-                    matChestWood
-                )
-            );
-
-            lid.position.y = 1.18;
-
-            group.add(lid);
-
-
-            const lock = addShadowMesh(
-                new THREE.Mesh(
-                    new THREE.BoxGeometry(
-                        0.25,
-                        0.35,
-                        0.12
-                    ),
-                    matChestMetal
-                )
-            );
-
-            lock.position.set(
-                0,
-                0.85,
-                0.73
-            );
-
-            group.add(lock);
-
-
-            const band1 = addShadowMesh(
-                new THREE.Mesh(
-                    new THREE.BoxGeometry(
-                        0.15,
-                        1.2,
-                        1.5
-                    ),
-                    matChestMetal
-                )
-            );
-
-            band1.position.set(
-                -0.65,
-                0.6,
-                0
-            );
-
-            group.add(band1);
-
-
-            const band2 = addShadowMesh(
-                new THREE.Mesh(
-                    new THREE.BoxGeometry(
-                        0.15,
-                        1.2,
-                        1.5
-                    ),
-                    matChestMetal
-                )
-            );
-
-            band2.position.set(
-                0.65,
-                0.6,
-                0
-            );
-
-            group.add(band2);
-
-
-            group.position.set(x, 0, z);
-
-            group.userData.opened = false;
-            group.userData.lid = lid;
-
-            scene.add(group);
-
-            chests.push(group);
-
-            return group;
-        }
-
-
-        // ---------- BOMBKRATRAR ----------
-
+        // ---------- KRATER ----------
         function buildCrater(x, z) {
 
             const r = 2 + Math.random() * 3;
@@ -858,25 +542,17 @@
             );
 
             ring.rotation.x = -Math.PI / 2;
-
-            ring.position.set(
-                x,
-                0.02,
-                z
-            );
-
+            ring.position.set(x, 0.02, z);
             ring.receiveShadow = true;
 
             return ring;
         }
 
 
-        // ---------- ELSTOLPAR ----------
-
+        // ---------- ELPYLON ----------
         function buildPylon(x, z) {
 
             const group = new THREE.Group();
-
 
             const pole = addShadowMesh(
                 new THREE.Mesh(
@@ -891,7 +567,6 @@
             );
 
             pole.position.y = 4.5;
-
             pole.rotation.z =
                 (Math.random() - 0.5) * 0.25;
 
@@ -913,95 +588,19 @@
 
             group.add(crossbar);
 
-
             group.position.set(x, 0, z);
 
             return group;
         }
 
 
-        // ---------- KOLLISIONER ----------
-
+        // ---------- GENERERA VÄRLD ----------
         const usedSpots = [];
-
-        const buildingColliders = [];
-
-        const playerRadius = 0.1;
-
-        const WORLD_MIN = -100;
-        const WORLD_MAX = 100;
-
-
-        function addBuildingCollider(ruin) {
-
-            const x = ruin.position.x;
-            const z = ruin.position.z;
-
-            const width =
-                ruin.userData.colliderWidth;
-
-            const depth =
-                ruin.userData.colliderDepth;
-
-            // Lite mindre än själva husets grafik så att
-            // spelaren kan gå nära väggarna utan osynliga
-            // extra meter runt byggnaden.
-            const padding = 0.15;
-
-            buildingColliders.push(
-                new THREE.Box3(
-                    new THREE.Vector3(
-                        x - width / 2 + padding,
-                        0,
-                        z - depth / 2 + padding
-                    ),
-                    new THREE.Vector3(
-                        x + width / 2 - padding,
-                        20,
-                        z + depth / 2 - padding
-                    )
-                )
-            );
-        }
-
-
-        function canMoveTo(x, z) {
-
-            if (
-                x < WORLD_MIN + playerRadius ||
-                x > WORLD_MAX - playerRadius ||
-                z < WORLD_MIN + playerRadius ||
-                z > WORLD_MAX - playerRadius
-            ) {
-                return false;
-            }
-
-
-            for (const box of buildingColliders) {
-
-                if (
-                    x > box.min.x - playerRadius &&
-                    x < box.max.x + playerRadius &&
-                    z > box.min.z - playerRadius &&
-                    z < box.max.z + playerRadius
-                ) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
 
         function spotFree(x, z, minDist) {
 
-            if (
-                Math.abs(x) < 12 &&
-                Math.abs(z) < 12
-            ) {
+            if (Math.abs(x) < 12 && Math.abs(z) < 12)
                 return false;
-            }
-
 
             for (const s of usedSpots) {
 
@@ -1019,46 +618,35 @@
         }
 
 
-        // ---------- FLER HUS ÖVER HELA KARTAN ----------
-
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 55; i++) {
 
             let x, z, tries = 0;
 
             do {
 
                 x =
-                    (Math.random() - 0.5) * 200;
+                    (Math.random() - 0.5) * 180;
 
                 z =
-                    (Math.random() - 0.5) * 200;
+                    (Math.random() - 0.5) * 180;
 
                 tries++;
 
             } while (
-                !spotFree(x, z, 7) &&
-                tries < 30
+                !spotFree(x, z, 9) &&
+                tries < 20
             );
 
+            if (tries >= 20)
+                continue;
 
-            if (tries >= 30) continue;
+            usedSpots.push({ x, z });
 
+            scene.add(
+                buildRuin(x, z)
+            );
 
-            usedSpots.push({
-                x,
-                z
-            });
-
-
-            const ruin =
-                buildRuin(x, z);
-
-            scene.add(ruin);
-
-            addBuildingCollider(ruin);
-
-
-            if (Math.random() > 0.65) {
+            if (Math.random() > 0.6) {
 
                 scene.add(
                     buildCrater(
@@ -1070,127 +658,13 @@
         }
 
 
-        // ---------- TÄT KRIGSBY ----------
-
-        const villageSpots = [
-
-            [-55, -55], [-40, -55], [-25, -55], [-10, -55],
-            [10, -55], [25, -55], [40, -55], [55, -55],
-
-            [-55, -38], [-40, -38], [-25, -38], [-10, -38],
-            [10, -38], [25, -38], [40, -38], [55, -38],
-
-            [-55, -20], [-40, -20], [-25, -20], [-10, -20],
-            [10, -20], [25, -20], [40, -20], [55, -20],
-
-            [-55, 0], [-40, 0], [-25, 0], [25, 0],
-            [40, 0], [55, 0],
-
-            [-55, 20], [-40, 20], [-25, 20], [-10, 20],
-            [10, 20], [25, 20], [40, 20], [55, 20],
-
-            [-55, 38], [-40, 38], [-25, 38], [-10, 38],
-            [10, 38], [25, 38], [40, 38], [55, 38],
-
-            [-55, 55], [-40, 55], [-25, 55], [-10, 55],
-            [10, 55], [25, 55], [40, 55], [55, 55]
-        ];
-
-
-        for (const spot of villageSpots) {
-
-            const x =
-                spot[0] +
-                (Math.random() - 0.5) * 3;
-
-            const z =
-                spot[1] +
-                (Math.random() - 0.5) * 3;
-
-
-            if (spotFree(x, z, 6.5)) {
-
-                usedSpots.push({
-                    x,
-                    z
-                });
-
-
-                const ruin =
-                    buildRuin(x, z);
-
-                scene.add(ruin);
-
-                addBuildingCollider(ruin);
-            }
-        }
-
-
-        // ---------- TRAPPA VID KRIGSBYN ----------
-
-        const stairs =
-            buildStairs(0, 55);
-
-        scene.add(stairs);
-
-
-        // ---------- KISTAR I STADEN ----------
-
-        buildChest(-70, -70);
-        buildChest(70, -70);
-        buildChest(-70, 70);
-        buildChest(70, 70);
-        buildChest(-20, 70);
-        buildChest(20, -70);
-        buildChest(-70, 15);
-        buildChest(70, 15);
-
-
-        // ---------- HUS UTANFÖR GRÄNSEN ----------
-
-        const outsideHouses = [
-
-            [-115, -75], [-115, -50], [-115, -25], [-115, 0],
-            [-115, 25], [-115, 50], [-115, 75],
-
-            [115, -75], [115, -50], [115, -25], [115, 0],
-            [115, 25], [115, 50], [115, 75],
-
-            [-75, -115], [-50, -115], [-25, -115], [0, -115],
-            [25, -115], [50, -115], [75, -115],
-
-            [-75, 115], [-50, 115], [-25, 115], [0, 115],
-            [25, 115], [50, 115], [75, 115]
-        ];
-
-
-        for (const spot of outsideHouses) {
-
-            const x =
-                spot[0] +
-                (Math.random() - 0.5) * 5;
-
-            const z =
-                spot[1] +
-                (Math.random() - 0.5) * 5;
-
-
-            scene.add(
-                buildRuin(x, z)
-            );
-        }
-
-
-        // ---------- ELSTOLPAR ----------
-
         for (let i = 0; i < 6; i++) {
 
             const x =
-                (Math.random() - 0.5) * 190;
+                (Math.random() - 0.5) * 170;
 
             const z =
-                (Math.random() - 0.5) * 190;
-
+                (Math.random() - 0.5) * 170;
 
             if (spotFree(x, z, 6)) {
 
@@ -1201,44 +675,37 @@
         }
 
 
-        // ---------- FRISTÅENDE KRATRAR ----------
-
         for (let i = 0; i < 10; i++) {
 
             scene.add(
                 buildCrater(
-                    (Math.random() - 0.5) * 210,
-                    (Math.random() - 0.5) * 210
+                    (Math.random() - 0.5) * 190,
+                    (Math.random() - 0.5) * 190
                 )
             );
         }
 
 
         // ---------- DAMMPARTIKLAR ----------
+        // MINDRE LAGG: 700 -> 350
+        const dustCount = 350;
 
-        const dustCount = 180;
-
-        const dustGeo =
-            new THREE.BufferGeometry();
+        const dustGeo = new THREE.BufferGeometry();
 
         const dustPos =
-            new Float32Array(
-                dustCount * 3
-            );
-
+            new Float32Array(dustCount * 3);
 
         for (let i = 0; i < dustCount; i++) {
 
             dustPos[i * 3] =
-                (Math.random() - 0.5) * 220;
+                (Math.random() - 0.5) * 200;
 
             dustPos[i * 3 + 1] =
                 Math.random() * 20;
 
             dustPos[i * 3 + 2] =
-                (Math.random() - 0.5) * 220;
+                (Math.random() - 0.5) * 200;
         }
-
 
         dustGeo.setAttribute(
             'position',
@@ -1248,7 +715,6 @@
             )
         );
 
-
         const dustMat =
             new THREE.PointsMaterial({
                 color: 0xe8d9b5,
@@ -1257,7 +723,6 @@
                 opacity: 0.5,
                 depthWrite: false
             });
-
 
         const dust =
             new THREE.Points(
@@ -1269,30 +734,21 @@
 
 
         // ---------- KONTROLLER ----------
-
         let cameraYAngle = 0;
         let cameraXAngle = 0;
         let isMouseLocked = false;
 
-
         const startOverlay =
-            document.getElementById(
-                'start-overlay'
-            );
+            document.getElementById('start-overlay');
 
         const crosshair =
-            document.getElementById(
-                'crosshair'
-            );
+            document.getElementById('crosshair');
 
         const loading =
-            document.getElementById(
-                'loading'
-            );
+            document.getElementById('loading');
 
 
         loading.style.display = 'none';
-
         startOverlay.style.display = 'flex';
 
 
@@ -1312,12 +768,10 @@
                     document.pointerLockElement ===
                     renderer.domElement;
 
-
                 startOverlay.style.display =
                     isMouseLocked
                         ? 'none'
                         : 'flex';
-
 
                 crosshair.style.display =
                     isMouseLocked
@@ -1339,7 +793,6 @@
                     cameraXAngle -=
                         e.movementY * 0.002;
 
-
                     cameraXAngle =
                         Math.max(
                             -Math.PI / 2.2,
@@ -1358,28 +811,24 @@
             a: false,
             s: false,
             d: false,
-            space: false,
-            e: false
+            space: false
         };
 
-
-        // ---------- REALISTISKARE RÖRELSE ----------
 
         let velocityY = 0;
         let isGrounded = true;
 
-        let velocityX = 0;
-        let velocityZ = 0;
+        let lastTime = performance.now();
 
-        const acceleration = 65;
-        const friction = 18;
-        const maxSpeed = 14;
+        // ---------- MJUKARE GÅNG ----------
+        let moveVelocityX = 0;
+        let moveVelocityZ = 0;
 
-        const gravity = 30;
-        const jumpSpeed = 11;
+        let walkTime = 0;
 
-        let lastTime =
-            performance.now();
+        const WALK_SPEED = 15;
+        const ACCELERATION = 70;
+        const DECELERATION = 90;
 
 
         document.addEventListener(
@@ -1400,9 +849,6 @@
 
                 if (e.code === 'Space')
                     keys.space = true;
-
-                if (e.code === 'KeyE')
-                    keys.e = true;
             }
         );
 
@@ -1425,73 +871,17 @@
 
                 if (e.code === 'Space')
                     keys.space = false;
-
-                if (e.code === 'KeyE')
-                    keys.e = false;
             }
         );
 
 
-        // ---------- KISTAÖPPNING ----------
-
-        function updateChests() {
-
-            let closestChest = null;
-            let closestDistance = 3.2;
-
-            for (const chest of chests) {
-
-                if (chest.userData.opened)
-                    continue;
-
-                const dx =
-                    chest.position.x -
-                    camera.position.x;
-
-                const dz =
-                    chest.position.z -
-                    camera.position.z;
-
-                const distance =
-                    Math.hypot(dx, dz);
-
-                if (distance < closestDistance) {
-
-                    closestDistance = distance;
-                    closestChest = chest;
-                }
-            }
-
-
-            if (
-                closestChest &&
-                keys.e
-            ) {
-
-                closestChest.userData.opened = true;
-
-                const lid =
-                    closestChest.userData.lid;
-
-                // Kistan öppnas uppåt.
-                lid.position.y = 1.65;
-                lid.rotation.x = -Math.PI * 0.55;
-            }
-        }
-
-
         // ---------- ANIMATIONSLOOP ----------
-
         function animate() {
 
-            requestAnimationFrame(
-                animate
-            );
-
+            requestAnimationFrame(animate);
 
             const timeNow =
                 performance.now();
-
 
             const delta =
                 Math.min(
@@ -1499,217 +889,216 @@
                     0.05
                 );
 
-
             lastTime = timeNow;
 
 
             if (isMouseLocked) {
 
-                let moveX = 0;
-                let moveZ = 0;
-
+                let targetMoveX = 0;
+                let targetMoveZ = 0;
 
                 if (keys.w) {
 
-                    moveX +=
+                    targetMoveX +=
                         Math.sin(cameraYAngle);
 
-                    moveZ +=
+                    targetMoveZ +=
                         Math.cos(cameraYAngle);
                 }
-
 
                 if (keys.s) {
 
-                    moveX -=
+                    targetMoveX -=
                         Math.sin(cameraYAngle);
 
-                    moveZ -=
+                    targetMoveZ -=
                         Math.cos(cameraYAngle);
                 }
-
 
                 if (keys.a) {
 
-                    moveX +=
+                    targetMoveX +=
                         Math.cos(cameraYAngle);
 
-                    moveZ -=
+                    targetMoveZ -=
                         Math.sin(cameraYAngle);
                 }
-
 
                 if (keys.d) {
 
-                    moveX -=
+                    targetMoveX -=
                         Math.cos(cameraYAngle);
 
-                    moveZ +=
+                    targetMoveZ +=
                         Math.sin(cameraYAngle);
                 }
 
 
-                const inputLength =
-                    Math.hypot(moveX, moveZ);
-
-
-                if (inputLength > 0) {
-
-                    moveX /= inputLength;
-                    moveZ /= inputLength;
-
-
-                    velocityX +=
-                        moveX * acceleration * delta;
-
-                    velocityZ +=
-                        moveZ * acceleration * delta;
-
-                } else {
-
-                    const speed =
-                        Math.hypot(
-                            velocityX,
-                            velocityZ
-                        );
-
-                    if (speed > 0) {
-
-                        const drop =
-                            friction * delta;
-
-                        const newSpeed =
-                            Math.max(
-                                0,
-                                speed - drop
-                            );
-
-                        const scale =
-                            speed > 0
-                                ? newSpeed / speed
-                                : 0;
-
-                        velocityX *= scale;
-                        velocityZ *= scale;
-                    }
-                }
-
-
-                const horizontalSpeed =
+                // Normalisera diagonal rörelse
+                const moveLength =
                     Math.hypot(
-                        velocityX,
-                        velocityZ
+                        targetMoveX,
+                        targetMoveZ
                     );
 
+                if (moveLength > 0) {
 
-                if (
-                    horizontalSpeed >
-                    maxSpeed
-                ) {
+                    targetMoveX /=
+                        moveLength;
 
-                    const scale =
-                        maxSpeed /
-                        horizontalSpeed;
+                    targetMoveZ /=
+                        moveLength;
 
-                    velocityX *= scale;
-                    velocityZ *= scale;
+                    targetMoveX *=
+                        WALK_SPEED;
+
+                    targetMoveZ *=
+                        WALK_SPEED;
                 }
 
 
-                // ---------- X-KOLLISION ----------
-
-                const nextX =
-                    camera.position.x +
-                    velocityX * delta;
-
-
-                if (
-                    canMoveTo(
-                        nextX,
-                        camera.position.z
-                    )
-                ) {
-
-                    camera.position.x =
-                        nextX;
-
-                } else {
-
-                    velocityX = 0;
-                }
+                // Mjuk acceleration
+                const acceleration =
+                    moveLength > 0
+                        ? ACCELERATION
+                        : DECELERATION;
 
 
-                // ---------- Z-KOLLISION ----------
+                moveVelocityX +=
+                    (targetMoveX - moveVelocityX) *
+                    Math.min(1, acceleration * delta / WALK_SPEED);
 
-                const nextZ =
-                    camera.position.z +
-                    velocityZ * delta;
+                moveVelocityZ +=
+                    (targetMoveZ - moveVelocityZ) *
+                    Math.min(1, acceleration * delta / WALK_SPEED);
 
 
-                if (
-                    canMoveTo(
-                        camera.position.x,
-                        nextZ
-                    )
-                ) {
+                camera.position.x +=
+                    moveVelocityX * delta;
 
-                    camera.position.z =
-                        nextZ;
-
-                } else {
-
-                    velocityZ = 0;
-                }
+                camera.position.z +=
+                    moveVelocityZ * delta;
 
 
                 // ---------- HOPP ----------
-
-                if (
-                    keys.space &&
-                    isGrounded
-                ) {
-
-                    velocityY =
-                        jumpSpeed;
-
-                    isGrounded =
-                        false;
-                }
-
-
                 velocityY -=
-                    gravity * delta;
-
+                    28 * delta;
 
                 camera.position.y +=
                     velocityY * delta;
 
 
                 if (
-                    camera.position.y <= 2
+                    keys.space &&
+                    isGrounded
+                ) {
+
+                    velocityY = 11;
+                    isGrounded = false;
+                }
+
+
+                if (
+                    camera.position.y < 2
                 ) {
 
                     camera.position.y = 2;
-
                     velocityY = 0;
-
                     isGrounded = true;
                 }
 
 
-                // ---------- KISTOR ----------
+                // ---------- GÅ-ANIMATION ----------
+                const horizontalSpeed =
+                    Math.hypot(
+                        moveVelocityX,
+                        moveVelocityZ
+                    );
 
-                updateChests();
+                if (
+                    horizontalSpeed > 0.5 &&
+                    isGrounded
+                ) {
+
+                    walkTime +=
+                        delta *
+                        8 *
+                        Math.min(
+                            horizontalSpeed / WALK_SPEED,
+                            1
+                        );
+
+                } else {
+
+                    // Mjuk återgång när man slutar gå
+                    walkTime += delta * 2;
+                }
+
+            } else {
+
+                // Ingen head-bob när spelet inte är igång
+                walkTime += delta * 2;
+            }
+
+
+            // ---------- HEAD BOB ----------
+            const moving =
+                Math.hypot(
+                    moveVelocityX,
+                    moveVelocityZ
+                ) > 0.5 &&
+                isGrounded &&
+                isMouseLocked;
+
+
+            let bobX = 0;
+            let bobY = 0;
+
+            if (moving) {
+
+                const speedFactor =
+                    Math.min(
+                        Math.hypot(
+                            moveVelocityX,
+                            moveVelocityZ
+                        ) / WALK_SPEED,
+                        1
+                    );
+
+                bobX =
+                    Math.cos(walkTime) *
+                    0.025 *
+                    speedFactor;
+
+                bobY =
+                    Math.abs(
+                        Math.sin(walkTime)
+                    ) *
+                    0.045 *
+                    speedFactor;
+
+            } else {
+
+                // Lugn kamera när man står still
+                bobX =
+                    Math.sin(walkTime * 0.8) *
+                    0.003;
+
+                bobY =
+                    Math.sin(walkTime * 0.6) *
+                    0.002;
             }
 
 
             // ---------- DAMM ----------
-
             const pos =
                 dustGeo.attributes.position;
 
-
-            for (let i = 0; i < dustCount; i++) {
+            for (
+                let i = 0;
+                i < dustCount;
+                i++
+            ) {
 
                 pos.array[i * 3] +=
                     0.15 * delta * 10;
@@ -1717,14 +1106,12 @@
                 pos.array[i * 3 + 1] -=
                     0.02 * delta * 10;
 
-
                 if (
                     pos.array[i * 3 + 1] < 0
                 ) {
 
                     pos.array[i * 3 + 1] = 18;
                 }
-
 
                 if (
                     pos.array[i * 3] >
@@ -1736,34 +1123,30 @@
                 }
             }
 
-
             pos.needsUpdate = true;
 
 
             // ---------- KAMERA ----------
-
-            const target =
-                new THREE.Vector3();
-
-
-            target.x =
+            const targetX =
                 camera.position.x +
                 Math.sin(cameraYAngle) *
                 Math.cos(cameraXAngle);
 
-
-            target.z =
+            const targetZ =
                 camera.position.z +
                 Math.cos(cameraYAngle) *
                 Math.cos(cameraXAngle);
 
-
-            target.y =
+            const targetY =
                 camera.position.y +
                 Math.sin(cameraXAngle);
 
 
-            camera.lookAt(target);
+            camera.lookAt(
+                targetX + bobX,
+                targetY + bobY,
+                targetZ
+            );
 
 
             renderer.render(
@@ -1774,7 +1157,6 @@
 
 
         // ---------- RESIZE ----------
-
         window.addEventListener(
             'resize',
             () => {
@@ -1789,13 +1171,6 @@
                     window.innerWidth,
                     window.innerHeight
                 );
-
-                renderer.setPixelRatio(
-                    Math.min(
-                        window.devicePixelRatio,
-                        1.5
-                    )
-                );
             }
         );
 
@@ -1806,3 +1181,4 @@
 
 </body>
 </html>
+```
