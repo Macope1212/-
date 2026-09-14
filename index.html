@@ -73,9 +73,14 @@
 
         camera.position.set(0, 2, 0);
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        const renderer = new THREE.WebGLRenderer({
+            antialias: true,
+            powerPreference: "high-performance"
+        });
 
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         renderer.outputEncoding = THREE.sRGBEncoding;
@@ -148,7 +153,8 @@
         sun.position.set(-150, 90, -250);
         sun.castShadow = true;
 
-        sun.shadow.mapSize.set(1024, 1024);
+        // Minskad upplösning för bättre FPS
+        sun.shadow.mapSize.set(512, 512);
 
         sun.shadow.camera.left = -120;
         sun.shadow.camera.right = 120;
@@ -372,15 +378,13 @@
                     const hs =
                         1.2 + Math.random() * 1.8;
 
-                    const hole = addShadowMesh(
-                        new THREE.Mesh(
-                            new THREE.BoxGeometry(
-                                hs,
-                                hs,
-                                d + 0.4
-                            ),
-                            matConcreteHole
-                        )
+                    const hole = new THREE.Mesh(
+                        new THREE.BoxGeometry(
+                            hs,
+                            hs,
+                            d + 0.4
+                        ),
+                        matConcreteHole
                     );
 
                     hole.position.set(
@@ -395,15 +399,13 @@
 
                 if (Math.random() > 0.5) {
 
-                    const chunk = addShadowMesh(
-                        new THREE.Mesh(
-                            new THREE.BoxGeometry(
-                                w * 0.4,
-                                h * 0.35,
-                                d * 0.4
-                            ),
-                            mat
-                        )
+                    const chunk = new THREE.Mesh(
+                        new THREE.BoxGeometry(
+                            w * 0.4,
+                            h * 0.35,
+                            d * 0.4
+                        ),
+                        mat
                     );
 
                     chunk.position.set(
@@ -449,15 +451,13 @@
 
                 for (let j = 0; j < 4; j++) {
 
-                    const rubble = addShadowMesh(
-                        new THREE.Mesh(
-                            new THREE.BoxGeometry(
-                                w * (0.3 + Math.random() * 0.35),
-                                1.2 + Math.random() * 2,
-                                d * (0.3 + Math.random() * 0.35)
-                            ),
-                            matRubble
-                        )
+                    const rubble = new THREE.Mesh(
+                        new THREE.BoxGeometry(
+                            w * (0.3 + Math.random() * 0.35),
+                            1.2 + Math.random() * 2,
+                            d * (0.3 + Math.random() * 0.35)
+                        ),
+                        matRubble
                     );
 
                     rubble.position.set(
@@ -479,16 +479,14 @@
                     j++
                 ) {
 
-                    const beam = addShadowMesh(
-                        new THREE.Mesh(
-                            new THREE.CylinderGeometry(
-                                0.12,
-                                0.12,
-                                3 + Math.random() * 3,
-                                6
-                            ),
-                            matMetal
-                        )
+                    const beam = new THREE.Mesh(
+                        new THREE.CylinderGeometry(
+                            0.12,
+                            0.12,
+                            3 + Math.random() * 3,
+                            6
+                        ),
+                        matMetal
                     );
 
                     beam.position.set(
@@ -512,15 +510,13 @@
 
             if (Math.random() > 0.25) {
 
-                const door = addShadowMesh(
-                    new THREE.Mesh(
-                        new THREE.BoxGeometry(
-                            1.5,
-                            3,
-                            0.18
-                        ),
-                        matConcreteHole
-                    )
+                const door = new THREE.Mesh(
+                    new THREE.BoxGeometry(
+                        1.5,
+                        3,
+                        0.18
+                    ),
+                    matConcreteHole
                 );
 
                 door.position.set(
@@ -540,15 +536,13 @@
 
                 for (let i = 0; i < windowCount; i++) {
 
-                    const windowMesh = addShadowMesh(
-                        new THREE.Mesh(
-                            new THREE.BoxGeometry(
-                                1.4,
-                                1.3,
-                                0.15
-                            ),
-                            matConcreteHole
-                        )
+                    const windowMesh = new THREE.Mesh(
+                        new THREE.BoxGeometry(
+                            1.4,
+                            1.3,
+                            0.15
+                        ),
+                        matConcreteHole
                     );
 
                     windowMesh.position.set(
@@ -575,15 +569,13 @@
                     i++
                 ) {
 
-                    const bag = addShadowMesh(
-                        new THREE.Mesh(
-                            new THREE.SphereGeometry(
-                                0.5,
-                                6,
-                                5
-                            ),
-                            matSandbag
-                        )
+                    const bag = new THREE.Mesh(
+                        new THREE.SphereGeometry(
+                            0.5,
+                            6,
+                            5
+                        ),
+                        matSandbag
                     );
 
                     bag.scale.set(
@@ -605,15 +597,13 @@
 
             if (Math.random() > 0.55) {
 
-                const box = addShadowMesh(
-                    new THREE.Mesh(
-                        new THREE.BoxGeometry(
-                            1.2,
-                            0.8,
-                            1.2
-                        ),
-                        matRubble
-                    )
+                const box = new THREE.Mesh(
+                    new THREE.BoxGeometry(
+                        1.2,
+                        0.8,
+                        1.2
+                    ),
+                    matRubble
                 );
 
                 box.position.set(
@@ -628,18 +618,16 @@
 
             if (Math.random() > 0.75) {
 
-                const barrel = addShadowMesh(
-                    new THREE.Mesh(
-                        new THREE.CylinderGeometry(
-                            0.5,
-                            0.5,
-                            1.3,
-                            10
-                        ),
-                        Math.random() > 0.5
-                            ? matMetalRust
-                            : matMetal
-                    )
+                const barrel = new THREE.Mesh(
+                    new THREE.CylinderGeometry(
+                        0.5,
+                        0.5,
+                        1.3,
+                        10
+                    ),
+                    Math.random() > 0.5
+                        ? matMetalRust
+                        : matMetal
                 );
 
                 barrel.position.set(
@@ -659,6 +647,12 @@
 
             group.position.set(x, 0, z);
 
+            // Endast själva husets grundyta används som collision.
+            // Dekorativa dörrar, fönster, lådor osv skapar därför
+            // inte längre osynliga barriärer.
+            group.userData.colliderWidth = w;
+            group.userData.colliderDepth = d;
+
             return group;
         }
 
@@ -673,16 +667,17 @@
 
             for (let i = 0; i < steps; i++) {
 
-                const step = addShadowMesh(
-                    new THREE.Mesh(
-                        new THREE.BoxGeometry(
-                            4,
-                            0.45,
-                            1.2
-                        ),
-                        matBuilding[2]
-                    )
+                const step = new THREE.Mesh(
+                    new THREE.BoxGeometry(
+                        4,
+                        0.45,
+                        1.2
+                    ),
+                    matBuilding[2]
                 );
+
+                step.castShadow = true;
+                step.receiveShadow = true;
 
                 step.position.set(
                     0,
@@ -709,7 +704,7 @@
                 new THREE.RingGeometry(
                     r * 0.4,
                     r,
-                    24
+                    16
                 ),
                 new THREE.MeshStandardMaterial({
                     color: 0x2e2a20,
@@ -795,7 +790,6 @@
 
         function canMoveTo(x, z) {
 
-            // Osynliga gränser
             if (
                 x < WORLD_MIN + playerRadius ||
                 x > WORLD_MAX - playerRadius ||
@@ -806,7 +800,8 @@
             }
 
 
-            // Hus
+            // Bara riktiga huskroppar används som collision.
+            // Inga Box3 från dekorativa objekt eller trappan.
             for (const box of buildingColliders) {
 
                 if (
@@ -849,9 +844,9 @@
         }
 
 
-        // ---------- VANLIGA RUINER ----------
+        // ---------- FLER HUS ÖVER HELA KARTAN ----------
 
-        for (let i = 0; i < 70; i++) {
+        for (let i = 0; i < 100; i++) {
 
             let x, z, tries = 0;
 
@@ -866,12 +861,12 @@
                 tries++;
 
             } while (
-                !spotFree(x, z, 9) &&
-                tries < 20
+                !spotFree(x, z, 7) &&
+                tries < 30
             );
 
 
-            if (tries >= 20) continue;
+            if (tries >= 30) continue;
 
 
             usedSpots.push({
@@ -885,15 +880,24 @@
 
             scene.add(ruin);
 
-
-            scene.updateMatrixWorld(true);
-
+            // Collision baserad endast på husets verkliga footprint.
             buildingColliders.push(
-                new THREE.Box3().setFromObject(ruin)
+                new THREE.Box3(
+                    new THREE.Vector3(
+                        x - ruin.userData.colliderWidth / 2,
+                        0,
+                        z - ruin.userData.colliderDepth / 2
+                    ),
+                    new THREE.Vector3(
+                        x + ruin.userData.colliderWidth / 2,
+                        20,
+                        z + ruin.userData.colliderDepth / 2
+                    )
+                )
             );
 
 
-            if (Math.random() > 0.6) {
+            if (Math.random() > 0.65) {
 
                 scene.add(
                     buildCrater(
@@ -905,55 +909,30 @@
         }
 
 
-        // ---------- LITEN KRIGSBY ----------
+        // ---------- TÄT KRIGSBY ----------
 
         const villageSpots = [
 
-            [-45, -38],
-            [-30, -38],
-            [-15, -38],
-            [0, -38],
-            [15, -38],
-            [30, -38],
-            [45, -38],
+            [-55, -55], [-40, -55], [-25, -55], [-10, -55],
+            [10, -55], [25, -55], [40, -55], [55, -55],
 
-            [-45, -18],
-            [-30, -18],
-            [-15, -18],
-            [15, -18],
-            [30, -18],
-            [45, -18],
+            [-55, -38], [-40, -38], [-25, -38], [-10, -38],
+            [10, -38], [25, -38], [40, -38], [55, -38],
 
-            [-45, 5],
-            [-30, 5],
-            [-15, 5],
-            [15, 5],
-            [30, 5],
-            [45, 5],
+            [-55, -20], [-40, -20], [-25, -20], [-10, -20],
+            [10, -20], [25, -20], [40, -20], [55, -20],
 
-            [-45, 28],
-            [-30, 28],
-            [-15, 28],
-            [0, 28],
-            [15, 28],
-            [30, 28],
-            [45, 28],
+            [-55, 0], [-40, 0], [-25, 0], [25, 0],
+            [40, 0], [55, 0],
 
-            [-30, 48],
-            [-15, 48],
-            [15, 48],
-            [30, 48],
+            [-55, 20], [-40, 20], [-25, 20], [-10, 20],
+            [10, 20], [25, 20], [40, 20], [55, 20],
 
-            [-55, 48],
-            [55, 48],
-            [-55, 28],
-            [55, 28],
-            [-55, 5],
-            [55, 5],
-            [-55, -18],
-            [55, -18],
-            [-55, -38],
-            [55, -38]
+            [-55, 38], [-40, 38], [-25, 38], [-10, 38],
+            [10, 38], [25, 38], [40, 38], [55, 38],
+
+            [-55, 55], [-40, 55], [-25, 55], [-10, 55],
+            [10, 55], [25, 55], [40, 55], [55, 55]
         ];
 
 
@@ -961,14 +940,14 @@
 
             const x =
                 spot[0] +
-                (Math.random() - 0.5) * 4;
+                (Math.random() - 0.5) * 3;
 
             const z =
                 spot[1] +
-                (Math.random() - 0.5) * 4;
+                (Math.random() - 0.5) * 3;
 
 
-            if (spotFree(x, z, 7)) {
+            if (spotFree(x, z, 6.5)) {
 
                 usedSpots.push({
                     x,
@@ -981,11 +960,19 @@
 
                 scene.add(ruin);
 
-
-                scene.updateMatrixWorld(true);
-
                 buildingColliders.push(
-                    new THREE.Box3().setFromObject(ruin)
+                    new THREE.Box3(
+                        new THREE.Vector3(
+                            x - ruin.userData.colliderWidth / 2,
+                            0,
+                            z - ruin.userData.colliderDepth / 2
+                        ),
+                        new THREE.Vector3(
+                            x + ruin.userData.colliderWidth / 2,
+                            20,
+                            z + ruin.userData.colliderDepth / 2
+                        )
+                    )
                 );
             }
         }
@@ -998,52 +985,25 @@
 
         scene.add(stairs);
 
-        scene.updateMatrixWorld(true);
-
-        buildingColliders.push(
-            new THREE.Box3().setFromObject(stairs)
-        );
+        // Trappan är INTE en osynlig vägg.
+        // Den får därför ingen vanlig Box3-kollision.
 
 
         // ---------- HUS UTANFÖR GRÄNSEN ----------
 
         const outsideHouses = [
 
-            // Vänster
-            [-115, -75],
-            [-115, -50],
-            [-115, -25],
-            [-115, 0],
-            [-115, 25],
-            [-115, 50],
-            [-115, 75],
+            [-115, -75], [-115, -50], [-115, -25], [-115, 0],
+            [-115, 25], [-115, 50], [-115, 75],
 
-            // Höger
-            [115, -75],
-            [115, -50],
-            [115, -25],
-            [115, 0],
-            [115, 25],
-            [115, 50],
-            [115, 75],
+            [115, -75], [115, -50], [115, -25], [115, 0],
+            [115, 25], [115, 50], [115, 75],
 
-            // Bakom
-            [-75, -115],
-            [-50, -115],
-            [-25, -115],
-            [0, -115],
-            [25, -115],
-            [50, -115],
-            [75, -115],
+            [-75, -115], [-50, -115], [-25, -115], [0, -115],
+            [25, -115], [50, -115], [75, -115],
 
-            // Framför
-            [-75, 115],
-            [-50, 115],
-            [-25, 115],
-            [0, 115],
-            [25, 115],
-            [50, 115],
-            [75, 115]
+            [-75, 115], [-50, 115], [-25, 115], [0, 115],
+            [25, 115], [50, 115], [75, 115]
         ];
 
 
@@ -1099,7 +1059,8 @@
 
         // ---------- DAMMPARTIKLAR ----------
 
-        const dustCount = 350;
+        // Färre partiklar ger bättre FPS.
+        const dustCount = 180;
 
         const dustGeo =
             new THREE.BufferGeometry();
@@ -1245,7 +1206,7 @@
         };
 
 
-        // ---------- REALISTISKARE RÖRELSE ----------
+        // ---------- FÖRBÄTTRAD MOVEMENT + HOPP ----------
 
         let velocityY = 0;
         let isGrounded = true;
@@ -1253,9 +1214,12 @@
         let velocityX = 0;
         let velocityZ = 0;
 
-        const acceleration = 55;
-        const friction = 12;
-        const maxSpeed = 15;
+        const acceleration = 65;
+        const friction = 18;
+        const maxSpeed = 14;
+
+        const gravity = 30;
+        const jumpSpeed = 11;
 
         let lastTime =
             performance.now();
@@ -1321,7 +1285,7 @@
             const delta =
                 Math.min(
                     (timeNow - lastTime) / 1000,
-                    0.1
+                    0.05
                 );
 
 
@@ -1389,16 +1353,34 @@
 
                     velocityZ +=
                         moveZ * acceleration * delta;
+
                 } else {
 
-                    const slowdown =
-                        Math.max(
-                            0,
-                            1 - friction * delta
+                    const speed =
+                        Math.hypot(
+                            velocityX,
+                            velocityZ
                         );
 
-                    velocityX *= slowdown;
-                    velocityZ *= slowdown;
+                    if (speed > 0) {
+
+                        const drop =
+                            friction * delta;
+
+                        const newSpeed =
+                            Math.max(
+                                0,
+                                speed - drop
+                            );
+
+                        const scale =
+                            speed > 0
+                                ? newSpeed / speed
+                                : 0;
+
+                        velocityX *= scale;
+                        velocityZ *= scale;
+                    }
                 }
 
 
@@ -1423,17 +1405,12 @@
                 }
 
 
+                // ---------- X-KOLLISION ----------
+
                 const nextX =
                     camera.position.x +
                     velocityX * delta;
 
-                const nextZ =
-                    camera.position.z +
-                    velocityZ * delta;
-
-
-                // Kollision separat i X och Z
-                // så att man kan glida längs väggar
 
                 if (
                     canMoveTo(
@@ -1449,6 +1426,13 @@
 
                     velocityX = 0;
                 }
+
+
+                // ---------- Z-KOLLISION ----------
+
+                const nextZ =
+                    camera.position.z +
+                    velocityZ * delta;
 
 
                 if (
@@ -1469,25 +1453,29 @@
 
                 // ---------- HOPP ----------
 
+                if (
+                    keys.space &&
+                    isGrounded
+                ) {
+
+                    velocityY =
+                        jumpSpeed;
+
+                    isGrounded =
+                        false;
+                }
+
+
                 velocityY -=
-                    28 * delta;
+                    gravity * delta;
+
 
                 camera.position.y +=
                     velocityY * delta;
 
 
                 if (
-                    keys.space &&
-                    isGrounded
-                ) {
-
-                    velocityY = 11;
-                    isGrounded = false;
-                }
-
-
-                if (
-                    camera.position.y < 2
+                    camera.position.y <= 2
                 ) {
 
                     camera.position.y = 2;
@@ -1584,6 +1572,10 @@
                 renderer.setSize(
                     window.innerWidth,
                     window.innerHeight
+                );
+
+                renderer.setPixelRatio(
+                    Math.min(window.devicePixelRatio, 1.5)
                 );
             }
         );
