@@ -3537,25 +3537,6 @@
                         briefingControlsEl.style.display = 'none';
                     }
 
-                    const oldResumeCta =
-                        document.querySelector('.briefing-cta');
-                    if (oldResumeCta) {
-                        oldResumeCta.remove();
-                    }
-
-                    const resumeCta =
-                        document.createElement('div');
-
-                    resumeCta.className = 'briefing-cta';
-                    resumeCta.innerHTML =
-                        '<span class="cta-label">CLICK TO RESUME</span>';
-
-                    resumeCta.addEventListener(
-                        'click',
-                        enterGame
-                    );
-
-                    document.querySelector('.briefing').appendChild(resumeCta);
                 }
             }
         );
