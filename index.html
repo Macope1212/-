@@ -3537,6 +3537,12 @@
                         briefingControlsEl.style.display = 'none';
                     }
 
+                    const oldResumeCta =
+                        document.querySelector('.briefing-cta');
+                    if (oldResumeCta) {
+                        oldResumeCta.remove();
+                    }
+
                     const resumeCta =
                         document.createElement('div');
 
