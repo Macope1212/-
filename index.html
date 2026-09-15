@@ -405,11 +405,13 @@
             width: 180px;
             height: 180px;
             background: #b99a68;
-            border: 3px solid rgba(255, 230, 190, 0.95);
-            border-radius: 8px;
+            border: 3px solid var(--c-accent);
+            outline: 1px solid rgba(236, 225, 200, 0.5);
+            outline-offset: -6px;
+            border-radius: 4px;
             z-index: 20;
             pointer-events: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.55);
+            box-shadow: 0 4px 18px rgba(0,0,0,0.6);
         }
 
         /* ---------- HP ---------- */
@@ -424,37 +426,41 @@
         }
 
         #health-label {
-            color: white;
-            font-size: 15px;
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-family: var(--font-mono);
+            color: var(--c-parchment);
+            font-size: 13px;
+            letter-spacing: 1.5px;
+            margin-bottom: 6px;
             text-shadow: 2px 2px 3px #000;
         }
 
         #health-bar-bg {
             width: 100%;
-            height: 22px;
-            background: rgba(0,0,0,0.65);
-            border: 2px solid white;
-            border-radius: 5px;
+            height: 20px;
+            background: rgba(13, 10, 7, 0.75);
+            border: 1px solid var(--c-line);
+            border-radius: 2px;
             overflow: hidden;
             box-sizing: border-box;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.5);
         }
 
         #health-bar {
             width: 100%;
             height: 100%;
-            background: #39b54a;
+            background: linear-gradient(90deg, var(--c-alert), var(--c-accent) 55%, #e6b84f);
             transition: width 0.12s linear;
         }
 
         #bots-killed-ui {
             position: absolute;
             left: 20px;
-            bottom: 78px;
-            color: white;
-            font-size: 15px;
-            font-weight: bold;
+            bottom: 76px;
+            font-family: var(--font-mono);
+            color: var(--c-sand);
+            font-size: 12px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
             text-shadow: 2px 2px 3px #000;
             z-index: 20;
             pointer-events: none;
@@ -467,9 +473,11 @@
             left: 50%;
             bottom: 27%;
             transform: translateX(-50%);
-            color: white;
-            font-size: 17px;
-            font-weight: bold;
+            color: var(--c-parchment);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
             text-shadow: 2px 2px 4px #000;
             z-index: 25;
             pointer-events: none;
@@ -479,18 +487,18 @@
 
         #interaction-progress {
             width: 190px;
-            height: 8px;
-            margin-top: 7px;
-            background: rgba(0,0,0,0.7);
-            border: 1px solid white;
-            border-radius: 4px;
+            height: 6px;
+            margin-top: 8px;
+            background: rgba(13, 10, 7, 0.75);
+            border: 1px solid var(--c-line);
+            border-radius: 2px;
             overflow: hidden;
         }
 
         #interaction-fill {
             width: 0%;
             height: 100%;
-            background: #e6b84f;
+            background: var(--c-accent);
         }
 
         /* ---------- WEAPON UI ---------- */
@@ -499,9 +507,11 @@
             position: absolute;
             right: 20px;
             bottom: 20px;
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
+            color: var(--c-parchment);
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 22px;
+            letter-spacing: 1.5px;
             text-shadow: 2px 2px 4px #000;
             z-index: 20;
             pointer-events: none;
@@ -524,9 +534,9 @@
         .inv-slot {
             width: 62px;
             height: 62px;
-            background: rgba(20, 20, 20, 0.55);
-            border: 2px solid rgba(255, 255, 255, 0.55);
-            border-radius: 8px;
+            background: rgba(13, 10, 7, 0.65);
+            border: 1px solid var(--c-line);
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -538,23 +548,114 @@
             position: absolute;
             top: 3px;
             left: 5px;
-            font-size: 11px;
-            color: rgba(255,255,255,0.75);
-            font-weight: bold;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--c-sand);
             text-shadow: 1px 1px 2px #000;
         }
 
         .inv-slot .slot-icon {
-            font-size: 15px;
+            font-family: var(--font-mono);
+            font-size: 13px;
             font-weight: bold;
-            color: white;
+            color: var(--c-parchment);
             text-align: center;
             text-shadow: 1px 1px 3px #000;
         }
 
         .inv-slot.selected {
-            border-color: #ffe38a;
-            box-shadow: 0 0 10px #ffe38a, 0 3px 10px rgba(0,0,0,0.5);
+            border-color: var(--c-accent);
+            box-shadow: 0 0 10px rgba(207, 106, 44, 0.65), 0 3px 10px rgba(0,0,0,0.5);
+        }
+
+        /* ---------- DÖDSSKÄRM ---------- */
+
+        .death-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 9999;
+            overflow: hidden;
+            background:
+                radial-gradient(ellipse at center, rgba(90, 30, 20, 0.55), rgba(5, 3, 2, 0.97) 72%),
+                repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 3px);
+        }
+
+        .death-overlay::before,
+        .death-overlay::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 9px;
+            background: repeating-linear-gradient(45deg, var(--c-alert) 0 14px, var(--c-parchment) 14px 28px);
+            opacity: 0.85;
+        }
+
+        .death-overlay::before { top: 0; }
+        .death-overlay::after { bottom: 0; }
+
+        .death-eyebrow {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 4px;
+            color: var(--c-sand);
+            opacity: 0.85;
+        }
+
+        .death-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: clamp(56px, 10vw, 96px);
+            line-height: 0.9;
+            letter-spacing: 6px;
+            margin: 0;
+            color: var(--c-parchment);
+            text-shadow: 0 0 30px rgba(179, 56, 44, 0.55);
+        }
+
+        .death-subtitle {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: 5px;
+            color: rgba(236, 225, 200, 0.55);
+        }
+
+        .death-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .death-btn {
+            font-family: var(--font-display);
+            font-size: 20px;
+            letter-spacing: 2px;
+            font-weight: 600;
+            padding: 14px 28px;
+            cursor: pointer;
+            border: 1px solid var(--c-accent);
+            background: rgba(207, 106, 44, 0.12);
+            color: var(--c-parchment);
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .death-btn:hover {
+            background: rgba(207, 106, 44, 0.24);
+            transform: translateY(-1px);
+        }
+
+        .death-btn.secondary {
+            border-color: var(--c-line);
+            background: rgba(236, 225, 200, 0.06);
+        }
+
+        .death-btn.secondary:hover {
+            background: rgba(236, 225, 200, 0.12);
         }
     </style>
 </head>
@@ -3347,58 +3448,35 @@
         let playerDead = false;
 
         const deathOverlay = document.createElement('div');
-        deathOverlay.style.position = 'fixed';
-        deathOverlay.style.inset = '0';
-        deathOverlay.style.display = 'none';
-        deathOverlay.style.alignItems = 'center';
-        deathOverlay.style.justifyContent = 'center';
-        deathOverlay.style.flexDirection = 'column';
-        deathOverlay.style.background = 'radial-gradient(circle at center, rgba(62,42,28,0.96) 0%, rgba(10,9,8,0.98) 70%)';
-        deathOverlay.style.color = '#fff';
-        deathOverlay.style.fontFamily = 'Arial, sans-serif';
-        deathOverlay.style.zIndex = '9999';
-        deathOverlay.style.gap = '18px';
+        deathOverlay.className = 'death-overlay';
+
+        const deathEyebrow = document.createElement('div');
+        deathEyebrow.className = 'death-eyebrow';
+        deathEyebrow.textContent = 'SEKTOR 7 · UPPDRAG MISSLYCKAT';
 
         const deathTitle = document.createElement('div');
+        deathTitle.className = 'death-title';
         deathTitle.textContent = 'DU DOG';
-        deathTitle.style.fontSize = '72px';
-        deathTitle.style.fontWeight = '900';
-        deathTitle.style.letterSpacing = '8px';
-        deathTitle.style.textShadow = '0 4px 25px rgba(0,0,0,0.9)';
 
         const deathSubtitle = document.createElement('div');
+        deathSubtitle.className = 'death-subtitle';
         deathSubtitle.textContent = 'ÖKENKRIGET';
-        deathSubtitle.style.fontSize = '15px';
-        deathSubtitle.style.letterSpacing = '5px';
-        deathSubtitle.style.opacity = '0.6';
 
         const deathButtons = document.createElement('div');
-        deathButtons.style.display = 'flex';
-        deathButtons.style.gap = '12px';
-        deathButtons.style.marginTop = '18px';
+        deathButtons.className = 'death-buttons';
 
         const playAgainButton = document.createElement('button');
-        playAgainButton.textContent = 'PLAY AGAIN';
-        playAgainButton.style.padding = '14px 28px';
-        playAgainButton.style.border = '1px solid #cf6a2c';
-        playAgainButton.style.background = '#cf6a2c';
-        playAgainButton.style.color = '#fff';
-        playAgainButton.style.fontWeight = '800';
-        playAgainButton.style.letterSpacing = '2px';
-        playAgainButton.style.cursor = 'pointer';
+        playAgainButton.type = 'button';
+        playAgainButton.className = 'death-btn';
+        playAgainButton.textContent = 'SPELA IGEN';
 
         const menuButton = document.createElement('button');
+        menuButton.type = 'button';
+        menuButton.className = 'death-btn secondary';
         menuButton.textContent = 'MENY';
-        menuButton.style.padding = '14px 28px';
-        menuButton.style.border = '1px solid rgba(236,225,200,0.45)';
-        menuButton.style.background = 'rgba(236,225,200,0.06)';
-        menuButton.style.color = '#ece1c8';
-        menuButton.style.fontWeight = '800';
-        menuButton.style.letterSpacing = '2px';
-        menuButton.style.cursor = 'pointer';
 
         deathButtons.append(playAgainButton, menuButton);
-        deathOverlay.append(deathTitle, deathSubtitle, deathButtons);
+        deathOverlay.append(deathEyebrow, deathTitle, deathSubtitle, deathButtons);
         document.body.appendChild(deathOverlay);
 
         function updateHealth() {
@@ -3436,8 +3514,79 @@
 
         updateHealth();
 
+        function resetGame() {
+
+            // HP och dödsstatus
+
+            playerDead = false;
+            playerHP = maxHP;
+            updateHealth();
+
+            deathOverlay.style.display = 'none';
+
+            // Position och kamera tillbaka till start
+
+            camera.position.set(0, 2, 0);
+            velocityY = 0;
+            isGrounded = true;
+            moveVelocity.x = 0;
+            moveVelocity.z = 0;
+            cameraYAngle = 0;
+            cameraXAngle = 0;
+
+            // Vapen och inventory
+
+            for (let i = 0; i < inventory.length; i++) {
+                inventory[i] = null;
+            }
+
+            selectedSlot = -1;
+            renderInventory();
+            setWeapon(null);
+
+            // Plocka bort kvarvarande loot på marken
+
+            for (const item of groundItems) {
+                if (item.parent) {
+                    scene.remove(item);
+                }
+            }
+
+            groundItems.length = 0;
+
+            // Stäng kistorna igen så en ny runda har nytt loot att hitta
+
+            for (const chest of chests) {
+
+                chest.userData.opened = false;
+
+                const lid = chest.userData.lid;
+
+                lid.rotation.x = 0;
+                lid.position.z = 0;
+            }
+
+            // Bottar (endast singleplayer)
+
+            if (!Net.enabled) {
+
+                for (const bot of bots) {
+                    scene.remove(bot.rig.group);
+                }
+
+                bots.length = 0;
+
+                botsKilled = 0;
+                updateBotsKilled();
+
+                spawnBot();
+            }
+
+            enterGame();
+        }
+
         playAgainButton.addEventListener('click', () => {
-            location.reload();
+            resetGame();
         });
 
         menuButton.addEventListener('click', () => {
