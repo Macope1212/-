@@ -1209,6 +1209,7 @@
         // ---------- COLLIDERS ----------
 
         const buildingColliders = [];
+        const shootBlockers = [];
 
         const playerRadius = 0.65;
 
@@ -1296,6 +1297,7 @@
                 wall.position.y = h / 2;
 
                 group.add(wall);
+                group.userData.blocksShots = true;
 
                 const holes =
                     2 + Math.floor(mapRandom() * 3);
@@ -1372,6 +1374,7 @@
                     (h * 0.65) / 2;
 
                 group.add(wall);
+                group.userData.blocksShots = true;
 
                 group.rotation.z =
                     (mapRandom() - 0.5) * 0.35;
@@ -1582,6 +1585,7 @@
         ) {
 
             const group = new THREE.Group();
+            group.userData.blocksShots = true;
 
             const width = 10;
             const depth = 18;
@@ -2210,6 +2214,10 @@
 
             scene.add(ruin);
 
+            if (ruin.userData.blocksShots) {
+                shootBlockers.push(ruin);
+            }
+
             buildingColliders.push(
                 ruin.userData.collider
             );
@@ -2243,6 +2251,7 @@
                 );
 
             scene.add(north);
+            shootBlockers.push(north);
 
             buildingColliders.push(
                 north.userData.collider
@@ -2256,6 +2265,7 @@
                 );
 
             scene.add(south);
+            shootBlockers.push(south);
 
             buildingColliders.push(
                 south.userData.collider
@@ -2276,6 +2286,7 @@
                 );
 
             scene.add(east);
+            shootBlockers.push(east);
 
             buildingColliders.push(
                 east.userData.collider
@@ -2289,6 +2300,7 @@
                 );
 
             scene.add(west);
+            shootBlockers.push(west);
 
             buildingColliders.push(
                 west.userData.collider
@@ -4690,7 +4702,19 @@
                 const intersections =
                     raycaster.intersectObjects(hitBoxes, false);
 
-                if (intersections.length > 0 && intersections[0].distance < 80) {
+                const wallIntersections =
+                    raycaster.intersectObjects(shootBlockers, true);
+
+                const playerHitDistance =
+                    intersections.length > 0
+                        ? intersections[0].distance
+                        : Infinity;
+
+                const wallBlocksShot =
+                    wallIntersections.length > 0 &&
+                    wallIntersections[0].distance < playerHitDistance;
+
+                if (!wallBlocksShot && intersections.length > 0 && intersections[0].distance < 80) {
 
                     const hitId = meshToId.get(intersections[0].object);
 
