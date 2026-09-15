@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="sv">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desert War Zone</title>
+    <title>Warzone</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -67,7 +67,7 @@
             height: 2px;
         }
 
-        /* ---------- LADDNINGSSKÄRM ---------- */
+        /* ---------- LOADING SCREEN ---------- */
 
         #loading {
             position: absolute;
@@ -112,7 +112,7 @@
             100% { transform: translateX(380%); }
         }
 
-        /* ---------- STARTSKÄRM / BRIEFING ---------- */
+        /* ---------- START SCREEN / BRIEFING ---------- */
 
         #start-overlay {
             position: absolute;
@@ -466,6 +466,20 @@
             pointer-events: none;
         }
 
+        #kills-ui {
+            position: absolute;
+            top: 205px;
+            right: 15px;
+            font-family: var(--font-mono);
+            color: var(--c-sand);
+            font-size: 12px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 3px #000;
+            z-index: 20;
+            pointer-events: none;
+        }
+
         /* ---------- INTERACTION ---------- */
 
         #interaction {
@@ -568,7 +582,7 @@
             box-shadow: 0 0 10px rgba(207, 106, 44, 0.65), 0 3px 10px rgba(0,0,0,0.5);
         }
 
-        /* ---------- DÖDSSKÄRM ---------- */
+        /* ---------- DEATH SCREEN ---------- */
 
         .death-overlay {
             position: fixed;
@@ -678,6 +692,43 @@
         .death-btn.secondary:hover {
             background: rgba(236, 225, 200, 0.12);
         }
+
+        /* ---------- PAUSE MENU ---------- */
+
+        #pause-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            background: rgba(4, 2, 2, 0.82);
+        }
+
+        .pause-panel {
+            position: relative;
+            width: min(440px, 88vw);
+            padding: 40px 44px 32px;
+            background: linear-gradient(180deg, rgba(22, 12, 9, 0.97), rgba(9, 5, 4, 0.99));
+            border: 1px solid var(--c-line);
+            text-align: center;
+        }
+
+        .pause-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: clamp(50px, 9vw, 82px);
+            line-height: 0.9;
+            letter-spacing: 4px;
+            margin: 0 0 28px;
+            color: var(--c-parchment);
+        }
+
+        .pause-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
     </style>
 </head>
 
@@ -685,7 +736,7 @@
 
     <div id="loading">
         <div>
-            <div class="loading-label">LADDAR ÖKENSTAD</div>
+            <div class="loading-label">LOADING WARZONE</div>
             <div class="loading-track"><div class="loading-fill"></div></div>
         </div>
     </div>
@@ -701,16 +752,16 @@
             <div class="briefing-corner bl"></div>
             <div class="briefing-corner br"></div>
 
-            <div class="briefing-eyebrow">SEKTOR 7 · ÖVERGIVEN STADSKÄRNA</div>
+            <div class="briefing-eyebrow">SECTOR 7 · ABANDONED CITY CENTER</div>
 
-            <h1 class="briefing-title">ÖKENKRIGET</h1>
+            <h1 class="briefing-title">Warzone</h1>
 
             <p class="briefing-sub">
-                Ruinerna är fulla av kistor med vapen och medicin. Gå in själv, eller ta med ett gäng.
+                The ruins are full of chests containing weapons and medical supplies. Go in alone, or bring a squad.
             </p>
 
             <div id="mode-select" class="mode-select">
-                <button type="button" class="mode-btn" id="btn-solo">SPELA SOLO</button>
+                <button type="button" class="mode-btn" id="btn-solo">PLAY SOLO</button>
                 <button type="button" class="mode-btn" id="btn-multi">MULTIPLAYER</button>
             </div>
 
@@ -718,28 +769,28 @@
 
                 <div id="multi-sub-select">
                     <div class="mode-select">
-                        <button type="button" class="mode-btn" id="btn-create">SKAPA GRUPP</button>
-                        <button type="button" class="mode-btn" id="btn-join">GÅ MED</button>
+                        <button type="button" class="mode-btn" id="btn-create">CREATE PARTY</button>
+                        <button type="button" class="mode-btn" id="btn-join">JOIN</button>
                     </div>
-                    <button type="button" class="mode-btn-back" id="btn-back-1">TILLBAKA</button>
+                    <button type="button" class="mode-btn-back" id="btn-back-1">BACK</button>
                 </div>
 
                 <div id="multi-sub-create" style="display:none;">
-                    <p class="multi-label">DIN KOD — DELA MED DINA VÄNNER</p>
+                    <p class="multi-label">YOUR CODE — SHARE WITH YOUR FRIENDS</p>
                     <div class="room-code" id="room-code-display">····</div>
-                    <p class="multi-status" id="create-status">Skapar rum...</p>
+                    <p class="multi-status" id="create-status">Creating room...</p>
                     <div class="player-count" id="create-player-count" style="display:none;"></div>
-                    <button type="button" class="mode-btn" id="btn-start-hosted" disabled>STARTA SPELET</button>
-                    <button type="button" class="mode-btn-back" id="btn-back-2">TILLBAKA</button>
+                    <button type="button" class="mode-btn" id="btn-start-hosted" disabled>START GAME</button>
+                    <button type="button" class="mode-btn-back" id="btn-back-2">BACK</button>
                 </div>
 
                 <div id="multi-sub-join" style="display:none;">
-                    <p class="multi-label">ANGE KOD</p>
+                    <p class="multi-label">ENTER CODE</p>
                     <input type="text" id="join-code-input" maxlength="4" class="join-input" placeholder="····" autocomplete="off" autocapitalize="characters">
-                    <button type="button" class="mode-btn" id="btn-join-confirm">ANSLUT</button>
-                    <button type="button" class="mode-btn" id="btn-start-joined" style="display:none;">STARTA SPELET</button>
+                    <button type="button" class="mode-btn" id="btn-join-confirm">JOIN</button>
+                    <button type="button" class="mode-btn" id="btn-start-joined" style="display:none;">START GAME</button>
                     <p class="multi-status" id="join-status"></p>
-                    <button type="button" class="mode-btn-back" id="btn-back-3">TILLBAKA</button>
+                    <button type="button" class="mode-btn-back" id="btn-back-3">BACK</button>
                 </div>
 
             </div>
@@ -747,22 +798,32 @@
             <div class="briefing-controls">
                 <div class="ctrl">
                     <span class="ctrl-key">W A S D</span>
-                    <span class="ctrl-desc">Förflyttning</span>
+                    <span class="ctrl-desc">Movement</span>
                 </div>
                 <div class="ctrl">
-                    <span class="ctrl-key">MUS</span>
-                    <span class="ctrl-desc">Sikte</span>
+                    <span class="ctrl-key">MOUSE</span>
+                    <span class="ctrl-desc">Aim</span>
                 </div>
                 <div class="ctrl">
-                    <span class="ctrl-key">MELLANSLAG</span>
-                    <span class="ctrl-desc">Hoppa</span>
+                    <span class="ctrl-key">SPACE</span>
+                    <span class="ctrl-desc">Jump</span>
                 </div>
                 <div class="ctrl">
-                    <span class="ctrl-key">KLICK / F</span>
-                    <span class="ctrl-desc">Skjut</span>
+                    <span class="ctrl-key">CLICK / F</span>
+                    <span class="ctrl-desc">Shoot</span>
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <div id="pause-overlay">
+        <div class="pause-panel">
+            <div class="pause-title">PAUSED</div>
+            <div class="pause-buttons">
+                <button type="button" class="death-btn" id="btn-resume">RESUME</button>
+                <button type="button" class="death-btn secondary" id="btn-return-lobby">RETURN TO LOBBY</button>
+            </div>
         </div>
     </div>
 
@@ -771,7 +832,7 @@
     <canvas id="minimap" width="180" height="180"></canvas>
 
     <div id="interaction">
-        HÅLL E FÖR ATT ÖPPNA KISTAN
+        HOLD E TO OPEN CHEST
         <div id="interaction-progress">
             <div id="interaction-fill"></div>
         </div>
@@ -784,10 +845,11 @@
         </div>
     </div>
 
-    <div id="bots-killed-ui">Bottar dödade: 0</div>
+    <div id="bots-killed-ui">Bots killed: 0</div>
+    <div id="kills-ui">Kills 0</div>
 
     <div id="weapon-ui">
-        Vapen: Händer
+        Weapon: Hands
     </div>
 
     <div id="inventory-ui">
@@ -802,7 +864,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js" defer></script>
 
     <script>
-        // ---------- GRUNDUPPSÄTTNING ----------
+        // ---------- SETUP ----------
 
         const scene = new THREE.Scene();
 
@@ -819,6 +881,7 @@
             antialias: true
         });
 
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -828,19 +891,19 @@
 
         const lookTarget = new THREE.Vector3();
 
-        // ---------- OSYNLIG MAP-GRÄNS ----------
+        // ---------- INVISIBLE MAP BOUNDARY ----------
 
         const MAP_BOUNDARY = 100;
 
-        // Kamerans ögonhöjd när man står på marken (matchar "camera.position.y < 2"
-        // längre ner). Nätverket skickar kamerans (dvs ögats) Y-position, men
-        // fjärrspelarens 3D-modell är byggd utifrån att modellens "group" står
-        // på marken (Y=0). Utan den här offseten hamnar andra spelares kroppar
-        // svävande uppe vid ögonhöjd istället för att stå på marken, vilket gör
-        // att man siktar/skjuter fel höjd och sällan träffar.
+        // Camera eye height when standing on the ground (matches "camera.position.y < 2"
+        // below). The network sends the camera (i.e. eye) Y position, but
+        // the remote player 3D model is built so the model "group" stands
+        // on the ground (Y=0). Without this offset, other players' bodies would end up
+        // floating at eye height instead of standing on the ground, which makes
+        // aiming/shooting at the wrong height and makes hits less reliable.
         const PLAYER_EYE_HEIGHT = 2;
 
-        // ---------- HIMMEL ----------
+        // ---------- SKY ----------
 
         function createSkyTexture() {
             const canvas = document.createElement('canvas');
@@ -878,7 +941,7 @@
 
         scene.fog = new THREE.FogExp2(0xd8b788, 0.016);
 
-        // ---------- SOL ----------
+        // ---------- SUN ----------
 
         const sunSprite = new THREE.Sprite(
             new THREE.SpriteMaterial({
@@ -894,14 +957,14 @@
 
         scene.add(sunSprite);
 
-        // ---------- LJUS ----------
+        // ---------- LIGHTING ----------
 
         const sun = new THREE.DirectionalLight(0xffe9c4, 1.3);
 
         sun.position.set(-150, 90, -250);
         sun.castShadow = true;
 
-        sun.shadow.mapSize.set(1024, 1024);
+        sun.shadow.mapSize.set(512, 512);
 
         sun.shadow.camera.left = -120;
         sun.shadow.camera.right = 120;
@@ -928,7 +991,7 @@
 
         scene.add(ambient);
 
-        // ---------- MARK ----------
+        // ---------- GROUND ----------
 
         function createSandTexture() {
             const size = 512;
@@ -1020,7 +1083,7 @@
 
         scene.add(floor);
 
-        // ---------- MATERIAL ----------
+        // ---------- MATERIALS ----------
 
         const matBuilding = [
             0x6b6455,
@@ -1069,7 +1132,7 @@
                 metalness: 0.2
             });
 
-        // ---------- KIST-MATERIAL ----------
+        // ---------- CHEST MATERIALS ----------
 
         const matChestWood =
             new THREE.MeshStandardMaterial({
@@ -1090,7 +1153,7 @@
                 metalness: 0.65
             });
 
-        // ---------- VAPENSMATERIAL ----------
+        // ---------- WEAPON MATERIALS ----------
 
         const matGun =
             new THREE.MeshStandardMaterial({
@@ -1189,10 +1252,10 @@
             return true;
         }
 
-        // ---------- BYGGNADER ----------
+        // ---------- BUILDINGS ----------
 
-        // Gemensam, deterministisk RNG för kartans slumpade objekt.
-        // Lägenheterna använder fortfarande Math.random() precis som tidigare.
+        // Shared deterministic RNG for the map's randomized objects.
+        // The apartments still use Math.random() exactly as before.
         function mulberry32(seed) {
             return function() {
                 let t = seed += 0x6D2B79F5;
@@ -1382,7 +1445,7 @@
                 }
             }
 
-            // Detaljer
+            // Details
 
             if (mapRandom() > 0.6) {
 
@@ -1449,7 +1512,7 @@
                 group.add(barrel);
             }
 
-            // Takdetalj bara när det faktiskt finns ett tak
+            // Roof detail only when there is actually a roof
 
             if (dmg > 0.25 && mapRandom() > 0.55) {
 
@@ -1491,7 +1554,7 @@
             return group;
         }
 
-        // ---------- LÄGENHETER ----------
+        // ---------- APARTMENTS ----------
 
         const matApartment = [
             0x6b6254,
@@ -1587,7 +1650,7 @@
             return group;
         }
 
-        // ---------- KRATRAR ----------
+        // ---------- CRATERS ----------
 
         function buildCrater(x, z) {
 
@@ -1621,7 +1684,7 @@
             return ring;
         }
 
-        // ---------- ELSTOLPAR ----------
+        // ---------- POWER POLES ----------
 
         function buildPylon(x, z) {
 
@@ -1666,7 +1729,7 @@
             return group;
         }
 
-        // ---------- KISTOR ----------
+        // ---------- CHESTS ----------
 
         const chests = [];
 
@@ -1704,7 +1767,7 @@
 
             group.add(lid);
 
-            // Metallband
+            // Metal band
 
             for (const px of [-0.7, 0.7]) {
 
@@ -1728,7 +1791,7 @@
                 group.add(band);
             }
 
-            // Lås
+            // Lock
 
             const lock = addShadowMesh(
                 new THREE.Mesh(
@@ -1749,7 +1812,7 @@
 
             group.add(lock);
 
-            // Extra trälist
+            // Extra wooden strip
 
             const frontBar = addShadowMesh(
                 new THREE.Mesh(
@@ -1790,13 +1853,13 @@
             return group;
         }
 
-        // ---------- VAPEN ----------
+        // ---------- WEAPONS ----------
 
         function createPistol() {
 
-            // Kompakt handeldvapen: bred, tjock slide ovanpå en tunnare
-            // ram, en kraftigt bakåtvinklad grepp och ett litet avtryckarbygel
-            // — en tydligt annorlunda, mycket kortare siluett än AR:n.
+            // Compact handgun: wide, thick slide above a thinner
+            // frame, a strongly angled grip, and a small trigger guard
+            // — a clearly different, much shorter silhouette than the AR.
 
             const group = new THREE.Group();
 
@@ -1865,10 +1928,10 @@
 
         function createAR() {
 
-            // Långt sturmgevär-format: överdel/underdel, cylindriskt
-            // handskydd i olivgrönt, tunn synlig pipa, sikten fram och bak,
-            // en kolv bak och ett vinklat, hängande magasin — helt annan
-            // siluett än den korta, kompakta pistolen.
+            // Long assault-rifle shape: upper/lower receiver, cylindrical
+            // olive-green handguard, thin visible barrel, front and rear sights,
+            // a stock at the rear and an angled hanging magazine — a completely different
+            // silhouette from the short, compact pistol.
 
             const group = new THREE.Group();
 
@@ -1975,9 +2038,9 @@
 
         function createBandage() {
 
-            // En rulle bandage som ligger ner på sidan, med en lös flik
-            // som sticker ut och en röd kors-lapp — tydligt ett bandage,
-            // inte en medicinflaska.
+            // A roll of bandages lying on its side, with a loose flap
+            // sticking out and a red cross patch — clearly a bandage,
+            // not a medicine bottle.
 
             const group = new THREE.Group();
 
@@ -2078,7 +2141,7 @@
             scene.add(bandage);
         }
 
-        // ---------- VÄRLD ----------
+        // ---------- WORLD ----------
 
         const usedSpots = [];
 
@@ -2110,7 +2173,7 @@
             return true;
         }
 
-        // 85 vanliga hus
+        // 85 regular buildings
 
         for (let i = 0; i < 85; i++) {
 
@@ -2164,7 +2227,7 @@
             }
         }
 
-        // Lägenheter runt barriären
+        // Apartments around the barrier
 
         for (
             let x = -95;
@@ -2232,7 +2295,7 @@
             );
         }
 
-        // Elstolpar
+        // Power poles
 
         for (let i = 0; i < 6; i++) {
 
@@ -2251,7 +2314,7 @@
             }
         }
 
-        // Kratrar
+        // Craters
 
         for (let i = 0; i < 10; i++) {
 
@@ -2263,7 +2326,7 @@
             );
         }
 
-        // ---------- KISTOR ----------
+        // ---------- CHESTS ----------
 
         const chestPositions = [
             [-55, -40],
@@ -2289,20 +2352,20 @@
                     pos[1]
                 );
 
-            // Kistan får enkel osynlig plats
-            // så minimapen kan visa den
+            // The chest gets a simple invisible position
+            // so the minimap can display it
             chest.userData.mapX =
                 pos[0];
 
             chest.userData.mapZ =
                 pos[1];
 
-            // Stabilt index för nätverkssynk
+            // Stable index for network synchronization
             chest.userData.netIndex =
                 chestIndex;
         });
 
-        // ---------- DAMMPARTIKLAR ----------
+        // ---------- DUST PARTICLES ----------
 
         const dustCount = 350;
 
@@ -2359,11 +2422,11 @@
 
         // ---------- MULTIPLAYER (PeerJS / WebRTC) ----------
         //
-        // Stjärntopologi: den som "skapar grupp" är host och kör en egen
-        // PeerJS-peer med ett kort rumskodsnamn. Alla andra ("klienter")
-        // ansluter direkt till hosten via WebRTC. Hosten vidarebefordrar
-        // (relayar) all spelardata mellan alla anslutna klienter, så alla
-        // ser alla — utan att någon behöver hosta en egen server.
+        // Star topology: the person who "creates a party" is the host and runs their own
+        // PeerJS peer with a short room code name. Everyone else ("clients")
+        // connects directly to the host via WebRTC. The host forwards
+        // (relays) all player data between all connected clients, so everyone
+        // sees everyone — without anyone needing to host their own server.
 
         const ROOM_PREFIX = 'okenkriget-';
 
@@ -2421,11 +2484,11 @@
 
             group.add(weaponSlot);
 
-            // Osynlig, generös hitbox som täcker hela kroppen (inte bara de
-            // tunna synliga formerna). Den renderas aldrig (opacity 0) men
-            // är fortfarande raycastbar, så träffar registreras mycket mer
-            // tillförlitligt — särskilt viktigt när man siktar med styrplatta
-            // istället för mus, där precisionen är lägre.
+            // Invisible, generous hitbox covering the whole body (not just the
+            // thin visible shapes). It is never rendered (opacity 0) but
+            // are still raycastable, so hits are registered much more
+            // reliably — especially important when aiming with a trackpad
+            // instead of a mouse, where precision is lower.
 
             const hitbox = new THREE.Mesh(
                 new THREE.BoxGeometry(1.0, 2.1, 1.0),
@@ -2441,7 +2504,7 @@
 
             group.add(hitbox);
 
-            // HP-mätare ovanför huvudet
+            // HP bar above the head
 
             const barCanvas = document.createElement('canvas');
 
@@ -2527,7 +2590,7 @@
 
                 btnStartHostedEl.disabled = true;
                 roomCodeDisplayEl.textContent = '····';
-                createStatusEl.textContent = 'Skapar rum...';
+                createStatusEl.textContent = 'Creating room...';
                 createStatusEl.classList.remove('error');
                 createPlayerCountEl.style.display = 'none';
 
@@ -2540,7 +2603,7 @@
                 if (typeof Peer === 'undefined') {
 
                     createStatusEl.textContent =
-                        'Nätverket laddas fortfarande, försök igen om en sekund.';
+                        'The network is still loading, try again in a second.';
 
                     createStatusEl.classList.add('error');
 
@@ -2557,7 +2620,7 @@
                 this.roomCode = code;
 
                 roomCodeDisplayEl.textContent = code;
-                createStatusEl.textContent = 'Skapar rum...';
+                createStatusEl.textContent = 'Creating room...';
 
                 let peer;
 
@@ -2570,7 +2633,7 @@
                 } catch (err) {
 
                     createStatusEl.textContent =
-                        'Kunde inte skapa rum. Testa igen.';
+                        'Could not create room. Try again.';
 
                     createStatusEl.classList.add('error');
 
@@ -2584,12 +2647,12 @@
                     this.myId = id;
 
                     createStatusEl.textContent =
-                        'Rum skapat! Dela koden ' + code + ' med dina vänner.';
+                        'Room created! Share code ' + code + ' with your friends.';
 
                     btnStartHostedEl.disabled = false;
 
                     createPlayerCountEl.style.display = 'block';
-                    createPlayerCountEl.textContent = '0 andra spelare anslutna';
+                    createPlayerCountEl.textContent = '0 other players connected';
                 });
 
                 peer.on('error', err => {
@@ -2598,13 +2661,13 @@
 
                     if (err && err.type === 'unavailable-id') {
 
-                        // Extremt osannolik kollision, försök igen med ny kod
+                        // Extremely unlikely collision, try again with a new code
                         this.hostParty();
                         return;
                     }
 
                     createStatusEl.textContent =
-                        'Nätverksfel: ' + (err && err.type ? err.type : 'okänt') + '.';
+                        'Network error: ' + (err && err.type ? err.type : 'unknown') + '.';
 
                     createStatusEl.classList.add('error');
                 });
@@ -2624,8 +2687,8 @@
                     createPlayerCountEl.textContent =
                         this.connections.size + ' andra spelare anslutna';
 
-                    // Berätta för den nya klienten om alla existerande spelare
-                    // och vilka kistor som redan är öppnade
+                    // Tell the new client about all existing players
+                    // and which chests are already opened
 
                     const existingPlayerIds =
                         [this.myId, ...this.players.keys()];
@@ -2642,7 +2705,7 @@
                         openedChests
                     });
 
-                    // Berätta för alla andra att en ny spelare gick med
+                    // Tell everyone else that a new player joined
 
                     this._addRemotePlayer(conn.peer);
 
@@ -2690,7 +2753,7 @@
                 if (typeof Peer === 'undefined') {
 
                     joinStatusEl.textContent =
-                        'Nätverket laddas fortfarande, försök igen om en sekund.';
+                        'The network is still loading, try again in a second.';
 
                     joinStatusEl.classList.add('error');
 
@@ -2713,7 +2776,7 @@
 
                 } catch (err) {
 
-                    joinStatusEl.textContent = 'Kunde inte ansluta. Testa igen.';
+                    joinStatusEl.textContent = 'Could not connect. Try again.';
                     joinStatusEl.classList.add('error');
                     return;
                 }
@@ -2743,7 +2806,7 @@
                     conn.on('close', () => {
 
                         joinStatusEl.textContent =
-                            'Anslutningen till hosten bröts.';
+                            'Connection to the host was lost.';
 
                         joinStatusEl.classList.add('error');
 
@@ -2754,7 +2817,7 @@
                     conn.on('error', err => {
 
                         joinStatusEl.textContent =
-                            'Kunde inte hitta ett rum med den koden.';
+                            'Could not find a room with that code.';
 
                         joinStatusEl.classList.add('error');
                     });
@@ -2765,7 +2828,7 @@
                     console.warn('PeerJS client error', err);
 
                     joinStatusEl.textContent =
-                        'Kunde inte hitta ett rum med den koden.';
+                        'Could not find a room with that code.';
 
                     joinStatusEl.classList.add('error');
                 });
@@ -2874,7 +2937,7 @@
 
                     case 'welcome': {
 
-                        // Endast klienter tar emot detta
+                        // Only clients receive this
 
                         for (const id of data.playerIds) {
 
@@ -2895,7 +2958,7 @@
                         this.joinedAndReady = true;
 
                         joinStatusEl.textContent =
-                            'Ansluten! Redo att gå in.';
+                            'Connected! Ready to enter.';
 
                         joinStatusEl.classList.remove('error');
 
@@ -2923,7 +2986,7 @@
 
                     case 'state': {
 
-                        // Om vi är host: relaya vidare till alla andra klienter
+                        // If we are host: relay to all other clients
 
                         if (this.isHost) {
                             this._broadcast(data, fromId);
@@ -2943,11 +3006,20 @@
                             p.targetPos.set(data.x, data.y - PLAYER_EYE_HEIGHT, data.z);
                             p.targetYaw = data.ry;
                             p.hp = data.hp;
+                            p.kills = data.kills || 0;
                             p.rig.drawBar(data.hp);
 
                             this._setRemoteWeapon(data.id, data.weapon);
                         }
 
+                        break;
+                    }
+
+                    case 'kills': {
+                        if (data.kills !== undefined) {
+                            kills = data.kills;
+                            updateKills();
+                        }
                         break;
                     }
 
@@ -2981,8 +3053,8 @@
 
                     case 'damage': {
 
-                        // Host skickar skadan till rätt spelare.
-                        // Om hosten själv blir träffad tar hosten skadan direkt.
+                        // Host sends the damage to the correct player.
+                        // If the host is hit, the host takes the damage directly.
                         if (this.isHost) {
 
                             if (data.targetId === this.myId) {
@@ -3008,7 +3080,7 @@
                             break;
                         }
 
-                        // Klienten som blev träffad tar skadan lokalt.
+                        // The client that was hit takes the damage locally.
                         if (data.targetId === this.myId) {
                             playerHP = Math.max(0, playerHP - data.amount);
                             updateHealth();
@@ -3029,7 +3101,7 @@
 
                 if (now < this.nextStateSend) return;
 
-                this.nextStateSend = now + 60; // ~16 gånger per sekund
+                this.nextStateSend = now + 60; // ~16 times per second
 
                 const msg = {
                     type: 'state',
@@ -3039,7 +3111,8 @@
                     z: camera.position.z,
                     ry: cameraYAngle,
                     hp: playerHP,
-                    weapon: currentWeapon
+                    weapon: currentWeapon,
+                    kills
                 };
 
                 if (this.isHost) {
@@ -3109,7 +3182,30 @@
 
                     } else {
 
+                        const target = this.players.get(targetId);
+                        if (target) {
+                            target.hp = Math.max(0, target.hp - amount);
+                        }
+
                         this._sendToPlayer(targetId, msg);
+
+                        if (target && target.hp <= 0) {
+                            if (data.fromId === this.myId) {
+                                kills++;
+                                updateKills();
+                            } else {
+                                const killer = this.players.get(data.fromId);
+                                if (killer) {
+                                    killer.kills = (killer.kills || 0) + 1;
+                                    const killerConn = this.connections.get(data.fromId);
+                                    if (killerConn) {
+                                        try {
+                                            killerConn.send({ type: 'kills', kills: killer.kills });
+                                        } catch (err) {}
+                                    }
+                                }
+                            }
+                        }
                     }
 
                 } else {
@@ -3179,7 +3275,7 @@
             }, 35);
         }
 
-        // ---------- KONTROLLER ----------
+        // ---------- CONTROLS ----------
 
         let cameraYAngle = 0;
         let cameraXAngle = 0;
@@ -3231,7 +3327,7 @@
         startOverlay.style.display =
             'flex';
 
-        // ---------- MENYNAVIGERING ----------
+        // ---------- MENU NAVIGATION ----------
 
         const modeSelectEl = document.getElementById('mode-select');
         const multiPanelEl = document.getElementById('multi-panel');
@@ -3251,6 +3347,7 @@
 
         btnStartJoinedEl.addEventListener('click', () => {
 
+            spawnPlayerRandomly();
             enterGame();
         });
 
@@ -3264,8 +3361,43 @@
             multiSubJoinEl.style.display = panel === 'multi-join' ? 'block' : 'none';
         }
 
+        function findMultiplayerSpawnPosition() {
+
+            for (let attempt = 0; attempt < 200; attempt++) {
+
+                const x =
+                    -MAP_BOUNDARY + 5 +
+                    Math.random() * (MAP_BOUNDARY * 2 - 10);
+
+                const z =
+                    -MAP_BOUNDARY + 5 +
+                    Math.random() * (MAP_BOUNDARY * 2 - 10);
+
+                if (canMoveTo(x, z)) {
+                    return { x, z };
+                }
+            }
+
+            return { x: 0, z: 0 };
+        }
+
+        function spawnPlayerRandomly() {
+
+            const spawn = findMultiplayerSpawnPosition();
+
+            camera.position.set(spawn.x, 2, spawn.z);
+            velocityY = 0;
+            isGrounded = true;
+            moveVelocity.x = 0;
+            moveVelocity.z = 0;
+            cameraYAngle = 0;
+            cameraXAngle = 0;
+        }
+
         function enterGame() {
 
+            paused = false;
+            pauseOverlay.style.display = 'none';
             renderer.domElement.requestPointerLock();
         }
 
@@ -3280,7 +3412,7 @@
             enterGame();
         });
 
-        // In i multiplayer-vyn
+        // In the multiplayer view
 
         document.getElementById('btn-multi').addEventListener('click', () => {
 
@@ -3306,7 +3438,7 @@
             showPanel('multi-select');
         });
 
-        // Skapa grupp
+        // Create party
 
         document.getElementById('btn-create').addEventListener('click', () => {
 
@@ -3317,10 +3449,11 @@
         btnStartHostedEl.addEventListener('click', () => {
 
             Net.enabled = true;
+            spawnPlayerRandomly();
             enterGame();
         });
 
-        // Gå med i grupp
+        // Join party
 
         document.getElementById('btn-join').addEventListener('click', () => {
 
@@ -3349,18 +3482,23 @@
 
             if (code.length < 4) {
 
-                joinStatusEl.textContent = 'Ange en 4-teckens kod.';
+                joinStatusEl.textContent = 'Enter a 4-character code.';
                 joinStatusEl.classList.add('error');
                 return;
             }
 
-            joinStatusEl.textContent = 'Ansluter...';
+            joinStatusEl.textContent = 'Connecting...';
             joinStatusEl.classList.remove('error');
 
             Net.joinParty(code);
         });
 
         let gameStarted = false;
+        let paused = false;
+
+        const pauseOverlay = document.getElementById('pause-overlay');
+        const btnResume = document.getElementById('btn-resume');
+        const btnReturnLobby = document.getElementById('btn-return-lobby');
 
         document.addEventListener(
             'pointerlockchange',
@@ -3370,8 +3508,13 @@
                     document.pointerLockElement ===
                     renderer.domElement;
 
+                if (!isMouseLocked && gameStarted && !playerDead && !paused) {
+                    paused = true;
+                    pauseOverlay.style.display = 'flex';
+                }
+
                 startOverlay.style.display =
-                    (isMouseLocked || playerDead)
+                    (isMouseLocked || playerDead || paused)
                         ? 'none'
                         : 'flex';
 
@@ -3399,7 +3542,7 @@
 
                     resumeCta.className = 'briefing-cta';
                     resumeCta.innerHTML =
-                        '<span class="cta-label">KLICKA FÖR ATT FORTSÄTTA</span>';
+                        '<span class="cta-label">CLICK TO RESUME</span>';
 
                     resumeCta.addEventListener(
                         'click',
@@ -3407,6 +3550,59 @@
                     );
 
                     document.querySelector('.briefing').appendChild(resumeCta);
+                }
+            }
+        );
+
+        btnResume.addEventListener('click', () => {
+            enterGame();
+        });
+
+        btnReturnLobby.addEventListener('click', () => {
+
+            paused = false;
+            playerDead = false;
+            pauseOverlay.style.display = 'none';
+            deathOverlay.style.display = 'none';
+
+            Net.teardown();
+            gameStarted = false;
+
+            if (document.pointerLockElement) {
+                document.exitPointerLock();
+            }
+
+            modeSelectEl.style.display = 'flex';
+            multiPanelEl.style.display = 'none';
+            multiSubSelectEl.style.display = 'none';
+            multiSubCreateEl.style.display = 'none';
+            multiSubJoinEl.style.display = 'none';
+
+            const briefingControlsEl =
+                document.querySelector('.briefing-controls');
+
+            if (briefingControlsEl) {
+                briefingControlsEl.style.display = 'grid';
+            }
+
+            startOverlay.style.display = 'flex';
+        });
+
+        document.addEventListener(
+            'keydown',
+            e => {
+
+                if (e.code === 'Escape' && gameStarted && !playerDead) {
+                    e.preventDefault();
+
+                    if (!paused) {
+                        paused = true;
+                        pauseOverlay.style.display = 'flex';
+
+                        if (document.pointerLockElement) {
+                            document.exitPointerLock();
+                        }
+                    }
                 }
             }
         );
@@ -3448,12 +3644,12 @@
         let velocityY = 0;
         let isGrounded = true;
 
-        // ---------- REALISTISK RÖRELSE ----------
-        // Istället för att hastigheten hoppar direkt till max/noll så
-        // accelererar och bromsar spelaren in mjukt, precis som i de
-        // flesta FPS-spel. Samma kod körs oavsett om man spelar solo
-        // eller i multiplayer — det finns ingen separat rörelselogik
-        // för de olika lägena.
+        // ---------- REALISTIC MOVEMENT ----------
+        // Instead of speed jumping directly to max/zero, it
+        // smoothly accelerates and decelerates the player, like in
+        // most FPS games. The same code runs whether playing solo
+        // or multiplayer — there is no separate movement logic
+        // for the different modes.
 
         const MAX_SPEED = 15;
         const GROUND_ACCEL = 85;
@@ -3501,15 +3697,15 @@
 
         const deathEyebrow = document.createElement('div');
         deathEyebrow.className = 'death-eyebrow';
-        deathEyebrow.textContent = 'SEKTOR 7 · UPPDRAG MISSLYCKAT';
+        deathEyebrow.textContent = 'SECTOR 7 · MISSION FAILED';
 
         const deathTitle = document.createElement('div');
         deathTitle.className = 'death-title';
-        deathTitle.textContent = 'DU DOG';
+        deathTitle.textContent = 'YOU DIED';
 
         const deathSubtitle = document.createElement('div');
         deathSubtitle.className = 'death-subtitle';
-        deathSubtitle.textContent = 'ÖKENKRIGET';
+        deathSubtitle.textContent = 'Warzone';
 
         const deathButtons = document.createElement('div');
         deathButtons.className = 'death-buttons';
@@ -3517,12 +3713,12 @@
         const playAgainButton = document.createElement('button');
         playAgainButton.type = 'button';
         playAgainButton.className = 'death-btn';
-        playAgainButton.textContent = 'SPELA IGEN';
+        playAgainButton.textContent = 'PLAY AGAIN';
 
         const menuButton = document.createElement('button');
         menuButton.type = 'button';
         menuButton.className = 'death-btn secondary';
-        menuButton.textContent = 'MENY';
+        menuButton.textContent = 'MENU';
 
         deathButtons.append(playAgainButton, menuButton);
 
@@ -3565,10 +3761,23 @@
 
             if (playerHP <= 0 && !playerDead) {
                 playerDead = true;
-                deathOverlay.style.display = 'flex';
 
-                if (document.pointerLockElement) {
-                    document.exitPointerLock();
+                if (Net.enabled) {
+                    if (document.pointerLockElement) {
+                        document.exitPointerLock();
+                    }
+
+                    setTimeout(() => {
+                        if (Net.enabled && playerDead) {
+                            resetGame();
+                        }
+                    }, 700);
+                } else {
+                    deathOverlay.style.display = 'flex';
+
+                    if (document.pointerLockElement) {
+                        document.exitPointerLock();
+                    }
                 }
             }
         }
@@ -3577,7 +3786,7 @@
 
         function resetGame() {
 
-            // HP och dödsstatus
+            // HP and death status
 
             playerDead = false;
             playerHP = maxHP;
@@ -3585,17 +3794,21 @@
 
             deathOverlay.style.display = 'none';
 
-            // Position och kamera tillbaka till start
+            // Position and camera reset to start
 
-            camera.position.set(0, 2, 0);
-            velocityY = 0;
-            isGrounded = true;
-            moveVelocity.x = 0;
-            moveVelocity.z = 0;
-            cameraYAngle = 0;
-            cameraXAngle = 0;
+            if (Net.enabled) {
+                spawnPlayerRandomly();
+            } else {
+                camera.position.set(0, 2, 0);
+                velocityY = 0;
+                isGrounded = true;
+                moveVelocity.x = 0;
+                moveVelocity.z = 0;
+                cameraYAngle = 0;
+                cameraXAngle = 0;
+            }
 
-            // Vapen och inventory
+            // Weapons and inventory
 
             for (let i = 0; i < inventory.length; i++) {
                 inventory[i] = null;
@@ -3605,7 +3818,7 @@
             renderInventory();
             setWeapon(null);
 
-            // Plocka bort kvarvarande loot på marken
+            // Remove remaining loot from the ground
 
             for (const item of groundItems) {
                 if (item.parent) {
@@ -3615,7 +3828,7 @@
 
             groundItems.length = 0;
 
-            // Stäng kistorna igen så en ny runda har nytt loot att hitta
+            // Close the chests again so a new round has new loot to find
 
             for (const chest of chests) {
 
@@ -3627,7 +3840,7 @@
                 lid.position.z = 0;
             }
 
-            // Bottar (endast singleplayer)
+            // Bots (singleplayer only)
 
             if (!Net.enabled) {
 
@@ -3654,10 +3867,18 @@
             location.reload();
         });
 
-        // ---------- SINGLEPLAYER-BOTTAR ----------
+        // ---------- SINGLEPLAYER BOTS ----------
 
         const bots = [];
         let botsKilled = 0;
+        let kills = 0;
+        const killsLabel =
+            document.getElementById('kills-ui');
+
+        function updateKills() {
+            killsLabel.textContent =
+                'Kills ' + kills;
+        }
         const botsKilledLabel =
             document.getElementById('bots-killed-ui');
         const BOT_HP = 100;
@@ -3667,7 +3888,7 @@
 
         function updateBotsKilled() {
             botsKilledLabel.textContent =
-                'Bottar dödade: ' + botsKilled;
+                'Bots killed: ' + botsKilled;
         }
 
         function findBotSpawnPosition() {
@@ -3734,6 +3955,8 @@
 
             botsKilled++;
             updateBotsKilled();
+            kills++;
+            updateKills();
             spawnBotsAfterKill();
         }
 
@@ -3784,17 +4007,18 @@
         }
 
         updateBotsKilled();
+        updateKills();
 
-        // ---------- VAPEN ----------
+        // ---------- WEAPONS ----------
 
         let currentWeapon = null;
 
-        // ---------- VAPEN-VIEWMODEL (syns i högra hörnet) ----------
+        // ---------- WEAPON VIEWMODEL (visible in the right corner) ----------
 
         function buildViewmodelPistol() {
 
-            // Kort, kompakt siluett i förstaperson: bred slide, smalare
-            // ram under, och ett tydligt bakåtvinklat grepp.
+            // Short, compact first-person silhouette: wide slide, thinner
+            // frame below, and a clearly angled grip.
 
             const group = new THREE.Group();
 
@@ -3864,10 +4088,10 @@
 
         function buildViewmodelAR() {
 
-            // Lång, spretig gevärs-siluett i förstaperson: kolv bak,
-            // cylindriskt handskydd i olivgrönt fram, synliga sikten,
-            // och ett vinklat magasin — mycket längre och spretigare
-            // än den kompakta pistolen.
+            // Long, extended first-person rifle silhouette: stock at the rear,
+            // cylindrical olive-green handguard at the front, visible sights,
+            // and an angled magazine — much longer and more extended
+            // than the compact pistol.
 
             const group = new THREE.Group();
 
@@ -4001,15 +4225,15 @@
             if (!type) {
 
                 weaponUI.textContent =
-                    'Vapen: Händer';
+                    'Weapon: Hands';
 
                 return;
             }
 
             weaponUI.textContent =
-                'Vapen: ' +
+                'Weapon: ' +
                 type +
-                ' · VÄNSTERKLICK / F';
+                ' · LEFT CLICK / F';
 
         }
 
@@ -4105,6 +4329,9 @@
 
             if (item.type === 'bandage') {
 
+                selectedSlot = index;
+                renderInventory();
+
                 if (
                     playerHP >= maxHP
                 ) {
@@ -4134,7 +4361,43 @@
             }
         }
 
-        // ---------- E-INTERAKTION ----------
+        function dropSelectedItem() {
+            if (selectedSlot < 0) return;
+
+            const item = inventory[selectedSlot];
+            if (!item) return;
+
+            let groundItem;
+
+            if (item.type === 'bandage') {
+                groundItem = createBandage();
+                groundItem.userData.pickupType = 'Bandage';
+            } else if (item.type === 'weapon') {
+                groundItem = item.name === 'AR' ? createAR() : createPistol();
+                groundItem.userData.pickupType = item.name;
+                groundItem.rotation.y = Math.random() * Math.PI;
+            } else {
+                return;
+            }
+
+            groundItem.position.set(
+                camera.position.x,
+                0,
+                camera.position.z
+            );
+
+            groundItems.push(groundItem);
+            scene.add(groundItem);
+
+            inventory[selectedSlot] = null;
+            if (currentWeapon === item.name) {
+                setWeapon(null);
+            }
+            selectedSlot = -1;
+            renderInventory();
+        }
+
+        // ---------- E INTERACTION ----------
 
         let nearbyChest = null;
         let chestHoldStart = 0;
@@ -4271,7 +4534,7 @@
             if (
                 findEmptySlot() === -1
             ) {
-                // Inventoryt är fullt (5/5), kan inte plocka upp mer
+                // Inventory is full (5/5), cannot pick up more
                 return;
             }
 
@@ -4345,7 +4608,7 @@
             }
         }
 
-        // ---------- SKJUTA ----------
+        // ---------- SHOOTING ----------
 
         const raycaster =
             new THREE.Raycaster();
@@ -4379,7 +4642,7 @@
                 shootDirection
             );
 
-            // Själva skottet
+            // The shot itself
 
             const endPoint =
                 camera.position.clone().add(
@@ -4404,7 +4667,7 @@
 
             scene.add(tracer);
 
-            // Ta bort spår snabbt så det inte laggar
+            // Remove tracers quickly so it does not lag
 
             setTimeout(
                 () => {
@@ -4421,7 +4684,7 @@
 
             Net.sendShoot(camera.position, shootDirection);
 
-            // Träffkontroll mot andra spelare (multiplayer)
+            // Hit detection against other players (multiplayer)
 
             if (Net.enabled && Net.players.size > 0) {
 
@@ -4454,7 +4717,7 @@
                 }
             }
 
-            // Träffkontroll mot bottar i singleplayer
+            // Hit detection against bots in singleplayer
 
             if (!Net.enabled && bots.length > 0) {
 
@@ -4537,7 +4800,7 @@
                 }
             }
 
-            // Olika eldhastighet
+            // Different fire rates
 
             if (
                 currentWeapon ===
@@ -4576,7 +4839,7 @@
             }
         );
 
-        // ---------- TANGENTBINDNINGAR ----------
+        // ---------- KEY BINDINGS ----------
 
         document.addEventListener(
             'keydown',
@@ -4613,8 +4876,8 @@
                     }
                 }
 
-                // Alternativ skjutknapp — så man kan spela på en laptop
-                // utan datormus (t.ex. via styrplatta) och ändå kunna skjuta.
+                // Alternative shoot button — so the game can be played on a laptop
+                // without a mouse (e.g. using a trackpad) and still shoot.
 
                 if (
                     e.code === 'KeyF' &&
@@ -4623,6 +4886,10 @@
                 ) {
 
                     shoot();
+                }
+
+                if (e.code === 'KeyQ') {
+                    dropSelectedItem();
                 }
 
                 if (
@@ -4696,6 +4963,7 @@
 
         const minimapSize =
             180;
+        let lastMinimapDraw = 0;
 
         function worldToMinimapX(x) {
 
@@ -4715,7 +4983,11 @@
             );
         }
 
-        function drawMinimap() {
+        function drawMinimap(force = false) {
+            const now = performance.now();
+            if (!force && now - lastMinimapDraw < 50) return;
+            lastMinimapDraw = now;
+
 
             minimapCtx.clearRect(
                 0,
@@ -4736,7 +5008,7 @@
                 minimapSize
             );
 
-            // Rutnät
+            // Grid
 
             minimapCtx.strokeStyle =
                 'rgba(70,55,35,0.18)';
@@ -4783,7 +5055,7 @@
                 minimapCtx.stroke();
             }
 
-            // Alla byggnader
+            // All buildings
 
             minimapCtx.fillStyle =
                 '#40372d';
@@ -4826,7 +5098,7 @@
                 );
             }
 
-            // Kistor
+            // Chests
 
             for (
                 const chest of chests
@@ -4859,7 +5131,7 @@
                 );
             }
 
-            // Andra spelare (multiplayer)
+            // Other players (multiplayer)
 
             for (const p of Net.players.values()) {
 
@@ -4875,7 +5147,7 @@
                 minimapCtx.stroke();
             }
 
-            // Spelare
+            // Player
 
             const playerX =
                 worldToMinimapX(
@@ -4909,7 +5181,7 @@
 
             minimapCtx.stroke();
 
-            // Spelarens riktning
+            // Playerns riktning
 
             const directionLength =
                 10;
@@ -4945,7 +5217,7 @@
 
             minimapCtx.stroke();
 
-            // Tydlig ram
+            // Clear border
 
             minimapCtx.strokeStyle =
                 '#fff0c7';
@@ -4960,7 +5232,7 @@
             );
         }
 
-        // ---------- ANIMATIONSLOOP ----------
+        // ---------- ANIMATION LOOP ----------
 
         function animate() {
 
@@ -5052,8 +5324,8 @@
                 const targetVX = inputX * MAX_SPEED;
                 const targetVZ = inputZ * MAX_SPEED;
 
-                // Acceleration/inbromsning: snabbare på marken, trögare
-                // (mer "sväng") i luften — precis som i de flesta FPS-spel.
+                // Acceleration/deceleration: faster on the ground, slower
+                // (more "turning") in the air — just like in most FPS games.
 
                 const rate = hasInput
                     ? (isGrounded ? GROUND_ACCEL : AIR_ACCEL)
@@ -5075,8 +5347,8 @@
                     camera.position.z +
                     moveVelocity.z * delta;
 
-                // Kollisionskontroll separat
-                // för X och Z så man inte fastnar
+                // Collision check separately
+                // for X and Z so the player does not get stuck
 
                 if (
                     canMoveTo(
@@ -5132,7 +5404,7 @@
                     isGrounded = true;
                 }
 
-                // Liten "bob"-rörelse på vapnet man håller
+                // Small "bob" movement on the weapon being held
 
                 const activeViewmodel =
                     currentWeapon === 'Pistol'
@@ -5178,7 +5450,7 @@
                 }
             }
 
-            // ---------- KISTA E ----------
+            // ---------- CHEST E ----------
 
             nearbyChest =
                 findNearbyChest();
@@ -5247,7 +5519,7 @@
                     0;
             }
 
-            // ---------- PICKUP AV SAKER ----------
+            // ---------- ITEM PICKUP ----------
 
             pickUpNearbyItem();
 
@@ -5295,7 +5567,7 @@
 
             pos.needsUpdate = true;
 
-            // ---------- KAMERA ----------
+            // ---------- CAMERA ----------
 
             const target =
                 lookTarget;
@@ -5328,7 +5600,7 @@
                 target
             );
 
-            // ---------- SINGLEPLAYER-BOTTAR ----------
+            // ---------- SINGLEPLAYER BOTS ----------
 
             updateBots(delta);
 
