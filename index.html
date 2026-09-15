@@ -2853,6 +2853,7 @@
                             if (data.targetId === this.myId) {
                                 playerHP = Math.max(0, playerHP - data.amount);
                                 updateHealth();
+                                this.nextStateSend = 0;
                                 this.sendState();
                             } else {
                                 const targetConn = this.connections.get(data.targetId);
@@ -2876,6 +2877,7 @@
                         if (data.targetId === this.myId) {
                             playerHP = Math.max(0, playerHP - data.amount);
                             updateHealth();
+                            this.nextStateSend = 0;
                             this.sendState();
                         }
 
@@ -3351,13 +3353,52 @@
         deathOverlay.style.alignItems = 'center';
         deathOverlay.style.justifyContent = 'center';
         deathOverlay.style.flexDirection = 'column';
-        deathOverlay.style.background = 'rgba(0,0,0,0.75)';
+        deathOverlay.style.background = 'radial-gradient(circle at center, rgba(62,42,28,0.96) 0%, rgba(10,9,8,0.98) 70%)';
         deathOverlay.style.color = '#fff';
         deathOverlay.style.fontFamily = 'Arial, sans-serif';
-        deathOverlay.style.fontSize = '56px';
-        deathOverlay.style.fontWeight = '900';
         deathOverlay.style.zIndex = '9999';
-        deathOverlay.textContent = 'DU DOG';
+        deathOverlay.style.gap = '18px';
+
+        const deathTitle = document.createElement('div');
+        deathTitle.textContent = 'DU DOG';
+        deathTitle.style.fontSize = '72px';
+        deathTitle.style.fontWeight = '900';
+        deathTitle.style.letterSpacing = '8px';
+        deathTitle.style.textShadow = '0 4px 25px rgba(0,0,0,0.9)';
+
+        const deathSubtitle = document.createElement('div');
+        deathSubtitle.textContent = 'ÖKENKRIGET';
+        deathSubtitle.style.fontSize = '15px';
+        deathSubtitle.style.letterSpacing = '5px';
+        deathSubtitle.style.opacity = '0.6';
+
+        const deathButtons = document.createElement('div');
+        deathButtons.style.display = 'flex';
+        deathButtons.style.gap = '12px';
+        deathButtons.style.marginTop = '18px';
+
+        const playAgainButton = document.createElement('button');
+        playAgainButton.textContent = 'PLAY AGAIN';
+        playAgainButton.style.padding = '14px 28px';
+        playAgainButton.style.border = '1px solid #cf6a2c';
+        playAgainButton.style.background = '#cf6a2c';
+        playAgainButton.style.color = '#fff';
+        playAgainButton.style.fontWeight = '800';
+        playAgainButton.style.letterSpacing = '2px';
+        playAgainButton.style.cursor = 'pointer';
+
+        const menuButton = document.createElement('button');
+        menuButton.textContent = 'MENY';
+        menuButton.style.padding = '14px 28px';
+        menuButton.style.border = '1px solid rgba(236,225,200,0.45)';
+        menuButton.style.background = 'rgba(236,225,200,0.06)';
+        menuButton.style.color = '#ece1c8';
+        menuButton.style.fontWeight = '800';
+        menuButton.style.letterSpacing = '2px';
+        menuButton.style.cursor = 'pointer';
+
+        deathButtons.append(playAgainButton, menuButton);
+        deathOverlay.append(deathTitle, deathSubtitle, deathButtons);
         document.body.appendChild(deathOverlay);
 
         function updateHealth() {
@@ -3394,6 +3435,14 @@
         }
 
         updateHealth();
+
+        playAgainButton.addEventListener('click', () => {
+            location.reload();
+        });
+
+        menuButton.addEventListener('click', () => {
+            location.reload();
+        });
 
         // ---------- SINGLEPLAYER-BOTTAR ----------
 
@@ -4166,27 +4215,24 @@
 
             if (Net.enabled && Net.players.size > 0) {
 
-                const groupToId = new Map();
+                const meshToId = new Map();
                 const hitBoxes = [];
 
                 for (const [pid, p] of Net.players.entries()) {
-
-                    groupToId.set(p.rig.group, pid);
-                    hitBoxes.push(p.rig.group);
+                    p.rig.group.traverse(child => {
+                        if (child.isMesh) {
+                            meshToId.set(child, pid);
+                            hitBoxes.push(child);
+                        }
+                    });
                 }
 
                 const intersections =
-                    raycaster.intersectObjects(hitBoxes, true);
+                    raycaster.intersectObjects(hitBoxes, false);
 
                 if (intersections.length > 0 && intersections[0].distance < 80) {
 
-                    let hitRoot = intersections[0].object;
-
-                    while (hitRoot && !groupToId.has(hitRoot)) {
-                        hitRoot = hitRoot.parent;
-                    }
-
-                    const hitId = hitRoot ? groupToId.get(hitRoot) : null;
+                    const hitId = meshToId.get(intersections[0].object);
 
                     if (hitId) {
 
