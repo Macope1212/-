@@ -2846,17 +2846,37 @@
 
                     case 'damage': {
 
-                        if (this.isHost && data.targetId !== this.myId) {
+                        // Host skickar skadan till rätt spelare.
+                        // Om hosten själv blir träffad tar hosten skadan direkt.
+                        if (this.isHost) {
 
-                            // Rutta skadan till rätt klient
-                            this._sendToPlayer(data.targetId, data);
+                            if (data.targetId === this.myId) {
+                                playerHP = Math.max(0, playerHP - data.amount);
+                                updateHealth();
+                                this.sendState();
+                            } else {
+                                const targetConn = this.connections.get(data.targetId);
+
+                                if (targetConn) {
+                                    try {
+                                        targetConn.send({
+                                            type: 'damage',
+                                            targetId: data.targetId,
+                                            amount: data.amount,
+                                            fromId: data.fromId
+                                        });
+                                    } catch (err) {}
+                                }
+                            }
+
                             break;
                         }
 
+                        // Klienten som blev träffad tar skadan lokalt.
                         if (data.targetId === this.myId) {
-
-                            playerHP -= data.amount;
+                            playerHP = Math.max(0, playerHP - data.amount);
                             updateHealth();
+                            this.sendState();
                         }
 
                         break;
@@ -3322,6 +3342,23 @@
 
         let playerHP = 100;
         const maxHP = 100;
+        let playerDead = false;
+
+        const deathOverlay = document.createElement('div');
+        deathOverlay.style.position = 'fixed';
+        deathOverlay.style.inset = '0';
+        deathOverlay.style.display = 'none';
+        deathOverlay.style.alignItems = 'center';
+        deathOverlay.style.justifyContent = 'center';
+        deathOverlay.style.flexDirection = 'column';
+        deathOverlay.style.background = 'rgba(0,0,0,0.75)';
+        deathOverlay.style.color = '#fff';
+        deathOverlay.style.fontFamily = 'Arial, sans-serif';
+        deathOverlay.style.fontSize = '56px';
+        deathOverlay.style.fontWeight = '900';
+        deathOverlay.style.zIndex = '9999';
+        deathOverlay.textContent = 'DU DOG';
+        document.body.appendChild(deathOverlay);
 
         function updateHealth() {
 
@@ -3345,6 +3382,15 @@
                 Math.round(playerHP) +
                 ' / ' +
                 maxHP;
+
+            if (playerHP <= 0 && !playerDead) {
+                playerDead = true;
+                deathOverlay.style.display = 'flex';
+
+                if (document.pointerLockElement) {
+                    document.exitPointerLock();
+                }
+            }
         }
 
         updateHealth();
@@ -3433,7 +3479,7 @@
         }
 
         function updateBots(delta) {
-            if (Net.enabled || !isMouseLocked) {
+            if (playerDead || Net.enabled || !isMouseLocked) {
                 return;
             }
 
@@ -4058,6 +4104,7 @@
         function shoot() {
 
             if (
+                playerDead ||
                 !isMouseLocked ||
                 !currentWeapon
             ) {
@@ -4174,14 +4221,61 @@
                     const bot = botToObject.get(botIntersections[0].object);
 
                     if (bot) {
-                        const damage =
-                            currentWeapon === 'AR' ? 30 : 22;
+                        let blockedByBuilding = false;
+                        const hitDistance = botIntersections[0].distance;
 
-                        bot.hp -= damage;
-                        bot.rig.drawBar(bot.hp);
+                        const rayX = shootDirection.x;
+                        const rayZ = shootDirection.z;
 
-                        if (bot.hp <= 0) {
-                            killBot(bot);
+                        for (const c of buildingColliders) {
+                            const dx = camera.position.x - c.x;
+                            const dz = camera.position.z - c.z;
+                            const angle = -c.rotationZ;
+                            const cos = Math.cos(angle);
+                            const sin = Math.sin(angle);
+
+                            const localOriginX = dx * cos - dz * sin;
+                            const localOriginZ = dx * sin + dz * cos;
+                            const localDirX = rayX * cos - rayZ * sin;
+                            const localDirZ = rayX * sin + rayZ * cos;
+
+                            let tMin = 0;
+                            let tMax = hitDistance;
+
+                            if (Math.abs(localDirX) < 0.000001) {
+                                if (Math.abs(localOriginX) > c.halfW) continue;
+                            } else {
+                                const tx1 = (-c.halfW - localOriginX) / localDirX;
+                                const tx2 = (c.halfW - localOriginX) / localDirX;
+                                tMin = Math.max(tMin, Math.min(tx1, tx2));
+                                tMax = Math.min(tMax, Math.max(tx1, tx2));
+                            }
+
+                            if (Math.abs(localDirZ) < 0.000001) {
+                                if (Math.abs(localOriginZ) > c.halfD) continue;
+                            } else {
+                                const tz1 = (-c.halfD - localOriginZ) / localDirZ;
+                                const tz2 = (c.halfD - localOriginZ) / localDirZ;
+                                tMin = Math.max(tMin, Math.min(tz1, tz2));
+                                tMax = Math.min(tMax, Math.max(tz1, tz2));
+                            }
+
+                            if (tMax >= tMin && tMax >= 0 && tMin <= hitDistance) {
+                                blockedByBuilding = true;
+                                break;
+                            }
+                        }
+
+                        if (!blockedByBuilding) {
+                            const damage =
+                                currentWeapon === 'AR' ? 30 : 22;
+
+                            bot.hp -= damage;
+                            bot.rig.drawBar(bot.hp);
+
+                            if (bot.hp <= 0) {
+                                killBot(bot);
+                            }
                         }
                     }
                 }
@@ -5020,5 +5114,3 @@
 
 </body>
 </html>
-
-
