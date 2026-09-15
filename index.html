@@ -1191,22 +1191,35 @@
 
         // ---------- BYGGNADER ----------
 
+        // Gemensam, deterministisk RNG för kartans slumpade objekt.
+        // Lägenheterna använder fortfarande Math.random() precis som tidigare.
+        function mulberry32(seed) {
+            return function() {
+                let t = seed += 0x6D2B79F5;
+                t = Math.imul(t ^ t >>> 15, t | 1);
+                t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+                return ((t ^ t >>> 14) >>> 0) / 4294967296;
+            };
+        }
+
+        const mapRandom = mulberry32(123456789);
+
         function buildRuin(x, z) {
 
             const group = new THREE.Group();
 
-            const w = 7 + Math.random() * 6;
-            const h = 8 + Math.random() * 12;
-            const d = 7 + Math.random() * 6;
+            const w = 7 + mapRandom() * 6;
+            const h = 8 + mapRandom() * 12;
+            const d = 7 + mapRandom() * 6;
 
             const mat =
                 matBuilding[
                     Math.floor(
-                        Math.random() * matBuilding.length
+                        mapRandom() * matBuilding.length
                     )
                 ];
 
-            const dmg = Math.random();
+            const dmg = mapRandom();
 
             if (dmg > 0.55) {
 
@@ -1222,12 +1235,12 @@
                 group.add(wall);
 
                 const holes =
-                    2 + Math.floor(Math.random() * 3);
+                    2 + Math.floor(mapRandom() * 3);
 
                 for (let i = 0; i < holes; i++) {
 
                     const hs =
-                        1.2 + Math.random() * 1.8;
+                        1.2 + mapRandom() * 1.8;
 
                     const hole = addShadowMesh(
                         new THREE.Mesh(
@@ -1241,9 +1254,9 @@
                     );
 
                     hole.position.set(
-                        (Math.random() - 0.5) *
+                        (mapRandom() - 0.5) *
                             (w - hs),
-                        (Math.random() * 0.6 + 0.25) *
+                        (mapRandom() * 0.6 + 0.25) *
                             h,
                         0
                     );
@@ -1251,7 +1264,7 @@
                     group.add(hole);
                 }
 
-                if (Math.random() > 0.5) {
+                if (mapRandom() > 0.5) {
 
                     const chunk = addShadowMesh(
                         new THREE.Mesh(
@@ -1298,10 +1311,10 @@
                 group.add(wall);
 
                 group.rotation.z =
-                    (Math.random() - 0.5) * 0.35;
+                    (mapRandom() - 0.5) * 0.35;
 
                 group.rotation.x =
-                    (Math.random() - 0.5) * 0.08;
+                    (mapRandom() - 0.5) * 0.08;
 
             } else {
 
@@ -1312,32 +1325,32 @@
                             new THREE.BoxGeometry(
                                 w *
                                     (0.3 +
-                                    Math.random() * 0.35),
+                                    mapRandom() * 0.35),
                                 1.2 +
-                                    Math.random() * 2,
+                                    mapRandom() * 2,
                                 d *
                                     (0.3 +
-                                    Math.random() * 0.35)
+                                    mapRandom() * 0.35)
                             ),
                             matRubble
                         )
                     );
 
                     rubble.position.set(
-                        (Math.random() - 0.5) * w,
+                        (mapRandom() - 0.5) * w,
                         0.8,
-                        (Math.random() - 0.5) * d
+                        (mapRandom() - 0.5) * d
                     );
 
                     rubble.rotation.y =
-                        Math.random() * Math.PI;
+                        mapRandom() * Math.PI;
 
                     group.add(rubble);
                 }
 
                 for (
                     let j = 0;
-                    j < 2 + Math.floor(Math.random() * 2);
+                    j < 2 + Math.floor(mapRandom() * 2);
                     j++
                 ) {
 
@@ -1346,7 +1359,7 @@
                             new THREE.CylinderGeometry(
                                 0.12,
                                 0.12,
-                                3 + Math.random() * 3,
+                                3 + mapRandom() * 3,
                                 6
                             ),
                             matMetal
@@ -1354,15 +1367,15 @@
                     );
 
                     beam.position.set(
-                        (Math.random() - 0.5) * w,
+                        (mapRandom() - 0.5) * w,
                         1.5,
-                        (Math.random() - 0.5) * d
+                        (mapRandom() - 0.5) * d
                     );
 
                     beam.rotation.set(
-                        Math.random() * 0.8,
+                        mapRandom() * 0.8,
                         0,
-                        Math.random() * 0.8
+                        mapRandom() * 0.8
                     );
 
                     group.add(beam);
@@ -1371,11 +1384,11 @@
 
             // Detaljer
 
-            if (Math.random() > 0.6) {
+            if (mapRandom() > 0.6) {
 
                 for (
                     let i = 0;
-                    i < 2 + Math.floor(Math.random() * 3);
+                    i < 2 + Math.floor(mapRandom() * 3);
                     i++
                 ) {
 
@@ -1395,16 +1408,16 @@
                     bag.position.set(
                         w / 2 +
                             0.5 +
-                            Math.random() * 1.5,
+                            mapRandom() * 1.5,
                         0.3,
-                        (Math.random() - 0.5) * d
+                        (mapRandom() - 0.5) * d
                     );
 
                     group.add(bag);
                 }
             }
 
-            if (Math.random() > 0.75) {
+            if (mapRandom() > 0.75) {
 
                 const barrel = addShadowMesh(
                     new THREE.Mesh(
@@ -1414,7 +1427,7 @@
                             1.3,
                             10
                         ),
-                        Math.random() > 0.5
+                        mapRandom() > 0.5
                             ? matMetalRust
                             : matMetal
                     )
@@ -1423,13 +1436,13 @@
                 barrel.position.set(
                     -w / 2 -
                         1 -
-                        Math.random(),
+                        mapRandom(),
                     0.65,
-                    (Math.random() - 0.5) * d
+                    (mapRandom() - 0.5) * d
                 );
 
                 barrel.rotation.z =
-                    Math.random() > 0.8
+                    mapRandom() > 0.8
                         ? Math.PI / 2
                         : 0;
 
@@ -1438,7 +1451,7 @@
 
             // Takdetalj bara när det faktiskt finns ett tak
 
-            if (dmg > 0.25 && Math.random() > 0.55) {
+            if (dmg > 0.25 && mapRandom() > 0.55) {
 
                 const roofHeight =
                     dmg > 0.55
@@ -1460,7 +1473,7 @@
                     roofHeight + 0.15;
 
                 roof.rotation.z =
-                    (Math.random() - 0.5) * 0.2;
+                    (mapRandom() - 0.5) * 0.2;
 
                 group.add(roof);
             }
@@ -1579,7 +1592,7 @@
         function buildCrater(x, z) {
 
             const r =
-                2 + Math.random() * 3;
+                2 + mapRandom() * 3;
 
             const ring = new THREE.Mesh(
                 new THREE.RingGeometry(
@@ -1629,7 +1642,7 @@
             pole.position.y = 4.5;
 
             pole.rotation.z =
-                (Math.random() - 0.5) * 0.25;
+                (mapRandom() - 0.5) * 0.25;
 
             group.add(pole);
 
@@ -2108,11 +2121,11 @@
             do {
 
                 x =
-                    (Math.random() - 0.5) *
+                    (mapRandom() - 0.5) *
                     180;
 
                 z =
-                    (Math.random() - 0.5) *
+                    (mapRandom() - 0.5) *
                     180;
 
                 tries++;
@@ -2138,14 +2151,14 @@
                 ruin.userData.collider
             );
 
-            if (Math.random() > 0.6) {
+            if (mapRandom() > 0.6) {
 
                 scene.add(
                     buildCrater(
                         x +
-                            (Math.random() - 0.5) * 6,
+                            (mapRandom() - 0.5) * 6,
                         z +
-                            (Math.random() - 0.5) * 6
+                            (mapRandom() - 0.5) * 6
                     )
                 );
             }
@@ -2224,10 +2237,10 @@
         for (let i = 0; i < 6; i++) {
 
             const x =
-                (Math.random() - 0.5) * 170;
+                (mapRandom() - 0.5) * 170;
 
             const z =
-                (Math.random() - 0.5) * 170;
+                (mapRandom() - 0.5) * 170;
 
             if (
                 spotFree(x, z, 6)
@@ -2244,8 +2257,8 @@
 
             scene.add(
                 buildCrater(
-                    (Math.random() - 0.5) * 190,
-                    (Math.random() - 0.5) * 190
+                    (mapRandom() - 0.5) * 190,
+                    (mapRandom() - 0.5) * 190
                 )
             );
         }
