@@ -576,12 +576,10 @@
             display: none;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
-            gap: 20px;
             z-index: 9999;
             overflow: hidden;
             background:
-                radial-gradient(ellipse at center, rgba(90, 30, 20, 0.55), rgba(5, 3, 2, 0.97) 72%),
+                radial-gradient(ellipse at center, rgba(70, 24, 16, 0.92), rgba(4, 2, 2, 1) 78%),
                 repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 3px);
         }
 
@@ -599,23 +597,45 @@
         .death-overlay::before { top: 0; }
         .death-overlay::after { bottom: 0; }
 
+        .death-panel {
+            position: relative;
+            width: min(560px, 88vw);
+            padding: 40px 44px 32px;
+            background: linear-gradient(180deg, rgba(22, 12, 9, 0.97), rgba(9, 5, 4, 0.99));
+            border: 1px solid var(--c-line);
+            text-align: center;
+        }
+
+        .death-corner {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--c-alert);
+        }
+
+        .death-corner.tl { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+        .death-corner.tr { top: -1px; right: -1px; border-left: none; border-bottom: none; }
+        .death-corner.bl { bottom: -1px; left: -1px; border-right: none; border-top: none; }
+        .death-corner.br { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
         .death-eyebrow {
             font-family: var(--font-mono);
             font-size: 11px;
             letter-spacing: 4px;
             color: var(--c-sand);
             opacity: 0.85;
+            margin-bottom: 18px;
         }
 
         .death-title {
             font-family: var(--font-display);
             font-weight: 700;
-            font-size: clamp(56px, 10vw, 96px);
+            font-size: clamp(50px, 9vw, 82px);
             line-height: 0.9;
-            letter-spacing: 6px;
-            margin: 0;
+            letter-spacing: 4px;
+            margin: 0 0 14px;
             color: var(--c-parchment);
-            text-shadow: 0 0 30px rgba(179, 56, 44, 0.55);
+            text-shadow: 0 0 26px rgba(179, 56, 44, 0.5);
         }
 
         .death-subtitle {
@@ -623,20 +643,21 @@
             font-size: 12px;
             letter-spacing: 5px;
             color: rgba(236, 225, 200, 0.55);
+            margin-bottom: 28px;
         }
 
         .death-buttons {
             display: flex;
             gap: 12px;
-            margin-top: 12px;
         }
 
         .death-btn {
+            flex: 1;
             font-family: var(--font-display);
             font-size: 20px;
             letter-spacing: 2px;
             font-weight: 600;
-            padding: 14px 28px;
+            padding: 15px 10px;
             cursor: pointer;
             border: 1px solid var(--c-accent);
             background: rgba(207, 106, 44, 0.12);
@@ -645,7 +666,7 @@
         }
 
         .death-btn:hover {
-            background: rgba(207, 106, 44, 0.24);
+            background: rgba(207, 106, 44, 0.28);
             transform: translateY(-1px);
         }
 
@@ -3337,7 +3358,7 @@
                     renderer.domElement;
 
                 startOverlay.style.display =
-                    isMouseLocked
+                    (isMouseLocked || playerDead)
                         ? 'none'
                         : 'flex';
 
@@ -3450,6 +3471,21 @@
         const deathOverlay = document.createElement('div');
         deathOverlay.className = 'death-overlay';
 
+        const deathPanel = document.createElement('div');
+        deathPanel.className = 'death-panel';
+
+        const deathCornerTL = document.createElement('div');
+        deathCornerTL.className = 'death-corner tl';
+
+        const deathCornerTR = document.createElement('div');
+        deathCornerTR.className = 'death-corner tr';
+
+        const deathCornerBL = document.createElement('div');
+        deathCornerBL.className = 'death-corner bl';
+
+        const deathCornerBR = document.createElement('div');
+        deathCornerBR.className = 'death-corner br';
+
         const deathEyebrow = document.createElement('div');
         deathEyebrow.className = 'death-eyebrow';
         deathEyebrow.textContent = 'SEKTOR 7 · UPPDRAG MISSLYCKAT';
@@ -3476,7 +3512,19 @@
         menuButton.textContent = 'MENY';
 
         deathButtons.append(playAgainButton, menuButton);
-        deathOverlay.append(deathEyebrow, deathTitle, deathSubtitle, deathButtons);
+
+        deathPanel.append(
+            deathCornerTL,
+            deathCornerTR,
+            deathCornerBL,
+            deathCornerBR,
+            deathEyebrow,
+            deathTitle,
+            deathSubtitle,
+            deathButtons
+        );
+
+        deathOverlay.append(deathPanel);
         document.body.appendChild(deathOverlay);
 
         function updateHealth() {
