@@ -2637,6 +2637,35 @@
             vest.position.set(0, 1.08, -0.03);
             group.add(vest);
 
+            // Extra tactical gear
+            const radio = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(0.12, 0.22, 0.08),
+                    bootMat
+                )
+            );
+            radio.position.set(0.31, 1.18, 0.12);
+            group.add(radio);
+
+            const radioAntenna = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.012, 0.012, 0.22, 6),
+                    bootMat
+                )
+            );
+            radioAntenna.position.set(0.31, 1.38, 0.12);
+            radioAntenna.rotation.z = -0.12;
+            group.add(radioAntenna);
+
+            const belt = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(0.62, 0.09, 0.42),
+                    vestMat
+                )
+            );
+            belt.position.set(0, 0.78, 0);
+            group.add(belt);
+
             // Simple chest plates / pouches
             for (let i = -1; i <= 1; i++) {
                 const pouch = addShadowMesh(
@@ -2688,6 +2717,108 @@
             );
             head.position.y = 1.76;
             group.add(head);
+
+            // Face details
+            const faceDarkMat = new THREE.MeshStandardMaterial({
+                color: 0x2a1d18,
+                roughness: 0.9
+            });
+
+            const eyeWhiteMat = new THREE.MeshStandardMaterial({
+                color: 0xf0e7d8,
+                roughness: 0.7
+            });
+
+            const leftEye = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.SphereGeometry(0.038, 8, 6),
+                    eyeWhiteMat
+                )
+            );
+            leftEye.scale.z = 0.35;
+            leftEye.position.set(-0.105, 1.79, -0.275);
+            group.add(leftEye);
+
+            const rightEye = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.SphereGeometry(0.038, 8, 6),
+                    eyeWhiteMat
+                )
+            );
+            rightEye.scale.z = 0.35;
+            rightEye.position.set(0.105, 1.79, -0.275);
+            group.add(rightEye);
+
+            const leftPupil = new THREE.Mesh(
+                new THREE.SphereGeometry(0.017, 6, 5),
+                faceDarkMat
+            );
+            leftPupil.position.set(-0.105, 1.79, -0.292);
+            group.add(leftPupil);
+
+            const rightPupil = new THREE.Mesh(
+                new THREE.SphereGeometry(0.017, 6, 5),
+                faceDarkMat
+            );
+            rightPupil.position.set(0.105, 1.79, -0.292);
+            group.add(rightPupil);
+
+            const nose = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.ConeGeometry(0.045, 0.11, 6),
+                    skinMat
+                )
+            );
+            nose.rotation.x = Math.PI / 2;
+            nose.position.set(0, 1.72, -0.29);
+            group.add(nose);
+
+            const mouth = new THREE.Mesh(
+                new THREE.BoxGeometry(0.11, 0.025, 0.018),
+                faceDarkMat
+            );
+            mouth.position.set(0, 1.665, -0.282);
+            group.add(mouth);
+
+            const leftEar = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.SphereGeometry(0.065, 8, 6),
+                    skinMat
+                )
+            );
+            leftEar.scale.z = 0.55;
+            leftEar.position.set(-0.285, 1.75, 0);
+            group.add(leftEar);
+
+            const rightEar = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.SphereGeometry(0.065, 8, 6),
+                    skinMat
+                )
+            );
+            rightEar.scale.z = 0.55;
+            rightEar.position.set(0.285, 1.75, 0);
+            group.add(rightEar);
+
+            // Helmet straps and chin guard
+            const strap = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(0.035, 0.22, 0.025),
+                    bootMat
+                )
+            );
+            strap.position.set(-0.22, 1.68, -0.17);
+            strap.rotation.z = -0.22;
+            group.add(strap);
+
+            const chinGuard = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(0.22, 0.07, 0.07),
+                    vestMat
+                )
+            );
+            chinGuard.position.set(0, 1.59, -0.22);
+            group.add(chinGuard);
 
             // Combat helmet
             const helmet = addShadowMesh(
