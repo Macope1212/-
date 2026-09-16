@@ -2262,6 +2262,8 @@
         }
 
         // 85 regular buildings
+        // Remove the three regular ruins marked in red on the supplied minimap.
+        const removedRuinIndices = new Set([7, 34, 67]);
 
         for (let i = 0; i < 85; i++) {
 
@@ -2292,6 +2294,10 @@
                 x,
                 z
             });
+
+            if (removedRuinIndices.has(i)) {
+                continue;
+            }
 
             const ruin =
                 buildRuin(x, z);
@@ -2560,8 +2566,9 @@
                 roughness: 1
             });
 
+            const isZombie = colorHex === 0x39b54a;
             const skinMat = new THREE.MeshStandardMaterial({
-                color: 0xb88968,
+                color: isZombie ? 0x4caf50 : 0xb88968,
                 roughness: 0.9
             });
 
@@ -2778,7 +2785,7 @@
             });
 
             const irisMat = new THREE.MeshStandardMaterial({
-                color: 0x3b2418,
+                color: isZombie ? 0x111111 : 0x3b2418,
                 roughness: 0.5
             });
 
@@ -2796,7 +2803,7 @@
             // Eyes.
             const leftEye = addShadowMesh(
                 new THREE.Mesh(
-                    new THREE.SphereGeometry(0.052, 10, 8),
+                    new THREE.SphereGeometry(isZombie ? 0.075 : 0.078, 10, 8),
                     eyeMat
                 )
             );
@@ -2806,7 +2813,7 @@
 
             const rightEye = addShadowMesh(
                 new THREE.Mesh(
-                    new THREE.SphereGeometry(0.052, 10, 8),
+                    new THREE.SphereGeometry(isZombie ? 0.075 : 0.078, 10, 8),
                     eyeMat
                 )
             );
@@ -2816,7 +2823,7 @@
 
             // Irises/pupils face toward the camera/front.
             const leftIris = new THREE.Mesh(
-                new THREE.SphereGeometry(0.027, 8, 6),
+                new THREE.SphereGeometry(isZombie ? 0.034 : 0.040, 8, 6),
                 irisMat
             );
             leftIris.scale.z = 0.3;
@@ -2824,7 +2831,7 @@
             group.add(leftIris);
 
             const rightIris = new THREE.Mesh(
-                new THREE.SphereGeometry(0.027, 8, 6),
+                new THREE.SphereGeometry(isZombie ? 0.034 : 0.040, 8, 6),
                 irisMat
             );
             rightIris.scale.z = 0.3;
@@ -3406,6 +3413,12 @@
 
                     p.rig.currentWeaponMesh = createShotgun();
                     p.rig.currentWeaponMesh.scale.set(0.8, 0.8, 0.8);
+                    p.rig.weaponSlot.add(p.rig.currentWeaponMesh);
+
+                } else if (weaponType === 'Bandage') {
+
+                    p.rig.currentWeaponMesh = createBandage();
+                    p.rig.currentWeaponMesh.scale.set(0.42, 0.42, 0.42);
                     p.rig.weaponSlot.add(p.rig.currentWeaponMesh);
                 }
             },
@@ -4541,7 +4554,7 @@
 
         function spawnBot() {
             const spawn = findBotSpawnPosition();
-            const rig = buildRemotePlayerMesh(0x8f3f3f);
+            const rig = buildRemotePlayerMesh(0x39b54a);
 
             rig.group.position.set(
                 spawn.x,
@@ -4855,6 +4868,43 @@
             return group;
         }
 
+        function buildViewmodelBandage() {
+            const group = new THREE.Group();
+            const wrapMat = new THREE.MeshStandardMaterial({ color: 0xe7dcc6, roughness: 0.85 });
+            const shadowMat = new THREE.MeshStandardMaterial({ color: 0xb9ab95, roughness: 0.95 });
+            const redMat = new THREE.MeshStandardMaterial({ color: 0xd65b4b, roughness: 0.65 });
+
+            const roll = new THREE.Mesh(new THREE.CylinderGeometry(0.115, 0.115, 0.30, 12), wrapMat);
+            roll.rotation.z = Math.PI / 2;
+            roll.position.set(0.05, 0.02, -0.10);
+            group.add(roll);
+
+            const wrap = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.035, 12), shadowMat);
+            wrap.rotation.z = Math.PI / 2;
+            wrap.position.set(0.12, 0.02, -0.10);
+            group.add(wrap);
+
+            const cross1 = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.12, 0.018), redMat);
+            cross1.position.set(-0.05, 0.02, -0.215);
+            group.add(cross1);
+
+            const cross2 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.045, 0.018), redMat);
+            cross2.position.set(-0.05, 0.02, -0.215);
+            group.add(cross2);
+
+            const flap = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.018, 0.10), wrapMat);
+            flap.position.set(-0.22, 0.02, -0.06);
+            flap.rotation.y = 0.2;
+            group.add(flap);
+
+            group.position.set(0.34, -0.34, -0.58);
+            group.rotation.y = -0.18;
+            group.rotation.x = -0.12;
+            group.userData.basePos = { x: group.position.x, y: group.position.y };
+            group.visible = false;
+            return group;
+        }
+
         function buildViewmodelShotgun() {
             // Detailed pump shotgun silhouette with a clean competitive-FPS presentation.
             const group = new THREE.Group();
@@ -4917,9 +4967,13 @@
         const viewmodelShotgun =
             buildViewmodelShotgun();
 
+        const viewmodelBandage =
+            buildViewmodelBandage();
+
         camera.add(viewmodelPistol);
         camera.add(viewmodelAR);
         camera.add(viewmodelShotgun);
+        camera.add(viewmodelBandage);
 
         scene.add(camera);
 
@@ -4938,6 +4992,9 @@
             viewmodelShotgun.visible =
                 type === 'Shotgun';
 
+            viewmodelBandage.visible =
+                type === 'Bandage';
+
             if (!type) {
 
                 weaponUI.textContent =
@@ -4947,9 +5004,11 @@
             }
 
             weaponUI.textContent =
-                'Weapon: ' +
-                type +
-                ' · LEFT CLICK / F';
+                type === 'Bandage'
+                    ? 'Bandage · USE WITH LEFT CLICK / F'
+                    : 'Weapon: ' +
+                      type +
+                      ' · LEFT CLICK / F';
 
         }
 
@@ -5058,6 +5117,25 @@
             return slot;
         }
 
+        function useBandage(index) {
+            if (index < 0 || index >= inventory.length) return;
+
+            const item = inventory[index];
+            if (!item || item.type !== 'bandage') return;
+            if (playerHP >= maxHP) return;
+
+            playerHP = Math.min(maxHP, playerHP + 35);
+            updateHealth();
+            inventory[index] = null;
+
+            if (selectedSlot === index) {
+                selectedSlot = -1;
+                setWeapon(null);
+            }
+
+            renderInventory();
+        }
+
         function useSlot(index) {
 
             const item =
@@ -5081,35 +5159,8 @@
             }
 
             if (item.type === 'bandage') {
-
                 selectedSlot = index;
-                renderInventory();
-
-                if (
-                    playerHP >= maxHP
-                ) {
-                    return;
-                }
-
-                playerHP =
-                    Math.min(
-                        maxHP,
-                        playerHP + 35
-                    );
-
-                updateHealth();
-
-                inventory[index] =
-                    null;
-
-                if (
-                    selectedSlot ===
-                    index
-                ) {
-
-                    selectedSlot = -1;
-                }
-
+                setWeapon('Bandage');
                 renderInventory();
             }
         }
@@ -5155,7 +5206,7 @@
             scene.add(groundItem);
 
             inventory[selectedSlot] = null;
-            if (currentWeapon === item.name) {
+            if (item.type === 'bandage' || currentWeapon === item.name) {
                 setWeapon(null);
             }
             selectedSlot = -1;
@@ -5416,6 +5467,12 @@
             });
 
         function shoot() {
+            if (currentWeapon === 'Bandage') {
+                if (selectedSlot >= 0) {
+                    useBandage(selectedSlot);
+                }
+                return;
+            }
 
             if (
                 playerDead ||
