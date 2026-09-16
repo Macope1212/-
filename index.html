@@ -1182,6 +1182,13 @@
                 metalness: 0.8
             });
 
+        const matGunWood =
+            new THREE.MeshStandardMaterial({
+                color: 0x5a3c22,
+                roughness: 0.85,
+                metalness: 0.05
+            });
+
         const matBandage =
             new THREE.MeshStandardMaterial({
                 color: 0xe8e0cf,
@@ -2040,6 +2047,70 @@
             return group;
         }
 
+        function createShotgun() {
+
+            // Pump-action shotgun: thin barrel, a wider cylindrical pump
+            // foregrip, a boxy receiver, and an angled wooden stock —
+            // a shorter, stockier silhouette than the AR, with a wooden
+            // stock that neither the pistol nor the AR have.
+
+            const group = new THREE.Group();
+
+            const barrel = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.045, 0.045, 0.62, 8),
+                matGunLight
+            );
+
+            barrel.rotation.z = Math.PI / 2;
+            barrel.position.set(0.55, 0.34, 0);
+
+            group.add(barrel);
+
+            const receiver = new THREE.Mesh(
+                new THREE.BoxGeometry(0.34, 0.2, 0.19),
+                matGun
+            );
+
+            receiver.position.set(0.08, 0.3, 0);
+
+            group.add(receiver);
+
+            const pump = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.075, 0.075, 0.3, 8),
+                matGunAccent
+            );
+
+            pump.rotation.z = Math.PI / 2;
+            pump.position.set(0.42, 0.26, 0);
+
+            group.add(pump);
+
+            const stock = new THREE.Mesh(
+                new THREE.BoxGeometry(0.46, 0.2, 0.15),
+                matGunWood
+            );
+
+            stock.position.set(-0.42, 0.2, 0);
+            stock.rotation.z = 0.12;
+
+            group.add(stock);
+
+            const grip = new THREE.Mesh(
+                new THREE.BoxGeometry(0.16, 0.34, 0.16),
+                matGunGrip
+            );
+
+            grip.position.set(-0.1, 0.02, 0);
+            grip.rotation.z = -0.3;
+
+            group.add(grip);
+
+            group.rotation.z =
+                -Math.PI / 2;
+
+            return group;
+        }
+
         function createBandage() {
 
             // A roll of bandages lying on its side, with a loose flap
@@ -2103,31 +2174,37 @@
 
         function spawnChestLoot(chest) {
 
-            const weaponIsAR =
-                Math.random() > 0.5;
+            const roll = Math.random();
 
-            const weapon =
-                weaponIsAR
-                    ? createAR()
-                    : createPistol();
+            let weaponType;
+            let weaponMesh;
 
-            weapon.position.set(
+            if (roll < 0.4) {
+                weaponType = 'Pistol';
+                weaponMesh = createPistol();
+            } else if (roll < 0.75) {
+                weaponType = 'AR';
+                weaponMesh = createAR();
+            } else {
+                weaponType = 'Shotgun';
+                weaponMesh = createShotgun();
+            }
+
+            weaponMesh.position.set(
                 chest.position.x + 2.0,
                 0,
                 chest.position.z
             );
 
-            weapon.rotation.y =
+            weaponMesh.rotation.y =
                 Math.random() * Math.PI;
 
-            weapon.userData.pickupType =
-                weaponIsAR
-                    ? 'AR'
-                    : 'Pistol';
+            weaponMesh.userData.pickupType =
+                weaponType;
 
-            groundItems.push(weapon);
+            groundItems.push(weaponMesh);
 
-            scene.add(weapon);
+            scene.add(weaponMesh);
 
             const bandage = createBandage();
 
@@ -2936,6 +3013,12 @@
                 } else if (weaponType === 'AR') {
 
                     p.rig.currentWeaponMesh = createAR();
+                    p.rig.currentWeaponMesh.scale.set(0.8, 0.8, 0.8);
+                    p.rig.weaponSlot.add(p.rig.currentWeaponMesh);
+
+                } else if (weaponType === 'Shotgun') {
+
+                    p.rig.currentWeaponMesh = createShotgun();
                     p.rig.currentWeaponMesh.scale.set(0.8, 0.8, 0.8);
                     p.rig.weaponSlot.add(p.rig.currentWeaponMesh);
                 }
@@ -4012,6 +4095,30 @@
 
         let currentWeapon = null;
 
+        // Damage per weapon. The shotgun falls off with distance: strong up close,
+        // much weaker at range. The pistol and AR keep a flat damage value.
+        function getWeaponDamage(weaponType, distance) {
+
+            if (weaponType === 'AR') {
+                return 30;
+            }
+
+            if (weaponType === 'Shotgun') {
+
+                const closeDamage = 65;
+                const farDamage = 8;
+                const falloffRange = 20;
+
+                const t =
+                    Math.min(1, Math.max(0, distance / falloffRange));
+
+                return closeDamage + (farDamage - closeDamage) * t;
+            }
+
+            // Pistol (default)
+            return 22;
+        }
+
         // ---------- WEAPON VIEWMODEL (visible in the right corner) ----------
 
         function buildViewmodelPistol() {
@@ -4198,14 +4305,92 @@
             return group;
         }
 
+        function buildViewmodelShotgun() {
+
+            // Short, chunky first-person silhouette: a thick pump foregrip,
+            // a boxy receiver, and a wooden stock — instantly different
+            // from both the pistol and the AR.
+
+            const group = new THREE.Group();
+
+            const barrel = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.032, 0.032, 0.5, 8),
+                matGunLight
+            );
+
+            barrel.rotation.x = Math.PI / 2;
+            barrel.position.set(0, 0.03, -0.55);
+
+            group.add(barrel);
+
+            const pump = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.06, 0.06, 0.22, 8),
+                matGunAccent
+            );
+
+            pump.rotation.x = Math.PI / 2;
+            pump.position.set(0, 0.0, -0.32);
+
+            group.add(pump);
+
+            const receiver = new THREE.Mesh(
+                new THREE.BoxGeometry(0.15, 0.15, 0.3),
+                matGun
+            );
+
+            receiver.position.set(0, 0.02, -0.08);
+
+            group.add(receiver);
+
+            const stock = new THREE.Mesh(
+                new THREE.BoxGeometry(0.13, 0.14, 0.3),
+                matGunWood
+            );
+
+            stock.position.set(0, -0.02, 0.24);
+
+            group.add(stock);
+
+            const grip = new THREE.Mesh(
+                new THREE.BoxGeometry(0.12, 0.26, 0.13),
+                matGunGrip
+            );
+
+            grip.position.set(0, -0.22, 0.0);
+            grip.rotation.x = 0.24;
+
+            group.add(grip);
+
+            group.position.set(
+                0.33,
+                -0.33,
+                -0.58
+            );
+
+            group.rotation.y = -0.12;
+
+            group.userData.basePos = {
+                x: group.position.x,
+                y: group.position.y
+            };
+
+            group.visible = false;
+
+            return group;
+        }
+
         const viewmodelPistol =
             buildViewmodelPistol();
 
         const viewmodelAR =
             buildViewmodelAR();
 
+        const viewmodelShotgun =
+            buildViewmodelShotgun();
+
         camera.add(viewmodelPistol);
         camera.add(viewmodelAR);
+        camera.add(viewmodelShotgun);
 
         scene.add(camera);
 
@@ -4220,6 +4405,9 @@
 
             viewmodelAR.visible =
                 type === 'AR';
+
+            viewmodelShotgun.visible =
+                type === 'Shotgun';
 
             if (!type) {
 
@@ -4372,7 +4560,13 @@
                 groundItem = createBandage();
                 groundItem.userData.pickupType = 'Bandage';
             } else if (item.type === 'weapon') {
-                groundItem = item.name === 'AR' ? createAR() : createPistol();
+                if (item.name === 'AR') {
+                    groundItem = createAR();
+                } else if (item.name === 'Shotgun') {
+                    groundItem = createShotgun();
+                } else {
+                    groundItem = createPistol();
+                }
                 groundItem.userData.pickupType = item.name;
                 groundItem.rotation.y = Math.random() * Math.PI;
             } else {
@@ -4604,6 +4798,33 @@
                 scene.remove(
                     closest
                 );
+
+                return;
+            }
+
+            if (
+                closest.userData.pickupType ===
+                'Shotgun'
+            ) {
+
+                const slot =
+                    addToInventory({
+                        type: 'weapon',
+                        name: 'Shotgun',
+                        icon: 'SG'
+                    });
+
+                selectedSlot = slot;
+
+                setWeapon(
+                    'Shotgun'
+                );
+
+                renderInventory();
+
+                scene.remove(
+                    closest
+                );
             }
         }
 
@@ -4721,9 +4942,9 @@
                     if (hitId) {
 
                         const damage =
-                            currentWeapon === 'AR' ? 30 : 22;
+                            getWeaponDamage(currentWeapon, intersections[0].distance);
 
-                        Net.sendDamage(hitId, damage);
+                        Net.sendDamage(hitId, Math.round(damage));
                     }
                 }
             }
@@ -4798,7 +5019,7 @@
 
                         if (!blockedByBuilding) {
                             const damage =
-                                currentWeapon === 'AR' ? 30 : 22;
+                                getWeaponDamage(currentWeapon, hitDistance);
 
                             bot.hp -= damage;
                             bot.rig.drawBar(bot.hp);
@@ -4830,6 +5051,15 @@
                 nextShotTime =
                     performance.now() +
                     110;
+
+            } else if (
+                currentWeapon ===
+                'Shotgun'
+            ) {
+
+                nextShotTime =
+                    performance.now() +
+                    650;
             }
         }
 
@@ -5422,6 +5652,8 @@
                         ? viewmodelPistol
                         : currentWeapon === 'AR'
                         ? viewmodelAR
+                        : currentWeapon === 'Shotgun'
+                        ? viewmodelShotgun
                         : null;
 
                 if (activeViewmodel) {
