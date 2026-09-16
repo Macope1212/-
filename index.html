@@ -2547,68 +2547,209 @@
 
             const group = new THREE.Group();
 
-            const mat = new THREE.MeshStandardMaterial({
+            // Multiplayer soldier model. The uniform is the same for everyone,
+            // while the player-specific color is used on the shoulder patches
+            // and small helmet marking so players are easy to tell apart.
+            const uniformMat = new THREE.MeshStandardMaterial({
+                color: 0x4a5145,
+                roughness: 0.95
+            });
+
+            const vestMat = new THREE.MeshStandardMaterial({
+                color: 0x30362f,
+                roughness: 1
+            });
+
+            const skinMat = new THREE.MeshStandardMaterial({
+                color: 0xb88968,
+                roughness: 0.9
+            });
+
+            const helmetMat = new THREE.MeshStandardMaterial({
+                color: 0x252a25,
+                roughness: 1
+            });
+
+            const bootMat = new THREE.MeshStandardMaterial({
+                color: 0x171a17,
+                roughness: 1
+            });
+
+            const playerMarkMat = new THREE.MeshStandardMaterial({
                 color: colorHex,
                 roughness: 0.8
             });
 
-            const body = addShadowMesh(
+            // Legs
+            const leftLeg = addShadowMesh(
                 new THREE.Mesh(
-                    new THREE.CylinderGeometry(0.4, 0.45, 1.3, 8),
-                    mat
+                    new THREE.BoxGeometry(0.22, 0.72, 0.24),
+                    uniformMat
                 )
             );
+            leftLeg.position.set(-0.16, 0.42, 0);
+            group.add(leftLeg);
 
-            body.position.y = 1.05;
+            const rightLeg = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(0.22, 0.72, 0.24),
+                    uniformMat
+                )
+            );
+            rightLeg.position.set(0.16, 0.42, 0);
+            group.add(rightLeg);
 
-            group.add(body);
+            // Boots
+            const leftBoot = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(0.25, 0.16, 0.34),
+                    bootMat
+                )
+            );
+            leftBoot.position.set(-0.16, 0.08, -0.035);
+            group.add(leftBoot);
+
+            const rightBoot = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(0.25, 0.16, 0.34),
+                    bootMat
+                )
+            );
+            rightBoot.position.set(0.16, 0.08, -0.035);
+            group.add(rightBoot);
+
+            // Torso + tactical vest
+            const torso = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(0.66, 0.72, 0.38),
+                    uniformMat
+                )
+            );
+            torso.position.y = 1.05;
+            group.add(torso);
+
+            const vest = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(0.54, 0.52, 0.42),
+                    vestMat
+                )
+            );
+            vest.position.set(0, 1.08, -0.03);
+            group.add(vest);
+
+            // Simple chest plates / pouches
+            for (let i = -1; i <= 1; i++) {
+                const pouch = addShadowMesh(
+                    new THREE.Mesh(
+                        new THREE.BoxGeometry(0.13, 0.12, 0.08),
+                        vestMat
+                    )
+                );
+                pouch.position.set(i * 0.16, 0.98, -0.25);
+                group.add(pouch);
+            }
+
+            // Arms
+            const leftArm = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.105, 0.12, 0.62, 8),
+                    uniformMat
+                )
+            );
+            leftArm.position.set(-0.45, 1.08, 0);
+            leftArm.rotation.z = -0.08;
+            group.add(leftArm);
+
+            const rightArm = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.105, 0.12, 0.62, 8),
+                    uniformMat
+                )
+            );
+            rightArm.position.set(0.45, 1.08, 0);
+            rightArm.rotation.z = 0.08;
+            group.add(rightArm);
+
+            // Neck and head
+            const neck = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.13, 0.13, 0.18, 8),
+                    skinMat
+                )
+            );
+            neck.position.y = 1.52;
+            group.add(neck);
 
             const head = addShadowMesh(
                 new THREE.Mesh(
-                    new THREE.SphereGeometry(0.32, 10, 8),
-                    mat
+                    new THREE.SphereGeometry(0.29, 12, 10),
+                    skinMat
                 )
             );
-
-            head.position.y = 1.95;
-
+            head.position.y = 1.76;
             group.add(head);
 
+            // Combat helmet
+            const helmet = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.SphereGeometry(0.34, 12, 8, 0, Math.PI * 2, 0, Math.PI * 0.62),
+                    helmetMat
+                )
+            );
+            helmet.position.y = 1.86;
+            group.add(helmet);
+
+            const helmetMark = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(0.16, 0.055, 0.025),
+                    playerMarkMat
+                )
+            );
+            helmetMark.position.set(0, 1.93, -0.31);
+            group.add(helmetMark);
+
+            // Colored shoulder patches make different players immediately visible.
+            const leftPatch = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(0.12, 0.12, 0.035),
+                    playerMarkMat
+                )
+            );
+            leftPatch.position.set(-0.47, 1.28, -0.02);
+            group.add(leftPatch);
+
+            const rightPatch = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(0.12, 0.12, 0.035),
+                    playerMarkMat
+                )
+            );
+            rightPatch.position.set(0.47, 1.28, -0.02);
+            group.add(rightPatch);
+
             const weaponSlot = new THREE.Group();
-
-            weaponSlot.position.set(0.45, 1.35, 0);
-
+            weaponSlot.position.set(0.48, 1.18, -0.12);
             group.add(weaponSlot);
 
-            // Invisible, generous hitbox covering the whole body (not just the
-            // thin visible shapes). It is never rendered (opacity 0) but
-            // are still raycastable, so hits are registered much more
-            // reliably — especially important when aiming with a trackpad
-            // instead of a mouse, where precision is lower.
-
+            // Invisible hitbox covering the whole soldier.
             const hitbox = new THREE.Mesh(
-                new THREE.BoxGeometry(1.0, 2.1, 1.0),
+                new THREE.BoxGeometry(1.05, 2.15, 0.82),
                 new THREE.MeshBasicMaterial({
                     transparent: true,
                     opacity: 0,
                     depthWrite: false
                 })
             );
-
-            hitbox.position.y = 1.3;
+            hitbox.position.y = 1.12;
             hitbox.name = 'hitbox';
-
             group.add(hitbox);
 
-            // HP bar above the head
-
+            // HP bar above the helmet
             const barCanvas = document.createElement('canvas');
-
             barCanvas.width = 64;
             barCanvas.height = 10;
 
             const barTex = new THREE.CanvasTexture(barCanvas);
-
             const barSprite = new THREE.Sprite(
                 new THREE.SpriteMaterial({
                     map: barTex,
@@ -2617,25 +2758,19 @@
             );
 
             barSprite.scale.set(1.3, 0.2, 1);
-            barSprite.position.y = 2.55;
+            barSprite.position.y = 2.45;
             barSprite.renderOrder = 999;
-
             group.add(barSprite);
 
             function drawBar(hp) {
-
                 const ctx = barCanvas.getContext('2d');
-
                 ctx.clearRect(0, 0, 64, 10);
-
                 ctx.fillStyle = 'rgba(0,0,0,0.6)';
                 ctx.fillRect(0, 0, 64, 10);
 
                 const pct = Math.max(0, Math.min(1, hp / 100));
-
                 ctx.fillStyle = pct > 0.4 ? '#39b54a' : '#c94c3d';
                 ctx.fillRect(2, 2, (64 - 4) * pct, 6);
-
                 barTex.needsUpdate = true;
             }
 
