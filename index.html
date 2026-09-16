@@ -569,12 +569,19 @@
         }
 
         .inv-slot .slot-icon {
-            font-family: var(--font-mono);
-            font-size: 13px;
-            font-weight: bold;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: var(--c-parchment);
-            text-align: center;
             text-shadow: 1px 1px 3px #000;
+        }
+
+        .inv-slot .slot-icon svg {
+            width: 38px;
+            height: 38px;
+            display: block;
         }
 
         .inv-slot.selected {
@@ -3973,7 +3980,160 @@
                 'Bots killed: ' + botsKilled;
         }
 
+        // ---------- BOT PATHFINDING ----------
+
+        const BOT_NAV_CELL_SIZE = 2.5;
+        const BOT_NAV_SIZE = Math.ceil((MAP_BOUNDARY * 2) / BOT_NAV_CELL_SIZE);
+        let botNavGrid = null;
+
+        function buildBotNavGrid() {
+            botNavGrid = new Array(BOT_NAV_SIZE);
+
+            for (let gz = 0; gz < BOT_NAV_SIZE; gz++) {
+                botNavGrid[gz] = new Array(BOT_NAV_SIZE);
+
+                for (let gx = 0; gx < BOT_NAV_SIZE; gx++) {
+                    const x = -MAP_BOUNDARY + (gx + 0.5) * BOT_NAV_CELL_SIZE;
+                    const z = -MAP_BOUNDARY + (gz + 0.5) * BOT_NAV_CELL_SIZE;
+
+                    botNavGrid[gz][gx] = canMoveTo(x, z);
+                }
+            }
+        }
+
+        function botWorldToGrid(x, z) {
+            return {
+                x: Math.max(0, Math.min(BOT_NAV_SIZE - 1, Math.floor((x + MAP_BOUNDARY) / BOT_NAV_CELL_SIZE))),
+                z: Math.max(0, Math.min(BOT_NAV_SIZE - 1, Math.floor((z + MAP_BOUNDARY) / BOT_NAV_CELL_SIZE)))
+            };
+        }
+
+        function botGridToWorld(gx, gz) {
+            return {
+                x: -MAP_BOUNDARY + (gx + 0.5) * BOT_NAV_CELL_SIZE,
+                z: -MAP_BOUNDARY + (gz + 0.5) * BOT_NAV_CELL_SIZE
+            };
+        }
+
+        function findBotPath(startX, startZ, targetX, targetZ) {
+            if (!botNavGrid) {
+                buildBotNavGrid();
+            }
+
+            const start = botWorldToGrid(startX, startZ);
+            const target = botWorldToGrid(targetX, targetZ);
+
+            if (!botNavGrid[start.z][start.x]) {
+                return [];
+            }
+
+            // If the target cell is blocked, find the closest walkable cell around it.
+            if (!botNavGrid[target.z][target.x]) {
+                let best = null;
+                let bestDist = Infinity;
+
+                for (let radius = 1; radius <= 8 && !best; radius++) {
+                    for (let dz = -radius; dz <= radius; dz++) {
+                        for (let dx = -radius; dx <= radius; dx++) {
+                            if (Math.max(Math.abs(dx), Math.abs(dz)) !== radius) continue;
+
+                            const gx = target.x + dx;
+                            const gz = target.z + dz;
+
+                            if (gx < 0 || gx >= BOT_NAV_SIZE || gz < 0 || gz >= BOT_NAV_SIZE) continue;
+                            if (!botNavGrid[gz][gx]) continue;
+
+                            const d = dx * dx + dz * dz;
+                            if (d < bestDist) {
+                                bestDist = d;
+                                best = { x: gx, z: gz };
+                            }
+                        }
+                    }
+                }
+
+                if (!best) return [];
+                target.x = best.x;
+                target.z = best.z;
+            }
+
+            const key = (x, z) => z * BOT_NAV_SIZE + x;
+            const open = [{ x: start.x, z: start.z, f: 0 }];
+            const cameFrom = new Map();
+            const gScore = new Map([[key(start.x, start.z), 0]]);
+            const closed = new Set();
+
+            const heuristic = (x, z) => Math.abs(x - target.x) + Math.abs(z - target.z);
+            const directions = [
+                [1, 0, 1], [-1, 0, 1], [0, 1, 1], [0, -1, 1],
+                [1, 1, 1.414], [1, -1, 1.414], [-1, 1, 1.414], [-1, -1, 1.414]
+            ];
+
+            while (open.length) {
+                let bestIndex = 0;
+                for (let i = 1; i < open.length; i++) {
+                    if (open[i].f < open[bestIndex].f) bestIndex = i;
+                }
+
+                const current = open.splice(bestIndex, 1)[0];
+                const currentKey = key(current.x, current.z);
+
+                if (closed.has(currentKey)) continue;
+                closed.add(currentKey);
+
+                if (current.x === target.x && current.z === target.z) {
+                    const path = [];
+                    let cursorKey = currentKey;
+
+                    while (cursorKey !== key(start.x, start.z)) {
+                        const parts = cursorKey;
+                        const cz = Math.floor(parts / BOT_NAV_SIZE);
+                        const cx = parts - cz * BOT_NAV_SIZE;
+                        path.push(botGridToWorld(cx, cz));
+                        cursorKey = cameFrom.get(cursorKey);
+                        if (cursorKey === undefined) return [];
+                    }
+
+                    path.reverse();
+                    return path;
+                }
+
+                for (const [dx, dz, cost] of directions) {
+                    const nx = current.x + dx;
+                    const nz = current.z + dz;
+
+                    if (nx < 0 || nx >= BOT_NAV_SIZE || nz < 0 || nz >= BOT_NAV_SIZE) continue;
+                    if (!botNavGrid[nz][nx]) continue;
+
+                    // Prevent diagonal corner-cutting through buildings.
+                    if (dx !== 0 && dz !== 0) {
+                        if (!botNavGrid[current.z][nx] || !botNavGrid[nz][current.x]) continue;
+                    }
+
+                    const neighborKey = key(nx, nz);
+                    if (closed.has(neighborKey)) continue;
+
+                    const tentativeG = (gScore.get(currentKey) ?? Infinity) + cost;
+                    if (tentativeG < (gScore.get(neighborKey) ?? Infinity)) {
+                        cameFrom.set(neighborKey, currentKey);
+                        gScore.set(neighborKey, tentativeG);
+                        open.push({
+                            x: nx,
+                            z: nz,
+                            f: tentativeG + heuristic(nx, nz)
+                        });
+                    }
+                }
+            }
+
+            return [];
+        }
+
         function findBotSpawnPosition() {
+            if (!botNavGrid) {
+                buildBotNavGrid();
+            }
+
             for (let attempt = 0; attempt < 100; attempt++) {
                 const x =
                     -MAP_BOUNDARY + 5 +
@@ -4015,7 +4175,12 @@
             bots.push({
                 rig,
                 hp: BOT_HP,
-                nextAttack: 0
+                nextAttack: 0,
+                path: [],
+                pathIndex: 0,
+                nextPathUpdate: 0,
+                lastTargetX: null,
+                lastTargetZ: null
             });
         }
 
@@ -4059,24 +4224,66 @@
                     group.rotation.y = Math.atan2(dx, dz);
                 }
 
+                // Recalculate the route regularly so bots react to your movement.
+                if (now >= bot.nextPathUpdate ||
+                    Math.hypot(
+                        camera.position.x - (bot.lastTargetX ?? camera.position.x),
+                        camera.position.z - (bot.lastTargetZ ?? camera.position.z)
+                    ) > 5) {
+                    bot.path = findBotPath(
+                        group.position.x,
+                        group.position.z,
+                        camera.position.x,
+                        camera.position.z
+                    );
+                    bot.pathIndex = 0;
+                    bot.nextPathUpdate = now + 350;
+                    bot.lastTargetX = camera.position.x;
+                    bot.lastTargetZ = camera.position.z;
+                }
+
                 if (distance > BOT_ATTACK_DISTANCE) {
-                    const step =
-                        Math.min(BOT_SPEED * delta, distance - BOT_ATTACK_DISTANCE);
+                    let targetX = camera.position.x;
+                    let targetZ = camera.position.z;
 
-                    const moveX = dx / distance * step;
-                    const moveZ = dz / distance * step;
+                    while (bot.pathIndex < bot.path.length) {
+                        const waypoint = bot.path[bot.pathIndex];
+                        const waypointDistance = Math.hypot(
+                            waypoint.x - group.position.x,
+                            waypoint.z - group.position.z
+                        );
 
-                    const newX = group.position.x + moveX;
-                    const newZ = group.position.z + moveZ;
+                        if (waypointDistance < 0.9) {
+                            bot.pathIndex++;
+                            continue;
+                        }
 
-                    if (canMoveTo(newX, group.position.z) &&
-                        Math.hypot(newX - camera.position.x, group.position.z - camera.position.z) > playerRadius) {
-                        group.position.x = newX;
+                        targetX = waypoint.x;
+                        targetZ = waypoint.z;
+                        break;
                     }
 
-                    if (canMoveTo(group.position.x, newZ) &&
-                        Math.hypot(group.position.x - camera.position.x, newZ - camera.position.z) > playerRadius) {
-                        group.position.z = newZ;
+                    const moveDX = targetX - group.position.x;
+                    const moveDZ = targetZ - group.position.z;
+                    const moveDistance = Math.hypot(moveDX, moveDZ);
+
+                    if (moveDistance > 0.001) {
+                        const step = Math.min(BOT_SPEED * delta, moveDistance);
+                        const moveX = moveDX / moveDistance * step;
+                        const moveZ = moveDZ / moveDistance * step;
+
+                        const newX = group.position.x + moveX;
+                        const newZ = group.position.z + moveZ;
+
+                        if (canMoveTo(newX, group.position.z) &&
+                            Math.hypot(newX - camera.position.x, group.position.z - camera.position.z) > playerRadius) {
+                            group.position.x = newX;
+                        }
+
+                        if (canMoveTo(group.position.x, newZ) &&
+                            Math.hypot(group.position.x - camera.position.x, newZ - camera.position.z) > playerRadius) {
+                            group.position.z = newZ;
+                        }
                     }
                 }
 
@@ -4443,6 +4650,43 @@
                 )
             );
 
+        function getInventoryIcon(item) {
+            if (item.type === 'bandage') {
+                return `
+                    <svg viewBox="0 0 48 48" aria-hidden="true">
+                        <rect x="10" y="17" width="28" height="14" rx="7" transform="rotate(-35 24 24)" fill="none" stroke="currentColor" stroke-width="4"/>
+                        <path d="M24 17v14M17 24h14" stroke="#d65b4b" stroke-width="3" stroke-linecap="round"/>
+                    </svg>`;
+            }
+
+            if (item.name === 'Pistol') {
+                return `
+                    <svg viewBox="0 0 48 48" aria-hidden="true">
+                        <path d="M7 18h25l5 4-7 4H23l-2 12h-8l2-12H7z" fill="currentColor"/>
+                        <rect x="27" y="17" width="8" height="5" rx="1" fill="currentColor"/>
+                    </svg>`;
+            }
+
+            if (item.name === 'AR') {
+                return `
+                    <svg viewBox="0 0 48 48" aria-hidden="true">
+                        <path d="M4 20h27l6 3-6 4H20l-3 10H10l2-10H4z" fill="currentColor"/>
+                        <rect x="29" y="18" width="13" height="4" rx="1" fill="currentColor"/>
+                        <rect x="24" y="27" width="4" height="8" rx="1" fill="currentColor"/>
+                    </svg>`;
+            }
+
+            if (item.name === 'Shotgun') {
+                return `
+                    <svg viewBox="0 0 48 48" aria-hidden="true">
+                        <path d="M4 18h31l7 4v5H24l-5 6h-8l3-7H4z" fill="currentColor"/>
+                        <rect x="30" y="16" width="13" height="4" rx="1" fill="currentColor"/>
+                    </svg>`;
+            }
+
+            return '';
+        }
+
         function renderInventory() {
 
             invSlotElements.forEach(
@@ -4456,9 +4700,9 @@
                             '.slot-icon'
                         );
 
-                    iconEl.textContent =
+                    iconEl.innerHTML =
                         item
-                            ? item.icon
+                            ? getInventoryIcon(item)
                             : '';
 
                     el.classList.toggle(
@@ -4548,6 +4792,8 @@
             }
         }
 
+        const dropDirection = new THREE.Vector3();
+
         function dropSelectedItem() {
             if (selectedSlot < 0) return;
 
@@ -4573,10 +4819,14 @@
                 return;
             }
 
+            camera.getWorldDirection(dropDirection);
+            dropDirection.y = 0;
+            dropDirection.normalize();
+
             groundItem.position.set(
-                camera.position.x,
+                camera.position.x + dropDirection.x * 2.2,
                 0,
-                camera.position.z
+                camera.position.z + dropDirection.z * 2.2
             );
 
             groundItems.push(groundItem);
