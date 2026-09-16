@@ -1001,7 +1001,7 @@
         // ---------- GROUND ----------
 
         function createSandTexture() {
-            const size = 512;
+            const size = 256;
 
             const canvas = document.createElement('canvas');
 
@@ -1013,7 +1013,7 @@
             ctx.fillStyle = '#c9a874';
             ctx.fillRect(0, 0, size, size);
 
-            for (let i = 0; i < 9000; i++) {
+            for (let i = 0; i < 3000; i++) {
 
                 const x = Math.random() * size;
                 const y = Math.random() * size;
@@ -6455,3 +6455,8 @@
         );
 
         animate();
+
+    </script>
+
+</body>
+</html>
