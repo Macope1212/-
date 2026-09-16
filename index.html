@@ -2527,8 +2527,9 @@
         const ROOM_PREFIX = 'okenkriget-';
 
         const remoteColors = [
-            0xe0523f, 0x4f9bd6, 0x5fd67e, 0xf2c94c,
-            0xb36fd6, 0xf29e4c, 0x4cd6c4, 0xe07bc0
+            0x2477ff, 0xf02b2b, 0x25c84a, 0xffd21f,
+            0x9b4dff, 0xff7a18, 0x16c7c7, 0xff4fa3,
+            0x7b2cff, 0x00a8ff, 0xff3030, 0x00d084
         ];
 
         function makeRoomCode() {
@@ -2547,16 +2548,15 @@
 
             const group = new THREE.Group();
 
-            // Multiplayer soldier model. The uniform is the same for everyone,
-            // while the player-specific color is used on the shoulder patches
-            // and small helmet marking so players are easy to tell apart.
+            // Multiplayer soldier model. Each player gets a full player color
+            // so everyone is immediately recognizable in the match.
             const uniformMat = new THREE.MeshStandardMaterial({
-                color: 0x4a5145,
+                color: colorHex,
                 roughness: 0.95
             });
 
             const vestMat = new THREE.MeshStandardMaterial({
-                color: 0x30362f,
+                color: colorHex,
                 roughness: 1
             });
 
@@ -2566,12 +2566,12 @@
             });
 
             const helmetMat = new THREE.MeshStandardMaterial({
-                color: 0x252a25,
+                color: colorHex,
                 roughness: 1
             });
 
             const bootMat = new THREE.MeshStandardMaterial({
-                color: 0x171a17,
+                color: colorHex,
                 roughness: 1
             });
 
@@ -2666,6 +2666,54 @@
             belt.position.set(0, 0.78, 0);
             group.add(belt);
 
+            // Extra cool combat gear
+            const leftShoulder = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.SphereGeometry(0.17, 10, 8),
+                    playerMarkMat
+                )
+            );
+            leftShoulder.scale.set(1.15, 0.65, 0.9);
+            leftShoulder.position.set(-0.39, 1.31, 0);
+            group.add(leftShoulder);
+
+            const rightShoulder = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.SphereGeometry(0.17, 10, 8),
+                    playerMarkMat
+                )
+            );
+            rightShoulder.scale.set(1.15, 0.65, 0.9);
+            rightShoulder.position.set(0.39, 1.31, 0);
+            group.add(rightShoulder);
+
+            const leftKnee = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(0.24, 0.18, 0.08),
+                    playerMarkMat
+                )
+            );
+            leftKnee.position.set(-0.16, 0.47, 0.13);
+            group.add(leftKnee);
+
+            const rightKnee = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(0.24, 0.18, 0.08),
+                    playerMarkMat
+                )
+            );
+            rightKnee.position.set(0.16, 0.47, 0.13);
+            group.add(rightKnee);
+
+            const backpack = addShadowMesh(
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(0.46, 0.5, 0.18),
+                    playerMarkMat
+                )
+            );
+            backpack.position.set(0, 1.16, 0.25);
+            group.add(backpack);
+
             // Simple chest plates / pouches
             for (let i = -1; i <= 1; i++) {
                 const pouch = addShadowMesh(
@@ -2674,7 +2722,7 @@
                         vestMat
                     )
                 );
-                pouch.position.set(i * 0.16, 0.98, -0.25);
+                pouch.position.set(i * 0.16, 0.98, 0.25);
                 group.add(pouch);
             }
 
@@ -2736,7 +2784,7 @@
                 )
             );
             leftEye.scale.z = 0.35;
-            leftEye.position.set(-0.105, 1.79, -0.275);
+            leftEye.position.set(-0.105, 1.79, 0.275);
             group.add(leftEye);
 
             const rightEye = addShadowMesh(
@@ -2746,21 +2794,21 @@
                 )
             );
             rightEye.scale.z = 0.35;
-            rightEye.position.set(0.105, 1.79, -0.275);
+            rightEye.position.set(0.105, 1.79, 0.275);
             group.add(rightEye);
 
             const leftPupil = new THREE.Mesh(
                 new THREE.SphereGeometry(0.017, 6, 5),
                 faceDarkMat
             );
-            leftPupil.position.set(-0.105, 1.79, -0.292);
+            leftPupil.position.set(-0.105, 1.79, 0.292);
             group.add(leftPupil);
 
             const rightPupil = new THREE.Mesh(
                 new THREE.SphereGeometry(0.017, 6, 5),
                 faceDarkMat
             );
-            rightPupil.position.set(0.105, 1.79, -0.292);
+            rightPupil.position.set(0.105, 1.79, 0.292);
             group.add(rightPupil);
 
             const nose = addShadowMesh(
@@ -2770,14 +2818,14 @@
                 )
             );
             nose.rotation.x = Math.PI / 2;
-            nose.position.set(0, 1.72, -0.29);
+            nose.position.set(0, 1.72, 0.29);
             group.add(nose);
 
             const mouth = new THREE.Mesh(
                 new THREE.BoxGeometry(0.11, 0.025, 0.018),
                 faceDarkMat
             );
-            mouth.position.set(0, 1.665, -0.282);
+            mouth.position.set(0, 1.665, 0.282);
             group.add(mouth);
 
             const leftEar = addShadowMesh(
@@ -2807,7 +2855,7 @@
                     bootMat
                 )
             );
-            strap.position.set(-0.22, 1.68, -0.17);
+            strap.position.set(-0.22, 1.68, 0.17);
             strap.rotation.z = -0.22;
             group.add(strap);
 
@@ -2817,7 +2865,7 @@
                     vestMat
                 )
             );
-            chinGuard.position.set(0, 1.59, -0.22);
+            chinGuard.position.set(0, 1.59, 0.22);
             group.add(chinGuard);
 
             // Combat helmet
@@ -2836,7 +2884,7 @@
                     playerMarkMat
                 )
             );
-            helmetMark.position.set(0, 1.93, -0.31);
+            helmetMark.position.set(0, 1.93, 0.31);
             group.add(helmetMark);
 
             // Colored shoulder patches make different players immediately visible.
@@ -2926,6 +2974,7 @@
             players: new Map(),       // peerId -> { rig, targetPos, targetYaw, hp, weapon, colorHex }
             nextStateSend: 0,
             joinedAndReady: false,
+            nextPlayerColorIndex: 0,
 
             teardown() {
 
@@ -2948,6 +2997,7 @@
 
                 this.players.clear();
                 this.joinedAndReady = false;
+                this.nextPlayerColorIndex = 0;
                 this.enabled = false;
 
                 btnStartHostedEl.disabled = true;
@@ -3007,6 +3057,7 @@
                 peer.on('open', id => {
 
                     this.myId = id;
+                    this.nextPlayerColorIndex = 1;
 
                     createStatusEl.textContent =
                         'Room created! Share code ' + code + ' with your friends.';
@@ -3049,6 +3100,10 @@
                     createPlayerCountEl.textContent =
                         this.connections.size + ' andra spelare anslutna';
 
+                    // Give each player a stable color based on join order.
+                    const colorIndex = this.nextPlayerColorIndex % remoteColors.length;
+                    this.nextPlayerColorIndex++;
+
                     // Tell the new client about all existing players
                     // and which chests are already opened
 
@@ -3064,16 +3119,18 @@
                         yourId: conn.peer,
                         hostId: this.myId,
                         playerIds: existingPlayerIds,
-                        openedChests
+                        openedChests,
+                        yourColorIndex: colorIndex
                     });
 
                     // Tell everyone else that a new player joined
 
-                    this._addRemotePlayer(conn.peer);
+                    this._addRemotePlayer(conn.peer, colorIndex);
 
                     this._broadcast({
                         type: 'join',
-                        id: conn.peer
+                        id: conn.peer,
+                        colorIndex
                     }, conn.peer);
                 });
 
@@ -3230,11 +3287,13 @@
                 }
             },
 
-            _addRemotePlayer(id) {
+            _addRemotePlayer(id, colorIndex = null) {
 
                 if (this.players.has(id) || id === this.myId) return;
 
-                const colorHex = colorForId(id);
+                const colorHex = colorIndex === null
+                    ? colorForId(id)
+                    : remoteColors[colorIndex % remoteColors.length];
 
                 const rig = buildRemotePlayerMesh(colorHex);
 
@@ -3307,9 +3366,9 @@
 
                         // Only clients receive this
 
-                        for (const id of data.playerIds) {
+                        for (let i = 0; i < data.playerIds.length; i++) {
 
-                            this._addRemotePlayer(id);
+                            this._addRemotePlayer(data.playerIds[i], i);
                         }
 
                         for (const idx of data.openedChests) {
@@ -3340,7 +3399,7 @@
 
                     case 'join': {
 
-                        this._addRemotePlayer(data.id);
+                        this._addRemotePlayer(data.id, data.colorIndex);
 
                         break;
                     }
@@ -6396,8 +6455,3 @@
         );
 
         animate();
-
-    </script>
-
-</body>
-</html>
