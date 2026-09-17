@@ -5,8 +5,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
 
-
-
 <style>
     :root {
         --c-bg-deep: #0d0a07;
@@ -27,13 +25,9 @@
     }
 
 
-
-
     canvas {
         display: block;
     }
-
-
 
 
     #crosshair {
@@ -50,8 +44,6 @@
     }
 
 
-
-
     #crosshair::before,
     #crosshair::after {
         content: "";
@@ -59,8 +51,6 @@
         background: #fff;
         box-shadow: 0 0 2px rgba(0,0,0,0.8);
     }
-
-
 
 
     #crosshair::before {
@@ -71,8 +61,6 @@
     }
 
 
-
-
     #crosshair::after {
         top: 4px;
         left: 0;
@@ -81,11 +69,7 @@
     }
 
 
-
-
     /* ---------- LOADING SCREEN ---------- */
-
-
 
 
     #loading {
@@ -102,8 +86,6 @@
     }
 
 
-
-
     .loading-label {
         font-family: var(--font-display);
         font-weight: 600;
@@ -115,8 +97,6 @@
     }
 
 
-
-
     .loading-track {
         width: 220px;
         height: 3px;
@@ -124,8 +104,6 @@
         background: rgba(236, 225, 200, 0.15);
         overflow: hidden;
     }
-
-
 
 
     .loading-fill {
@@ -136,19 +114,13 @@
     }
 
 
-
-
     @keyframes loadsweep {
         0% { transform: translateX(-120%); }
         100% { transform: translateX(380%); }
     }
 
 
-
-
     /* ---------- START SCREEN / BRIEFING ---------- */
-
-
 
 
     #start-overlay {
@@ -170,8 +142,6 @@
     }
 
 
-
-
     #start-overlay::before,
     #start-overlay::after {
         content: "";
@@ -184,12 +154,8 @@
     }
 
 
-
-
     #start-overlay::before { top: 0; }
     #start-overlay::after { bottom: 0; }
-
-
 
 
     .scan-sweep {
@@ -204,15 +170,11 @@
     }
 
 
-
-
     @keyframes sweep {
         0% { left: -30%; }
         55% { left: 110%; }
         100% { left: 110%; }
     }
-
-
 
 
     .briefing {
@@ -225,8 +187,6 @@
     }
 
 
-
-
     .briefing-corner {
         position: absolute;
         width: 22px;
@@ -235,14 +195,10 @@
     }
 
 
-
-
     .briefing-corner.tl { top: -1px; left: -1px; border-right: none; border-bottom: none; }
     .briefing-corner.tr { top: -1px; right: -1px; border-left: none; border-bottom: none; }
     .briefing-corner.bl { bottom: -1px; left: -1px; border-right: none; border-top: none; }
     .briefing-corner.br { bottom: -1px; right: -1px; border-left: none; border-top: none; }
-
-
 
 
     .briefing-eyebrow {
@@ -253,8 +209,6 @@
         opacity: 0.85;
         margin-bottom: 18px;
     }
-
-
 
 
     .briefing-title {
@@ -269,8 +223,6 @@
     }
 
 
-
-
     .briefing-sub {
         font-size: 14px;
         line-height: 1.55;
@@ -278,8 +230,6 @@
         max-width: 38ch;
         margin: 0 auto 28px;
     }
-
-
 
 
     .briefing-cta {
@@ -292,14 +242,10 @@
     }
 
 
-
-
     #start-overlay:hover .briefing-cta {
         background: rgba(207, 106, 44, 0.24);
         transform: translateY(-1px);
     }
-
-
 
 
     .cta-label {
@@ -311,8 +257,6 @@
     }
 
 
-
-
     .briefing-controls {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -322,16 +266,12 @@
     }
 
 
-
-
     .ctrl {
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 6px;
     }
-
-
 
 
     .ctrl-key {
@@ -345,8 +285,6 @@
     }
 
 
-
-
     .ctrl-desc {
         font-family: var(--font-mono);
         font-size: 10px;
@@ -355,14 +293,10 @@
     }
 
 
-
-
     @media (prefers-reduced-motion: reduce) {
         .scan-sweep { animation: none; display: none; }
         .loading-fill { animation: none; width: 100%; }
     }
-
-
 
 
     @media (max-width: 480px) {
@@ -371,16 +305,10 @@
     }
 
 
-
-
     /* ---------- MULTIPLAYER-PANEL ---------- */
 
 
-
-
     #start-overlay { cursor: default; }
-
-
 
 
     .mode-select {
@@ -388,8 +316,6 @@
         gap: 12px;
         margin-bottom: 28px;
     }
-
-
 
 
     .mode-btn {
@@ -408,14 +334,10 @@
     }
 
 
-
-
     .mode-btn:hover {
         background: rgba(207, 106, 44, 0.28);
         transform: translateY(-1px);
     }
-
-
 
 
     .mode-btn:disabled {
@@ -423,8 +345,6 @@
         cursor: default;
         transform: none;
     }
-
-
 
 
     .mode-btn-back {
@@ -440,20 +360,14 @@
     }
 
 
-
-
     .mode-btn-back:hover {
         color: var(--c-parchment);
     }
 
 
-
-
     .multi-panel {
         margin-bottom: 28px;
     }
-
-
 
 
     .multi-label {
@@ -463,8 +377,6 @@
         color: var(--c-sand);
         margin: 0 0 10px;
     }
-
-
 
 
     .room-code {
@@ -479,8 +391,6 @@
         user-select: all;
         cursor: text;
     }
-
-
 
 
     .join-input {
@@ -501,14 +411,10 @@
     }
 
 
-
-
     .join-input:focus {
         outline: none;
         border-color: var(--c-accent);
     }
-
-
 
 
     .multi-status {
@@ -521,13 +427,9 @@
     }
 
 
-
-
     .multi-status.error {
         color: #e08a7a;
     }
-
-
 
 
     .player-count {
@@ -539,11 +441,7 @@
     }
 
 
-
-
     /* ---------- MINIMAP ---------- */
-
-
 
 
     #minimap {
@@ -563,11 +461,7 @@
     }
 
 
-
-
     /* ---------- HP ---------- */
-
-
 
 
     #health-ui {
@@ -580,8 +474,6 @@
     }
 
 
-
-
     #health-label {
         font-family: var(--font-mono);
         color: var(--c-parchment);
@@ -590,8 +482,6 @@
         margin-bottom: 6px;
         text-shadow: 2px 2px 3px #000;
     }
-
-
 
 
     #health-bar-bg {
@@ -606,16 +496,12 @@
     }
 
 
-
-
     #health-bar {
         width: 100%;
         height: 100%;
         background: linear-gradient(90deg, var(--c-alert), var(--c-accent) 55%, #e6b84f);
         transition: width 0.12s linear;
     }
-
-
 
 
     #bots-killed-ui {
@@ -633,8 +519,6 @@
     }
 
 
-
-
     #kills-ui {
         position: absolute;
         top: 205px;
@@ -650,11 +534,7 @@
     }
 
 
-
-
     /* ---------- INTERACTION ---------- */
-
-
 
 
     #interaction {
@@ -675,8 +555,6 @@
     }
 
 
-
-
     #interaction-progress {
         width: 190px;
         height: 6px;
@@ -688,8 +566,6 @@
     }
 
 
-
-
     #interaction-fill {
         width: 0%;
         height: 100%;
@@ -697,11 +573,7 @@
     }
 
 
-
-
     /* ---------- WEAPON UI ---------- */
-
-
 
 
     #weapon-ui {
@@ -720,11 +592,7 @@
     }
 
 
-
-
     /* ---------- INVENTORY ---------- */
-
-
 
 
     #inventory-ui {
@@ -737,8 +605,6 @@
         z-index: 20;
         pointer-events: none;
     }
-
-
 
 
     .inv-slot {
@@ -755,8 +621,6 @@
     }
 
 
-
-
     .inv-slot .slot-number {
         position: absolute;
         top: 3px;
@@ -766,8 +630,6 @@
         color: var(--c-sand);
         text-shadow: 1px 1px 2px #000;
     }
-
-
 
 
     .inv-slot .slot-icon {
@@ -781,15 +643,11 @@
     }
 
 
-
-
     .inv-slot .slot-icon svg {
         width: 38px;
         height: 38px;
         display: block;
     }
-
-
 
 
     .inv-slot.selected {
@@ -798,11 +656,7 @@
     }
 
 
-
-
     /* ---------- DEATH SCREEN ---------- */
-
-
 
 
     .death-overlay {
@@ -819,8 +673,6 @@
     }
 
 
-
-
     .death-overlay::before,
     .death-overlay::after {
         content: "";
@@ -833,12 +685,8 @@
     }
 
 
-
-
     .death-overlay::before { top: 0; }
     .death-overlay::after { bottom: 0; }
-
-
 
 
     .death-panel {
@@ -851,8 +699,6 @@
     }
 
 
-
-
     .death-corner {
         position: absolute;
         width: 22px;
@@ -861,14 +707,10 @@
     }
 
 
-
-
     .death-corner.tl { top: -1px; left: -1px; border-right: none; border-bottom: none; }
     .death-corner.tr { top: -1px; right: -1px; border-left: none; border-bottom: none; }
     .death-corner.bl { bottom: -1px; left: -1px; border-right: none; border-top: none; }
     .death-corner.br { bottom: -1px; right: -1px; border-left: none; border-top: none; }
-
-
 
 
     .death-eyebrow {
@@ -879,8 +721,6 @@
         opacity: 0.85;
         margin-bottom: 18px;
     }
-
-
 
 
     .death-title {
@@ -895,8 +735,6 @@
     }
 
 
-
-
     .death-subtitle {
         font-family: var(--font-mono);
         font-size: 12px;
@@ -906,14 +744,10 @@
     }
 
 
-
-
     .death-buttons {
         display: flex;
         gap: 12px;
     }
-
-
 
 
     .death-btn {
@@ -931,14 +765,10 @@
     }
 
 
-
-
     .death-btn:hover {
         background: rgba(207, 106, 44, 0.28);
         transform: translateY(-1px);
     }
-
-
 
 
     .death-btn.secondary {
@@ -947,18 +777,12 @@
     }
 
 
-
-
     .death-btn.secondary:hover {
         background: rgba(236, 225, 200, 0.12);
     }
 
 
-
-
     /* ---------- PAUSE MENU ---------- */
-
-
 
 
     #pause-overlay {
@@ -972,8 +796,6 @@
     }
 
 
-
-
     .pause-panel {
         position: relative;
         width: min(440px, 88vw);
@@ -982,8 +804,6 @@
         border: 1px solid var(--c-line);
         text-align: center;
     }
-
-
 
 
     .pause-title {
@@ -995,8 +815,6 @@
         margin: 0 0 28px;
         color: var(--c-parchment);
     }
-
-
 
 
     .pause-buttons {
@@ -1015,21 +833,13 @@
 </div>
 
 
-
-
 <div id="start-overlay" style="display:none;">
-
-
 
 
     <div class="scan-sweep"></div>
 
 
-
-
     <div class="briefing">
-
-
 
 
         <div class="briefing-corner tl"></div>
@@ -1038,23 +848,15 @@
         <div class="briefing-corner br"></div>
 
 
-
-
         <div class="briefing-eyebrow">SECTOR 7 · ABANDONED CITY CENTER</div>
-
-
 
 
         <h1 class="briefing-title">Warzone</h1>
 
 
-
-
         <p class="briefing-sub">
             The ruins are full of chests containing weapons and medical supplies. Go in alone, or bring a squad.
         </p>
-
-
 
 
         <div id="mode-select" class="mode-select">
@@ -1063,11 +865,7 @@
         </div>
 
 
-
-
         <div id="multi-panel" class="multi-panel" style="display:none;">
-
-
 
 
             <div id="multi-sub-select">
@@ -1077,8 +875,6 @@
                 </div>
                 <button type="button" class="mode-btn-back" id="btn-back-1">BACK</button>
             </div>
-
-
 
 
             <div id="multi-sub-create" style="display:none;">
@@ -1091,8 +887,6 @@
             </div>
 
 
-
-
             <div id="multi-sub-join" style="display:none;">
                 <p class="multi-label">ENTER CODE</p>
                 <input type="text" id="join-code-input" maxlength="4" class="join-input" placeholder="····" autocomplete="off" autocapitalize="characters">
@@ -1103,11 +897,7 @@
             </div>
 
 
-
-
         </div>
-
-
 
 
         <div class="briefing-controls">
@@ -1130,12 +920,8 @@
         </div>
 
 
-
-
     </div>
 </div>
-
-
 
 
 <div id="pause-overlay">
@@ -1149,16 +935,10 @@
 </div>
 
 
-
-
 <div id="crosshair"></div>
 
 
-
-
 <canvas id="minimap" width="180" height="180"></canvas>
-
-
 
 
 <div id="interaction">
@@ -1169,8 +949,6 @@
 </div>
 
 
-
-
 <div id="health-ui">
     <div id="health-label">HP: 100 / 100</div>
     <div id="health-bar-bg">
@@ -1179,19 +957,13 @@
 </div>
 
 
-
-
 <div id="bots-killed-ui">Bots killed: 0</div>
 <div id="kills-ui">Kills 0</div>
-
-
 
 
 <div id="weapon-ui">
     Weapon: Hands
 </div>
-
-
 
 
 <div id="inventory-ui">
@@ -1203,24 +975,16 @@
 </div>
 
 
-
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js" defer></script>
-
-
 
 
 <script>
     // ---------- SETUP ----------
 
 
-
-
     const scene = new THREE.Scene();
-
-
 
 
     const camera = new THREE.PerspectiveCamera(
@@ -1231,18 +995,12 @@
     );
 
 
-
-
     camera.position.set(0, 2, 0);
-
-
 
 
     const renderer = new THREE.WebGLRenderer({
         antialias: true
     });
-
-
 
 
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
@@ -1252,26 +1010,16 @@
     renderer.outputEncoding = THREE.sRGBEncoding;
 
 
-
-
     document.body.appendChild(renderer.domElement);
-
-
 
 
     const lookTarget = new THREE.Vector3();
 
 
-
-
     // ---------- INVISIBLE MAP BOUNDARY ----------
 
 
-
-
     const MAP_BOUNDARY = 100;
-
-
 
 
     // Camera eye height when standing on the ground (matches "camera.position.y < 2"
@@ -1283,33 +1031,21 @@
     const PLAYER_EYE_HEIGHT = 2;
 
 
-
-
     // ---------- SKY ----------
-
-
 
 
     function createSkyTexture() {
         const canvas = document.createElement('canvas');
 
 
-
-
         canvas.width = 2;
         canvas.height = 256;
-
-
 
 
         const ctx = canvas.getContext('2d');
 
 
-
-
         const grad = ctx.createLinearGradient(0, 0, 0, 256);
-
-
 
 
         grad.addColorStop(0, '#8fa8c9');
@@ -1318,29 +1054,19 @@
         grad.addColorStop(1, '#f2d9a8');
 
 
-
-
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, 2, 256);
-
-
 
 
         const tex = new THREE.CanvasTexture(canvas);
         tex.magFilter = THREE.LinearFilter;
 
 
-
-
         return tex;
     }
 
 
-
-
     const skyGeo = new THREE.SphereGeometry(500, 32, 15);
-
-
 
 
     const skyMat = new THREE.MeshBasicMaterial({
@@ -1350,21 +1076,13 @@
     });
 
 
-
-
     scene.add(new THREE.Mesh(skyGeo, skyMat));
-
-
 
 
     scene.fog = new THREE.FogExp2(0xd8b788, 0.016);
 
 
-
-
     // ---------- SUN ----------
-
-
 
 
     const sunSprite = new THREE.Sprite(
@@ -1377,38 +1095,24 @@
     );
 
 
-
-
     sunSprite.scale.set(40, 40, 1);
     sunSprite.position.set(-150, 90, -250);
-
-
 
 
     scene.add(sunSprite);
 
 
-
-
     // ---------- LIGHTING ----------
 
 
-
-
     const sun = new THREE.DirectionalLight(0xffe9c4, 1.3);
-
-
 
 
     sun.position.set(-150, 90, -250);
     sun.castShadow = true;
 
 
-
-
     sun.shadow.mapSize.set(512, 512);
-
-
 
 
     sun.shadow.camera.left = -120;
@@ -1418,16 +1122,10 @@
     sun.shadow.camera.far = 500;
 
 
-
-
     sun.shadow.bias = -0.0015;
 
 
-
-
     scene.add(sun);
-
-
 
 
     const hemi = new THREE.HemisphereLight(
@@ -1437,11 +1135,7 @@
     );
 
 
-
-
     scene.add(hemi);
-
-
 
 
     const ambient = new THREE.AmbientLight(
@@ -1450,60 +1144,38 @@
     );
 
 
-
-
     scene.add(ambient);
 
 
-
-
     // ---------- GROUND ----------
-
-
 
 
     function createSandTexture() {
         const size = 256;
 
 
-
-
         const canvas = document.createElement('canvas');
-
-
 
 
         canvas.width = size;
         canvas.height = size;
 
 
-
-
         const ctx = canvas.getContext('2d');
-
-
 
 
         ctx.fillStyle = '#c9a874';
         ctx.fillRect(0, 0, size, size);
 
 
-
-
         for (let i = 0; i < 3000; i++) {
-
-
 
 
             const x = Math.random() * size;
             const y = Math.random() * size;
 
 
-
-
             const shade = Math.random() * 40 - 20;
-
-
 
 
             const r = 148 + shade;
@@ -1511,12 +1183,8 @@
             const b = 82 + shade;
 
 
-
-
             ctx.fillStyle =
                 `rgba(${r},${g},${b},${0.15 + Math.random() * 0.2})`;
-
-
 
 
             ctx.fillRect(
@@ -1528,18 +1196,12 @@
         }
 
 
-
-
         for (let i = 0; i < 14; i++) {
-
-
 
 
             const x = Math.random() * size;
             const y = Math.random() * size;
             const r = 8 + Math.random() * 22;
-
-
 
 
             const grad = ctx.createRadialGradient(
@@ -1552,14 +1214,10 @@
             );
 
 
-
-
             grad.addColorStop(
                 0,
                 'rgba(60,45,30,0.45)'
             );
-
-
 
 
             grad.addColorStop(
@@ -1568,11 +1226,7 @@
             );
 
 
-
-
             ctx.fillStyle = grad;
-
-
 
 
             ctx.beginPath();
@@ -1581,11 +1235,7 @@
         }
 
 
-
-
         const tex = new THREE.CanvasTexture(canvas);
-
-
 
 
         tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
@@ -1593,12 +1243,8 @@
         tex.encoding = THREE.sRGBEncoding;
 
 
-
-
         return tex;
     }
-
-
 
 
     const floor = new THREE.Mesh(
@@ -1611,22 +1257,14 @@
     );
 
 
-
-
     floor.rotation.x = -Math.PI / 2;
     floor.receiveShadow = true;
-
-
 
 
     scene.add(floor);
 
 
-
-
     // ---------- MATERIALS ----------
-
-
 
 
     const matBuilding = [
@@ -1645,15 +1283,11 @@
     );
 
 
-
-
     const matRubble =
         new THREE.MeshStandardMaterial({
             color: 0x453f34,
             roughness: 1
         });
-
-
 
 
     const matConcreteHole =
@@ -1663,15 +1297,11 @@
         });
 
 
-
-
     const matSandbag =
         new THREE.MeshStandardMaterial({
             color: 0x9c8656,
             roughness: 1
         });
-
-
 
 
     const matMetal =
@@ -1682,8 +1312,6 @@
         });
 
 
-
-
     const matMetalRust =
         new THREE.MeshStandardMaterial({
             color: 0x6b3a20,
@@ -1692,11 +1320,7 @@
         });
 
 
-
-
     // ---------- CHEST MATERIALS ----------
-
-
 
 
     const matChestWood =
@@ -1706,15 +1330,11 @@
         });
 
 
-
-
     const matChestDark =
         new THREE.MeshStandardMaterial({
             color: 0x39251a,
             roughness: 0.9
         });
-
-
 
 
     const matChestMetal =
@@ -1725,11 +1345,7 @@
         });
 
 
-
-
     // ---------- WEAPON MATERIALS ----------
-
-
 
 
     const matGun =
@@ -1740,15 +1356,11 @@
         });
 
 
-
-
     const matGunGrip =
         new THREE.MeshStandardMaterial({
             color: 0x493426,
             roughness: 0.9
         });
-
-
 
 
     const matGunAccent =
@@ -1759,16 +1371,12 @@
         });
 
 
-
-
     const matGunLight =
         new THREE.MeshStandardMaterial({
             color: 0x8a8a8a,
             roughness: 0.35,
             metalness: 0.8
         });
-
-
 
 
     const matGunWood =
@@ -1779,15 +1387,11 @@
         });
 
 
-
-
     const matBandage =
         new THREE.MeshStandardMaterial({
             color: 0xe8e0cf,
             roughness: 0.95
         });
-
-
 
 
     const matBandageShadow =
@@ -1797,15 +1401,11 @@
         });
 
 
-
-
     const matBandageRed =
         new THREE.MeshStandardMaterial({
             color: 0xb3382c,
             roughness: 0.6
         });
-
-
 
 
     function addShadowMesh(mesh) {
@@ -1815,27 +1415,17 @@
     }
 
 
-
-
     // ---------- COLLIDERS ----------
-
-
 
 
     const buildingColliders = [];
     const shootBlockers = [];
 
 
-
-
     const playerRadius = 0.65;
 
 
-
-
     function canMoveTo(x, z) {
-
-
 
 
         if (
@@ -1848,40 +1438,26 @@
         }
 
 
-
-
         for (const c of buildingColliders) {
-
-
 
 
             const dx = x - c.x;
             const dz = z - c.z;
 
 
-
-
             const angle = -c.rotationZ;
-
-
 
 
             const cos = Math.cos(angle);
             const sin = Math.sin(angle);
 
 
-
-
             const localX =
                 dx * cos - dz * sin;
 
 
-
-
             const localZ =
                 dx * sin + dz * cos;
-
-
 
 
             if (
@@ -1895,17 +1471,11 @@
         }
 
 
-
-
         return true;
     }
 
 
-
-
     // ---------- BUILDINGS ----------
-
-
 
 
     // Shared deterministic RNG for the map's randomized objects.
@@ -1920,28 +1490,18 @@
     }
 
 
-
-
     const mapRandom = mulberry32(123456789);
-
-
 
 
     function buildRuin(x, z) {
 
 
-
-
         const group = new THREE.Group();
-
-
 
 
         const w = 7 + mapRandom() * 6;
         const h = 8 + mapRandom() * 12;
         const d = 7 + mapRandom() * 6;
-
-
 
 
         const mat =
@@ -1952,16 +1512,10 @@
             ];
 
 
-
-
         const dmg = mapRandom();
 
 
-
-
         if (dmg > 0.55) {
-
-
 
 
             const wall = addShadowMesh(
@@ -1972,34 +1526,22 @@
             );
 
 
-
-
             wall.position.y = h / 2;
-
-
 
 
             group.add(wall);
             group.userData.blocksShots = true;
 
 
-
-
             const holes =
                 2 + Math.floor(mapRandom() * 3);
-
-
 
 
             for (let i = 0; i < holes; i++) {
 
 
-
-
                 const hs =
                     1.2 + mapRandom() * 1.8;
-
-
 
 
                 const hole = addShadowMesh(
@@ -2014,8 +1556,6 @@
                 );
 
 
-
-
                 hole.position.set(
                     (mapRandom() - 0.5) *
                         (w - hs),
@@ -2025,17 +1565,11 @@
                 );
 
 
-
-
                 group.add(hole);
             }
 
 
-
-
             if (mapRandom() > 0.5) {
-
-
 
 
                 const chunk = addShadowMesh(
@@ -2050,15 +1584,11 @@
                 );
 
 
-
-
                 chunk.position.set(
                     w * 0.25,
                     h * 0.15,
                     d * 0.2
                 );
-
-
 
 
                 chunk.rotation.set(
@@ -2068,17 +1598,11 @@
                 );
 
 
-
-
                 group.add(chunk);
             }
 
 
-
-
         } else if (dmg > 0.25) {
-
-
 
 
             const wall = addShadowMesh(
@@ -2093,40 +1617,26 @@
             );
 
 
-
-
             wall.position.y =
                 (h * 0.65) / 2;
-
-
 
 
             group.add(wall);
             group.userData.blocksShots = true;
 
 
-
-
             group.rotation.z =
                 (mapRandom() - 0.5) * 0.35;
-
-
 
 
             group.rotation.x =
                 (mapRandom() - 0.5) * 0.08;
 
 
-
-
         } else {
 
 
-
-
             for (let j = 0; j < 4; j++) {
-
-
 
 
                 const rubble = addShadowMesh(
@@ -2146,8 +1656,6 @@
                 );
 
 
-
-
                 rubble.position.set(
                     (mapRandom() - 0.5) * w,
                     0.8,
@@ -2155,18 +1663,12 @@
                 );
 
 
-
-
                 rubble.rotation.y =
                     mapRandom() * Math.PI;
 
 
-
-
                 group.add(rubble);
             }
-
-
 
 
             for (
@@ -2174,8 +1676,6 @@
                 j < 2 + Math.floor(mapRandom() * 2);
                 j++
             ) {
-
-
 
 
                 const beam = addShadowMesh(
@@ -2191,15 +1691,11 @@
                 );
 
 
-
-
                 beam.position.set(
                     (mapRandom() - 0.5) * w,
                     1.5,
                     (mapRandom() - 0.5) * d
                 );
-
-
 
 
                 beam.rotation.set(
@@ -2209,23 +1705,15 @@
                 );
 
 
-
-
                 group.add(beam);
             }
         }
 
 
-
-
         // Details
 
 
-
-
         if (mapRandom() > 0.6) {
-
-
 
 
             for (
@@ -2233,8 +1721,6 @@
                 i < 2 + Math.floor(mapRandom() * 3);
                 i++
             ) {
-
-
 
 
                 const bag = addShadowMesh(
@@ -2249,11 +1735,7 @@
                 );
 
 
-
-
                 bag.scale.set(1, 0.6, 0.7);
-
-
 
 
                 bag.position.set(
@@ -2265,18 +1747,12 @@
                 );
 
 
-
-
                 group.add(bag);
             }
         }
 
 
-
-
         if (mapRandom() > 0.75) {
-
-
 
 
             const barrel = addShadowMesh(
@@ -2294,8 +1770,6 @@
             );
 
 
-
-
             barrel.position.set(
                 -w / 2 -
                     1 -
@@ -2305,38 +1779,26 @@
             );
 
 
-
-
             barrel.rotation.z =
                 mapRandom() > 0.8
                     ? Math.PI / 2
                     : 0;
 
 
-
-
             group.add(barrel);
         }
-
-
 
 
         // Roof detail only when there is actually a roof
 
 
-
-
         if (dmg > 0.25 && mapRandom() > 0.55) {
-
-
 
 
             const roofHeight =
                 dmg > 0.55
                     ? h
                     : h * 0.65;
-
-
 
 
             const roof = addShadowMesh(
@@ -2351,29 +1813,19 @@
             );
 
 
-
-
             roof.position.y =
                 roofHeight + 0.15;
-
-
 
 
             roof.rotation.z =
                 (mapRandom() - 0.5) * 0.2;
 
 
-
-
             group.add(roof);
         }
 
 
-
-
         group.position.set(x, 0, z);
-
-
 
 
         group.userData.collider = {
@@ -2385,17 +1837,11 @@
         };
 
 
-
-
         return group;
     }
 
 
-
-
     // ---------- APARTMENTS ----------
-
-
 
 
     const matApartment = [
@@ -2411,16 +1857,12 @@
     );
 
 
-
-
     const matWindow =
         new THREE.MeshStandardMaterial({
             color: 0x27343b,
             roughness: 0.35,
             metalness: 0.15
         });
-
-
 
 
     function buildApartment(
@@ -2430,19 +1872,13 @@
     ) {
 
 
-
-
         const group = new THREE.Group();
         group.userData.blocksShots = true;
-
-
 
 
         const width = 10;
         const depth = 18;
         const height = 8;
-
-
 
 
         const building = addShadowMesh(
@@ -2462,33 +1898,21 @@
         );
 
 
-
-
         building.position.y =
             height / 2;
-
-
 
 
         group.add(building);
 
 
-
-
         for (let floor = 0; floor < 4; floor++) {
-
-
 
 
             const y =
                 1.1 + floor * 1.8;
 
 
-
-
             for (let side = -1; side <= 1; side += 2) {
-
-
 
 
                 const window = new THREE.Mesh(
@@ -2501,8 +1925,6 @@
                 );
 
 
-
-
                 window.position.set(
                     side * (width / 2 + 0.04),
                     y,
@@ -2510,19 +1932,13 @@
                 );
 
 
-
-
                 group.add(window);
             }
         }
 
 
-
-
         group.position.set(x, 0, z);
         group.rotation.y = rotationY;
-
-
 
 
         const collider = {
@@ -2534,33 +1950,21 @@
         };
 
 
-
-
         group.userData.collider = collider;
-
-
 
 
         return group;
     }
 
 
-
-
     // ---------- CRATERS ----------
-
-
 
 
     function buildCrater(x, z) {
 
 
-
-
         const r =
             2 + mapRandom() * 3;
-
-
 
 
         const ring = new THREE.Mesh(
@@ -2577,12 +1981,8 @@
         );
 
 
-
-
         ring.rotation.x =
             -Math.PI / 2;
-
-
 
 
         ring.position.set(
@@ -2592,32 +1992,20 @@
         );
 
 
-
-
         ring.receiveShadow = true;
-
-
 
 
         return ring;
     }
 
 
-
-
     // ---------- POWER POLES ----------
-
-
 
 
     function buildPylon(x, z) {
 
 
-
-
         const group = new THREE.Group();
-
-
 
 
         const pole = addShadowMesh(
@@ -2633,22 +2021,14 @@
         );
 
 
-
-
         pole.position.y = 4.5;
-
-
 
 
         pole.rotation.z =
             (mapRandom() - 0.5) * 0.25;
 
 
-
-
         group.add(pole);
-
-
 
 
         const crossbar = addShadowMesh(
@@ -2663,47 +2043,29 @@
         );
 
 
-
-
         crossbar.position.y = 8.5;
-
-
 
 
         group.add(crossbar);
 
 
-
-
         group.position.set(x, 0, z);
-
-
 
 
         return group;
     }
 
 
-
-
     // ---------- CHESTS ----------
-
-
 
 
     const chests = [];
 
 
-
-
     function buildChest(x, z) {
 
 
-
-
         const group = new THREE.Group();
-
-
 
 
         const base = addShadowMesh(
@@ -2718,16 +2080,10 @@
         );
 
 
-
-
         base.position.y = 0.58;
 
 
-
-
         group.add(base);
-
-
 
 
         const lid = addShadowMesh(
@@ -2742,26 +2098,16 @@
         );
 
 
-
-
         lid.position.y = 1.25;
-
-
 
 
         group.add(lid);
 
 
-
-
         // Metal band
 
 
-
-
         for (const px of [-0.7, 0.7]) {
-
-
 
 
             const band = addShadowMesh(
@@ -2776,8 +2122,6 @@
             );
 
 
-
-
             band.position.set(
                 px,
                 0.65,
@@ -2785,17 +2129,11 @@
             );
 
 
-
-
             group.add(band);
         }
 
 
-
-
         // Lock
-
-
 
 
         const lock = addShadowMesh(
@@ -2810,8 +2148,6 @@
         );
 
 
-
-
         lock.position.set(
             0,
             0.83,
@@ -2819,16 +2155,10 @@
         );
 
 
-
-
         group.add(lock);
 
 
-
-
         // Extra wooden strip
-
-
 
 
         const frontBar = addShadowMesh(
@@ -2843,8 +2173,6 @@
         );
 
 
-
-
         frontBar.position.set(
             0,
             0.75,
@@ -2852,11 +2180,7 @@
         );
 
 
-
-
         group.add(frontBar);
-
-
 
 
         group.position.set(
@@ -2866,12 +2190,8 @@
         );
 
 
-
-
         group.rotation.y =
             Math.random() * Math.PI;
-
-
 
 
         group.userData.chest = true;
@@ -2879,32 +2199,20 @@
         group.userData.lid = lid;
 
 
-
-
         chests.push(group);
 
 
-
-
         scene.add(group);
-
-
 
 
         return group;
     }
 
 
-
-
     // ---------- WEAPONS ----------
 
 
-
-
     function createPistol() {
-
-
 
 
         // Compact handgun: wide, thick slide above a thinner
@@ -2912,11 +2220,7 @@
         // — a clearly different, much shorter silhouette than the AR.
 
 
-
-
         const group = new THREE.Group();
-
-
 
 
         const slide = new THREE.Mesh(
@@ -2925,16 +2229,10 @@
         );
 
 
-
-
         slide.position.set(0.02, 0.34, 0);
 
 
-
-
         group.add(slide);
-
-
 
 
         const frame = new THREE.Mesh(
@@ -2943,16 +2241,10 @@
         );
 
 
-
-
         frame.position.set(-0.03, 0.235, 0);
 
 
-
-
         group.add(frame);
-
-
 
 
         const muzzle = new THREE.Mesh(
@@ -2961,16 +2253,10 @@
         );
 
 
-
-
         muzzle.position.set(0.33, 0.34, 0);
 
 
-
-
         group.add(muzzle);
-
-
 
 
         const grip = new THREE.Mesh(
@@ -2979,21 +2265,13 @@
         );
 
 
-
-
         grip.position.set(-0.19, 0.03, 0);
-
-
 
 
         grip.rotation.z = -0.34;
 
 
-
-
         group.add(grip);
-
-
 
 
         const triggerGuard = new THREE.Mesh(
@@ -3002,17 +2280,11 @@
         );
 
 
-
-
         triggerGuard.position.set(-0.06, 0.18, 0);
         triggerGuard.rotation.z = Math.PI / 2;
 
 
-
-
         group.add(triggerGuard);
-
-
 
 
         const rearSight = new THREE.Mesh(
@@ -3021,33 +2293,21 @@
         );
 
 
-
-
         rearSight.position.set(-0.27, 0.435, 0);
 
 
-
-
         group.add(rearSight);
-
-
 
 
         group.rotation.z =
             -Math.PI / 2;
 
 
-
-
         return group;
     }
 
 
-
-
     function createAR() {
-
-
 
 
         // Long assault-rifle shape: upper/lower receiver, cylindrical
@@ -3056,11 +2316,7 @@
         // silhouette from the short, compact pistol.
 
 
-
-
         const group = new THREE.Group();
-
-
 
 
         const upper = new THREE.Mesh(
@@ -3069,16 +2325,10 @@
         );
 
 
-
-
         upper.position.set(0.12, 0.34, 0);
 
 
-
-
         group.add(upper);
-
-
 
 
         const lower = new THREE.Mesh(
@@ -3087,16 +2337,10 @@
         );
 
 
-
-
         lower.position.set(0.02, 0.215, 0);
 
 
-
-
         group.add(lower);
-
-
 
 
         const handguard = new THREE.Mesh(
@@ -3105,17 +2349,11 @@
         );
 
 
-
-
         handguard.rotation.z = Math.PI / 2;
         handguard.position.set(0.75, 0.32, 0);
 
 
-
-
         group.add(handguard);
-
-
 
 
         const barrel = new THREE.Mesh(
@@ -3124,17 +2362,11 @@
         );
 
 
-
-
         barrel.rotation.z = Math.PI / 2;
         barrel.position.set(1.18, 0.32, 0);
 
 
-
-
         group.add(barrel);
-
-
 
 
         const frontSight = new THREE.Mesh(
@@ -3143,16 +2375,10 @@
         );
 
 
-
-
         frontSight.position.set(1.02, 0.46, 0);
 
 
-
-
         group.add(frontSight);
-
-
 
 
         const rearSight = new THREE.Mesh(
@@ -3161,16 +2387,10 @@
         );
 
 
-
-
         rearSight.position.set(0.22, 0.46, 0);
 
 
-
-
         group.add(rearSight);
-
-
 
 
         const stock = new THREE.Mesh(
@@ -3179,16 +2399,10 @@
         );
 
 
-
-
         stock.position.set(-0.58, 0.27, 0);
 
 
-
-
         group.add(stock);
-
-
 
 
         const buffTube = new THREE.Mesh(
@@ -3197,17 +2411,11 @@
         );
 
 
-
-
         buffTube.rotation.z = Math.PI / 2;
         buffTube.position.set(-0.32, 0.29, 0);
 
 
-
-
         group.add(buffTube);
-
-
 
 
         const grip = new THREE.Mesh(
@@ -3216,17 +2424,11 @@
         );
 
 
-
-
         grip.position.set(-0.1, 0.0, 0);
         grip.rotation.z = -0.26;
 
 
-
-
         group.add(grip);
-
-
 
 
         const magazine = new THREE.Mesh(
@@ -3235,34 +2437,22 @@
         );
 
 
-
-
         magazine.position.set(0.14, -0.1, 0);
         magazine.rotation.z = 0.22;
 
 
-
-
         group.add(magazine);
-
-
 
 
         group.rotation.z =
             -Math.PI / 2;
 
 
-
-
         return group;
     }
 
 
-
-
     function createShotgun() {
-
-
 
 
         // Pump-action shotgun: thin barrel, a wider cylindrical pump
@@ -3271,11 +2461,7 @@
         // stock that neither the pistol nor the AR have.
 
 
-
-
         const group = new THREE.Group();
-
-
 
 
         const barrel = new THREE.Mesh(
@@ -3284,17 +2470,11 @@
         );
 
 
-
-
         barrel.rotation.z = Math.PI / 2;
         barrel.position.set(0.55, 0.34, 0);
 
 
-
-
         group.add(barrel);
-
-
 
 
         const receiver = new THREE.Mesh(
@@ -3303,16 +2483,10 @@
         );
 
 
-
-
         receiver.position.set(0.08, 0.3, 0);
 
 
-
-
         group.add(receiver);
-
-
 
 
         const pump = new THREE.Mesh(
@@ -3321,17 +2495,11 @@
         );
 
 
-
-
         pump.rotation.z = Math.PI / 2;
         pump.position.set(0.42, 0.26, 0);
 
 
-
-
         group.add(pump);
-
-
 
 
         const stock = new THREE.Mesh(
@@ -3340,17 +2508,11 @@
         );
 
 
-
-
         stock.position.set(-0.42, 0.2, 0);
         stock.rotation.z = 0.12;
 
 
-
-
         group.add(stock);
-
-
 
 
         const grip = new THREE.Mesh(
@@ -3359,82 +2521,22 @@
         );
 
 
-
-
         grip.position.set(-0.1, 0.02, 0);
         grip.rotation.z = -0.3;
 
 
-
-
         group.add(grip);
-
-
 
 
         group.rotation.z =
             -Math.PI / 2;
 
 
-
-
         return group;
     }
-
-    function createRPG() {
-        const group = new THREE.Group();
-
-        const tube = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.12, 0.12, 1.15, 12),
-            matGun
-        );
-        tube.rotation.z = Math.PI / 2;
-        tube.position.set(0, 0.32, 0);
-        group.add(tube);
-
-        const front = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.16, 0.13, 0.22, 12),
-            matGunAccent
-        );
-        front.rotation.z = Math.PI / 2;
-        front.position.set(0.68, 0.32, 0);
-        group.add(front);
-
-        const sight = new THREE.Mesh(
-            new THREE.BoxGeometry(0.22, 0.08, 0.08),
-            matGunLight
-        );
-        sight.position.set(0.25, 0.47, 0);
-        group.add(sight);
-
-        const grip = new THREE.Mesh(
-            new THREE.BoxGeometry(0.18, 0.34, 0.18),
-            matGunGrip
-        );
-        grip.position.set(-0.15, 0.02, 0);
-        grip.rotation.z = -0.2;
-        group.add(grip);
-
-        const stock = new THREE.Mesh(
-            new THREE.BoxGeometry(0.34, 0.18, 0.16),
-            matGunWood
-        );
-        stock.position.set(-0.62, 0.25, 0);
-        stock.rotation.z = 0.08;
-        group.add(stock);
-
-        group.rotation.z = -Math.PI / 2;
-        return group;
-    }
-
-
-
-
 
 
     function createBandage() {
-
-
 
 
         // A roll of bandages lying on its side, with a loose flap
@@ -3442,11 +2544,7 @@
         // not a medicine bottle.
 
 
-
-
         const group = new THREE.Group();
-
-
 
 
         const roll = new THREE.Mesh(
@@ -3455,17 +2553,11 @@
         );
 
 
-
-
         roll.rotation.z = Math.PI / 2;
         roll.position.y = 0.3;
 
 
-
-
         group.add(roll);
-
-
 
 
         const wrapShadow = new THREE.Mesh(
@@ -3474,17 +2566,11 @@
         );
 
 
-
-
         wrapShadow.rotation.z = Math.PI / 2;
         wrapShadow.position.set(0.15, 0.3, 0);
 
 
-
-
         group.add(wrapShadow);
-
-
 
 
         const flap = new THREE.Mesh(
@@ -3493,17 +2579,11 @@
         );
 
 
-
-
         flap.position.set(-0.3, 0.3, 0.05);
         flap.rotation.y = 0.3;
 
 
-
-
         group.add(flap);
-
-
 
 
         const cross1 = new THREE.Mesh(
@@ -3512,16 +2592,10 @@
         );
 
 
-
-
         cross1.position.set(0, 0.3, 0.23);
 
 
-
-
         group.add(cross1);
-
-
 
 
         const cross2 = new THREE.Mesh(
@@ -3530,49 +2604,30 @@
         );
 
 
-
-
         cross2.position.set(0, 0.3, 0.23);
 
 
-
-
         group.add(cross2);
-
-
 
 
         return group;
     }
 
 
-
-
     const groundItems = [];
-
-
 
 
     function spawnChestLoot(chest) {
 
 
-
-
         const roll = Math.random();
-
-
 
 
         let weaponType;
         let weaponMesh;
 
 
-
-
-        if (roll < 0.10) {
-            weaponType = 'RPG';
-            weaponMesh = createRPG();
-        } else if (roll < 0.40) {
+        if (roll < 0.4) {
             weaponType = 'Pistol';
             weaponMesh = createPistol();
         } else if (roll < 0.75) {
@@ -3584,8 +2639,6 @@
         }
 
 
-
-
         weaponMesh.position.set(
             chest.position.x + 2.0,
             0,
@@ -3593,33 +2646,21 @@
         );
 
 
-
-
         weaponMesh.rotation.y =
             Math.random() * Math.PI;
-
-
 
 
         weaponMesh.userData.pickupType =
             weaponType;
 
 
-
-
         groundItems.push(weaponMesh);
-
-
 
 
         scene.add(weaponMesh);
 
 
-
-
         const bandage = createBandage();
-
-
 
 
         bandage.position.set(
@@ -3629,33 +2670,21 @@
         );
 
 
-
-
         bandage.userData.pickupType =
             'Bandage';
 
 
-
-
         groundItems.push(bandage);
-
-
 
 
         scene.add(bandage);
     }
 
 
-
-
     // ---------- WORLD ----------
 
 
-
-
     const usedSpots = [];
-
-
 
 
     function spotFree(
@@ -3663,8 +2692,6 @@
         z,
         minDist
     ) {
-
-
 
 
         if (
@@ -3675,11 +2702,7 @@
         }
 
 
-
-
         for (const s of usedSpots) {
-
-
 
 
             if (
@@ -3693,12 +2716,8 @@
         }
 
 
-
-
         return true;
     }
-
-
 
 
     // 85 regular buildings
@@ -3706,11 +2725,7 @@
     const removedRuinIndices = new Set([7, 34, 67]);
 
 
-
-
     for (let i = 0; i < 85; i++) {
-
-
 
 
         let x;
@@ -3718,11 +2733,7 @@
         let tries = 0;
 
 
-
-
         do {
-
-
 
 
             x =
@@ -3730,18 +2741,12 @@
                 180;
 
 
-
-
             z =
                 (mapRandom() - 0.5) *
                 180;
 
 
-
-
             tries++;
-
-
 
 
         } while (
@@ -3750,11 +2755,7 @@
         );
 
 
-
-
         if (tries >= 20) continue;
-
-
 
 
         usedSpots.push({
@@ -3763,24 +2764,16 @@
         });
 
 
-
-
         if (removedRuinIndices.has(i)) {
             continue;
         }
-
-
 
 
         const ruin =
             buildRuin(x, z);
 
 
-
-
         scene.add(ruin);
-
-
 
 
         if (ruin.userData.blocksShots) {
@@ -3788,18 +2781,12 @@
         }
 
 
-
-
         buildingColliders.push(
             ruin.userData.collider
         );
 
 
-
-
         if (mapRandom() > 0.6) {
-
-
 
 
             scene.add(
@@ -3814,11 +2801,7 @@
     }
 
 
-
-
     // Apartments around the barrier
-
-
 
 
     for (
@@ -3826,8 +2809,6 @@
         x <= 95;
         x += 10
     ) {
-
-
 
 
         const north =
@@ -3838,19 +2819,13 @@
             );
 
 
-
-
         scene.add(north);
         shootBlockers.push(north);
-
-
 
 
         buildingColliders.push(
             north.userData.collider
         );
-
-
 
 
         const south =
@@ -3861,12 +2836,8 @@
             );
 
 
-
-
         scene.add(south);
         shootBlockers.push(south);
-
-
 
 
         buildingColliders.push(
@@ -3875,15 +2846,11 @@
     }
 
 
-
-
     for (
         let z = -86;
         z <= 86;
         z += 10
     ) {
-
-
 
 
         const east =
@@ -3894,19 +2861,13 @@
             );
 
 
-
-
         scene.add(east);
         shootBlockers.push(east);
-
-
 
 
         buildingColliders.push(
             east.userData.collider
         );
-
-
 
 
         const west =
@@ -3917,12 +2878,8 @@
             );
 
 
-
-
         scene.add(west);
         shootBlockers.push(west);
-
-
 
 
         buildingColliders.push(
@@ -3931,28 +2888,18 @@
     }
 
 
-
-
     // Power poles
 
 
-
-
     for (let i = 0; i < 6; i++) {
-
-
 
 
         const x =
             (mapRandom() - 0.5) * 170;
 
 
-
-
         const z =
             (mapRandom() - 0.5) * 170;
-
-
 
 
         if (
@@ -3965,16 +2912,10 @@
     }
 
 
-
-
     // Craters
 
 
-
-
     for (let i = 0; i < 10; i++) {
-
-
 
 
         scene.add(
@@ -3986,11 +2927,7 @@
     }
 
 
-
-
     // ---------- CHESTS ----------
-
-
 
 
     const chestPositions = [
@@ -4010,11 +2947,7 @@
     ];
 
 
-
-
     chestPositions.forEach((pos, chestIndex) => {
-
-
 
 
         const chest =
@@ -4024,20 +2957,14 @@
             );
 
 
-
-
         // The chest gets a simple invisible position
         // so the minimap can display it
         chest.userData.mapX =
             pos[0];
 
 
-
-
         chest.userData.mapZ =
             pos[1];
-
-
 
 
         // Stable index for network synchronization
@@ -4046,30 +2973,20 @@
     });
 
 
-
-
     // ---------- DUST PARTICLES ----------
 
 
-
-
     const dustCount = 350;
-
-
 
 
     const dustGeo =
         new THREE.BufferGeometry();
 
 
-
-
     const dustPos =
         new Float32Array(
             dustCount * 3
         );
-
-
 
 
     for (
@@ -4079,27 +2996,19 @@
     ) {
 
 
-
-
         dustPos[i * 3] =
             (Math.random() - 0.5) *
             200;
-
-
 
 
         dustPos[i * 3 + 1] =
             Math.random() * 20;
 
 
-
-
         dustPos[i * 3 + 2] =
             (Math.random() - 0.5) *
             200;
     }
-
-
 
 
     dustGeo.setAttribute(
@@ -4109,8 +3018,6 @@
             3
         )
     );
-
-
 
 
     const dustMat =
@@ -4123,8 +3030,6 @@
         });
 
 
-
-
     const dust =
         new THREE.Points(
             dustGeo,
@@ -4132,11 +3037,7 @@
         );
 
 
-
-
     scene.add(dust);
-
-
 
 
     // ---------- MULTIPLAYER (PeerJS / WebRTC) ----------
@@ -4148,11 +3049,7 @@
     // sees everyone — without anyone needing to host their own server.
 
 
-
-
     const ROOM_PREFIX = 'okenkriget-';
-
-
 
 
     const remoteColors = [
@@ -4162,17 +3059,11 @@
     ];
 
 
-
-
     function makeRoomCode() {
-
-
 
 
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
         let code = '';
-
-
 
 
         for (let i = 0; i < 4; i++) {
@@ -4180,22 +3071,14 @@
         }
 
 
-
-
         return code;
     }
-
-
 
 
     function buildRemotePlayerMesh(colorHex) {
 
 
-
-
         const group = new THREE.Group();
-
-
 
 
         // Multiplayer soldier model. Each player gets a full player color
@@ -4206,14 +3089,10 @@
         });
 
 
-
-
         const vestMat = new THREE.MeshStandardMaterial({
             color: colorHex,
             roughness: 1
         });
-
-
 
 
         const isZombie = colorHex === 0x39b54a;
@@ -4223,14 +3102,10 @@
         });
 
 
-
-
         const helmetMat = new THREE.MeshStandardMaterial({
             color: colorHex,
             roughness: 1
         });
-
-
 
 
         const bootMat = new THREE.MeshStandardMaterial({
@@ -4239,14 +3114,10 @@
         });
 
 
-
-
         const playerMarkMat = new THREE.MeshStandardMaterial({
             color: colorHex,
             roughness: 0.8
         });
-
-
 
 
         // Legs
@@ -4260,8 +3131,6 @@
         group.add(leftLeg);
 
 
-
-
         const rightLeg = addShadowMesh(
             new THREE.Mesh(
                 new THREE.BoxGeometry(0.22, 0.72, 0.24),
@@ -4270,8 +3139,6 @@
         );
         rightLeg.position.set(0.16, 0.42, 0);
         group.add(rightLeg);
-
-
 
 
         // Boots
@@ -4285,8 +3152,6 @@
         group.add(leftBoot);
 
 
-
-
         const rightBoot = addShadowMesh(
             new THREE.Mesh(
                 new THREE.BoxGeometry(0.25, 0.16, 0.34),
@@ -4295,8 +3160,6 @@
         );
         rightBoot.position.set(0.16, 0.08, -0.035);
         group.add(rightBoot);
-
-
 
 
         // Torso + tactical vest
@@ -4310,8 +3173,6 @@
         group.add(torso);
 
 
-
-
         const vest = addShadowMesh(
             new THREE.Mesh(
                 new THREE.BoxGeometry(0.54, 0.52, 0.42),
@@ -4320,8 +3181,6 @@
         );
         vest.position.set(0, 1.08, -0.03);
         group.add(vest);
-
-
 
 
         // Extra tactical gear
@@ -4335,8 +3194,6 @@
         group.add(radio);
 
 
-
-
         const radioAntenna = addShadowMesh(
             new THREE.Mesh(
                 new THREE.CylinderGeometry(0.012, 0.012, 0.22, 6),
@@ -4348,8 +3205,6 @@
         group.add(radioAntenna);
 
 
-
-
         const belt = addShadowMesh(
             new THREE.Mesh(
                 new THREE.BoxGeometry(0.62, 0.09, 0.42),
@@ -4358,8 +3213,6 @@
         );
         belt.position.set(0, 0.78, 0);
         group.add(belt);
-
-
 
 
         // Extra cool combat gear
@@ -4374,8 +3227,6 @@
         group.add(leftShoulder);
 
 
-
-
         const rightShoulder = addShadowMesh(
             new THREE.Mesh(
                 new THREE.SphereGeometry(0.17, 10, 8),
@@ -4385,8 +3236,6 @@
         rightShoulder.scale.set(1.15, 0.65, 0.9);
         rightShoulder.position.set(0.39, 1.31, 0);
         group.add(rightShoulder);
-
-
 
 
         const leftKnee = addShadowMesh(
@@ -4399,8 +3248,6 @@
         group.add(leftKnee);
 
 
-
-
         const rightKnee = addShadowMesh(
             new THREE.Mesh(
                 new THREE.BoxGeometry(0.24, 0.18, 0.08),
@@ -4411,8 +3258,6 @@
         group.add(rightKnee);
 
 
-
-
         const backpack = addShadowMesh(
             new THREE.Mesh(
                 new THREE.BoxGeometry(0.46, 0.5, 0.18),
@@ -4421,8 +3266,6 @@
         );
         backpack.position.set(0, 1.16, 0.25);
         group.add(backpack);
-
-
 
 
         // Simple chest plates / pouches
@@ -4438,8 +3281,6 @@
         }
 
 
-
-
         // Arms
         const leftArm = addShadowMesh(
             new THREE.Mesh(
@@ -4450,8 +3291,6 @@
         leftArm.position.set(-0.45, 1.08, 0);
         leftArm.rotation.z = -0.08;
         group.add(leftArm);
-
-
 
 
         const rightArm = addShadowMesh(
@@ -4465,8 +3304,6 @@
         group.add(rightArm);
 
 
-
-
         // Neck and head
         const neck = addShadowMesh(
             new THREE.Mesh(
@@ -4476,8 +3313,6 @@
         );
         neck.position.y = 1.52;
         group.add(neck);
-
-
 
 
         const head = addShadowMesh(
@@ -4490,15 +3325,11 @@
         group.add(head);
 
 
-
-
         // Face details — all facial features are placed on the FRONT (+Z) side.
         const faceDarkMat = new THREE.MeshStandardMaterial({
             color: 0x211914,
             roughness: 0.85
         });
-
-
 
 
         const eyeMat = new THREE.MeshStandardMaterial({
@@ -4507,14 +3338,10 @@
         });
 
 
-
-
         const irisMat = new THREE.MeshStandardMaterial({
             color: isZombie ? 0x111111 : 0x3b2418,
             roughness: 0.5
         });
-
-
 
 
         // Subtle jaw/chin shape to make the head look less like a plain sphere.
@@ -4529,8 +3356,6 @@
         group.add(jaw);
 
 
-
-
         // Eyes.
         const leftEye = addShadowMesh(
             new THREE.Mesh(
@@ -4541,8 +3366,6 @@
         leftEye.scale.z = 0.32;
         leftEye.position.set(-0.105, 1.79, 0.285);
         group.add(leftEye);
-
-
 
 
         const rightEye = addShadowMesh(
@@ -4556,8 +3379,6 @@
         group.add(rightEye);
 
 
-
-
         // Irises/pupils face toward the camera/front.
         const leftIris = new THREE.Mesh(
             new THREE.SphereGeometry(isZombie ? 0.034 : 0.040, 8, 6),
@@ -4568,8 +3389,6 @@
         group.add(leftIris);
 
 
-
-
         const rightIris = new THREE.Mesh(
             new THREE.SphereGeometry(isZombie ? 0.034 : 0.040, 8, 6),
             irisMat
@@ -4577,8 +3396,6 @@
         rightIris.scale.z = 0.3;
         rightIris.position.set(0.105, 1.79, 0.302);
         group.add(rightIris);
-
-
 
 
         // Strong eyebrows for a more defined soldier face.
@@ -4591,8 +3408,6 @@
         group.add(leftBrow);
 
 
-
-
         const rightBrow = new THREE.Mesh(
             new THREE.BoxGeometry(0.115, 0.025, 0.025),
             faceDarkMat
@@ -4602,8 +3417,6 @@
         group.add(rightBrow);
 
 
-
-
         // Nose bridge + nose tip.
         const noseBridge = new THREE.Mesh(
             new THREE.BoxGeometry(0.055, 0.11, 0.045),
@@ -4611,8 +3424,6 @@
         );
         noseBridge.position.set(0, 1.755, 0.285);
         group.add(noseBridge);
-
-
 
 
         const nose = addShadowMesh(
@@ -4626,8 +3437,6 @@
         group.add(nose);
 
 
-
-
         // Small mouth with a defined lower lip.
         const mouth = new THREE.Mesh(
             new THREE.BoxGeometry(0.12, 0.025, 0.02),
@@ -4637,16 +3446,12 @@
         group.add(mouth);
 
 
-
-
         const lowerLip = new THREE.Mesh(
             new THREE.BoxGeometry(0.085, 0.018, 0.018),
             skinMat
         );
         lowerLip.position.set(0, 1.645, 0.288);
         group.add(lowerLip);
-
-
 
 
         // Ears.
@@ -4661,8 +3466,6 @@
         group.add(leftEar);
 
 
-
-
         const rightEar = addShadowMesh(
             new THREE.Mesh(
                 new THREE.SphereGeometry(0.065, 8, 6),
@@ -4672,8 +3475,6 @@
         rightEar.scale.z = 0.55;
         rightEar.position.set(0.285, 1.75, 0);
         group.add(rightEar);
-
-
 
 
         // Helmet straps and chin guard
@@ -4688,8 +3489,6 @@
         group.add(strap);
 
 
-
-
         const chinGuard = addShadowMesh(
             new THREE.Mesh(
                 new THREE.BoxGeometry(0.22, 0.07, 0.07),
@@ -4698,8 +3497,6 @@
         );
         chinGuard.position.set(0, 1.59, 0.22);
         group.add(chinGuard);
-
-
 
 
         // Combat helmet
@@ -4713,8 +3510,6 @@
         group.add(helmet);
 
 
-
-
         const helmetMark = addShadowMesh(
             new THREE.Mesh(
                 new THREE.BoxGeometry(0.16, 0.055, 0.025),
@@ -4723,8 +3518,6 @@
         );
         helmetMark.position.set(0, 1.93, 0.31);
         group.add(helmetMark);
-
-
 
 
         // Colored shoulder patches make different players immediately visible.
@@ -4738,8 +3531,6 @@
         group.add(leftPatch);
 
 
-
-
         const rightPatch = addShadowMesh(
             new THREE.Mesh(
                 new THREE.BoxGeometry(0.12, 0.12, 0.035),
@@ -4750,13 +3541,9 @@
         group.add(rightPatch);
 
 
-
-
         const weaponSlot = new THREE.Group();
         weaponSlot.position.set(0.48, 1.18, -0.12);
         group.add(weaponSlot);
-
-
 
 
         // Invisible hitbox covering the whole soldier.
@@ -4773,14 +3560,10 @@
         group.add(hitbox);
 
 
-
-
         // HP bar above the helmet
         const barCanvas = document.createElement('canvas');
         barCanvas.width = 64;
         barCanvas.height = 10;
-
-
 
 
         const barTex = new THREE.CanvasTexture(barCanvas);
@@ -4792,14 +3575,10 @@
         );
 
 
-
-
         barSprite.scale.set(1.3, 0.2, 1);
         barSprite.position.y = 2.45;
         barSprite.renderOrder = 999;
         group.add(barSprite);
-
-
 
 
         function drawBar(hp) {
@@ -4809,8 +3588,6 @@
             ctx.fillRect(0, 0, 64, 10);
 
 
-
-
             const pct = Math.max(0, Math.min(1, hp / 100));
             ctx.fillStyle = pct > 0.4 ? '#39b54a' : '#c94c3d';
             ctx.fillRect(2, 2, (64 - 4) * pct, 6);
@@ -4818,11 +3595,7 @@
         }
 
 
-
-
         drawBar(100);
-
-
 
 
         return {
@@ -4834,11 +3607,7 @@
     }
 
 
-
-
     const Net = {
-
-
 
 
         enabled: false,
@@ -4853,24 +3622,16 @@
         nextPlayerColorIndex: 0,
 
 
-
-
         teardown() {
 
 
-
-
             if (this.peer) {
-
-
 
 
                 try {
                     this.peer.destroy();
                 } catch (err) {}
             }
-
-
 
 
             this.peer = null;
@@ -4880,21 +3641,15 @@
             this.connections.clear();
 
 
-
-
             for (const p of this.players.values()) {
                 scene.remove(p.rig.group);
             }
-
-
 
 
             this.players.clear();
             this.joinedAndReady = false;
             this.nextPlayerColorIndex = 0;
             this.enabled = false;
-
-
 
 
             btnStartHostedEl.disabled = true;
@@ -4904,77 +3659,49 @@
             createPlayerCountEl.style.display = 'none';
 
 
-
-
             btnJoinConfirmEl.style.display = 'block';
             btnStartJoinedEl.style.display = 'none';
         },
 
 
-
-
         hostParty() {
 
 
-
-
             if (typeof Peer === 'undefined') {
-
-
 
 
                 createStatusEl.textContent =
                     'The network is still loading, try again in a second.';
 
 
-
-
                 createStatusEl.classList.add('error');
 
 
-
-
                 setTimeout(() => this.hostParty(), 400);
-
-
 
 
                 return;
             }
 
 
-
-
             this.teardown();
             this.isHost = true;
-
-
 
 
             const code = makeRoomCode();
 
 
-
-
             this.roomCode = code;
-
-
 
 
             roomCodeDisplayEl.textContent = code;
             createStatusEl.textContent = 'Creating room...';
 
 
-
-
             let peer;
 
 
-
-
             try {
-
-
 
 
                 peer = new Peer(ROOM_PREFIX + code, {
@@ -4982,55 +3709,35 @@
                 });
 
 
-
-
             } catch (err) {
-
-
 
 
                 createStatusEl.textContent =
                     'Could not create room. Try again.';
 
 
-
-
                 createStatusEl.classList.add('error');
-
-
 
 
                 return;
             }
 
 
-
-
             this.peer = peer;
 
 
-
-
             peer.on('open', id => {
-
-
 
 
                 this.myId = id;
                 this.nextPlayerColorIndex = 1;
 
 
-
-
                 createStatusEl.textContent =
                     'Room created! Share code ' + code + ' with your friends.';
 
 
-
-
                 btnStartHostedEl.disabled = false;
-
-
 
 
                 createPlayerCountEl.style.display = 'block';
@@ -5038,21 +3745,13 @@
             });
 
 
-
-
             peer.on('error', err => {
-
-
 
 
                 console.warn('PeerJS host error', err);
 
 
-
-
                 if (err && err.type === 'unavailable-id') {
-
-
 
 
                     // Extremely unlikely collision, try again with a new code
@@ -5061,23 +3760,15 @@
                 }
 
 
-
-
                 createStatusEl.textContent =
                     'Network error: ' + (err && err.type ? err.type : 'unknown') + '.';
-
-
 
 
                 createStatusEl.classList.add('error');
             });
 
 
-
-
             peer.on('connection', conn => {
-
-
 
 
                 this._registerHostConnection(conn);
@@ -5085,27 +3776,17 @@
         },
 
 
-
-
         _registerHostConnection(conn) {
-
-
 
 
             conn.on('open', () => {
 
 
-
-
                 this.connections.set(conn.peer, conn);
-
-
 
 
                 createPlayerCountEl.textContent =
                     this.connections.size + ' andra spelare anslutna';
-
-
 
 
                 // Give each player a stable color based on join order.
@@ -5113,25 +3794,17 @@
                 this.nextPlayerColorIndex++;
 
 
-
-
                 // Tell the new client about all existing players
                 // and which chests are already opened
-
-
 
 
                 const existingPlayerIds =
                     [this.myId, ...this.players.keys()];
 
 
-
-
                 const openedChests = chests
                     .filter(c => c.userData.opened)
                     .map(c => c.userData.netIndex);
-
-
 
 
                 conn.send({
@@ -5144,16 +3817,10 @@
                 });
 
 
-
-
                 // Tell everyone else that a new player joined
 
 
-
-
                 this._addRemotePlayer(conn.peer, colorIndex);
-
-
 
 
                 this._broadcast({
@@ -5164,33 +3831,21 @@
             });
 
 
-
-
             conn.on('data', data => {
-
-
 
 
                 this._handleData(conn.peer, data);
             });
 
 
-
-
             conn.on('close', () => {
-
-
 
 
                 this._dropConnection(conn.peer);
             });
 
 
-
-
             conn.on('error', () => {
-
-
 
 
                 this._dropConnection(conn.peer);
@@ -5198,28 +3853,18 @@
         },
 
 
-
-
         _dropConnection(peerId) {
-
-
 
 
             this.connections.delete(peerId);
             this._removeRemotePlayer(peerId);
 
 
-
-
             if (this.isHost) {
-
-
 
 
                 createPlayerCountEl.textContent =
                     this.connections.size + ' andra spelare anslutna';
-
-
 
 
                 this._broadcast({
@@ -5230,38 +3875,24 @@
         },
 
 
-
-
         joinParty(code) {
 
 
-
-
             if (typeof Peer === 'undefined') {
-
-
 
 
                 joinStatusEl.textContent =
                     'The network is still loading, try again in a second.';
 
 
-
-
                 joinStatusEl.classList.add('error');
-
-
 
 
                 setTimeout(() => this.joinParty(code), 400);
 
 
-
-
                 return;
             }
-
-
 
 
             this.teardown();
@@ -5269,16 +3900,10 @@
             this.roomCode = code;
 
 
-
-
             let peer;
 
 
-
-
             try {
-
-
 
 
                 peer = new Peer({
@@ -5286,11 +3911,7 @@
                 });
 
 
-
-
             } catch (err) {
-
-
 
 
                 joinStatusEl.textContent = 'Could not connect. Try again.';
@@ -5299,21 +3920,13 @@
             }
 
 
-
-
             this.peer = peer;
-
-
 
 
             peer.on('open', id => {
 
 
-
-
                 this.myId = id;
-
-
 
 
                 const conn = peer.connect(ROOM_PREFIX + code, {
@@ -5321,49 +3934,31 @@
                 });
 
 
-
-
                 this._hostConn = conn;
 
 
-
-
                 conn.on('open', () => {
-
-
 
 
                     this.connections.set(conn.peer, conn);
                 });
 
 
-
-
                 conn.on('data', data => {
-
-
 
 
                     this._handleData(conn.peer, data);
                 });
 
 
-
-
                 conn.on('close', () => {
-
-
 
 
                     joinStatusEl.textContent =
                         'Connection to the host was lost.';
 
 
-
-
                     joinStatusEl.classList.add('error');
-
-
 
 
                     this.joinedAndReady = false;
@@ -5371,17 +3966,11 @@
                 });
 
 
-
-
                 conn.on('error', err => {
-
-
 
 
                     joinStatusEl.textContent =
                         'Could not find a room with that code.';
-
-
 
 
                     joinStatusEl.classList.add('error');
@@ -5389,22 +3978,14 @@
             });
 
 
-
-
             peer.on('error', err => {
-
-
 
 
                 console.warn('PeerJS client error', err);
 
 
-
-
                 joinStatusEl.textContent =
                     'Could not find a room with that code.';
-
-
 
 
                 joinStatusEl.classList.add('error');
@@ -5412,21 +3993,13 @@
         },
 
 
-
-
         _broadcast(msg, exceptId) {
-
-
 
 
             for (const [pid, conn] of this.connections.entries()) {
 
 
-
-
                 if (pid === exceptId) continue;
-
-
 
 
                 try {
@@ -5436,16 +4009,10 @@
         },
 
 
-
-
         _sendToHost(msg) {
 
 
-
-
             if (this._hostConn) {
-
-
 
 
                 try {
@@ -5455,21 +4022,13 @@
         },
 
 
-
-
         _sendToPlayer(playerId, msg) {
-
-
 
 
             const conn = this.connections.get(playerId);
 
 
-
-
             if (conn) {
-
-
 
 
                 try {
@@ -5479,16 +4038,10 @@
         },
 
 
-
-
         _addRemotePlayer(id, colorIndex = null) {
 
 
-
-
             if (this.players.has(id) || id === this.myId) return;
-
-
 
 
             const colorHex = colorIndex === null
@@ -5496,16 +4049,10 @@
                 : remoteColors[colorIndex % remoteColors.length];
 
 
-
-
             const rig = buildRemotePlayerMesh(colorHex);
 
 
-
-
             scene.add(rig.group);
-
-
 
 
             this.players.set(id, {
@@ -5519,21 +4066,13 @@
         },
 
 
-
-
         _removeRemotePlayer(id) {
-
-
 
 
             const p = this.players.get(id);
 
 
-
-
             if (p) {
-
-
 
 
                 scene.remove(p.rig.group);
@@ -5542,36 +4081,22 @@
         },
 
 
-
-
         _setRemoteWeapon(id, weaponType) {
-
-
 
 
             const p = this.players.get(id);
 
 
-
-
             if (!p) return;
-
-
 
 
             if (p.weapon === weaponType) return;
 
 
-
-
             p.weapon = weaponType;
 
 
-
-
             if (p.rig.currentWeaponMesh) {
-
-
 
 
                 p.rig.weaponSlot.remove(p.rig.currentWeaponMesh);
@@ -5579,11 +4104,7 @@
             }
 
 
-
-
             if (weaponType === 'Pistol') {
-
-
 
 
                 p.rig.currentWeaponMesh = createPistol();
@@ -5591,11 +4112,7 @@
                 p.rig.weaponSlot.add(p.rig.currentWeaponMesh);
 
 
-
-
             } else if (weaponType === 'AR') {
-
-
 
 
                 p.rig.currentWeaponMesh = createAR();
@@ -5603,16 +4120,7 @@
                 p.rig.weaponSlot.add(p.rig.currentWeaponMesh);
 
 
-
-
-            } else
-        if (weaponType === 'RPG') {
-            return 70;
-        }
-
- if (weaponType === 'Shotgun') {
-
-
+            } else if (weaponType === 'Shotgun') {
 
 
                 p.rig.currentWeaponMesh = createShotgun();
@@ -5620,11 +4128,7 @@
                 p.rig.weaponSlot.add(p.rig.currentWeaponMesh);
 
 
-
-
             } else if (weaponType === 'Bandage') {
-
-
 
 
                 p.rig.currentWeaponMesh = createBandage();
@@ -5634,54 +4138,34 @@
         },
 
 
-
-
         _handleData(fromId, data) {
-
-
 
 
             if (!data || !data.type) return;
 
 
-
-
             switch (data.type) {
-
-
 
 
                 case 'welcome': {
 
 
-
-
                     // Only clients receive this
 
 
-
-
                     for (let i = 0; i < data.playerIds.length; i++) {
-
-
 
 
                         this._addRemotePlayer(data.playerIds[i], i);
                     }
 
 
-
-
                     for (const idx of data.openedChests) {
-
-
 
 
                         const chest = chests.find(
                             c => c.userData.netIndex === idx
                         );
-
-
 
 
                         if (chest) {
@@ -5690,81 +4174,51 @@
                     }
 
 
-
-
                     this.joinedAndReady = true;
-
-
 
 
                     joinStatusEl.textContent =
                         'Connected! Ready to enter.';
 
 
-
-
                     joinStatusEl.classList.remove('error');
 
 
-
-
                     this.enabled = true;
-
-
 
 
                     btnJoinConfirmEl.style.display = 'none';
                     btnStartJoinedEl.style.display = 'block';
 
 
-
-
                     break;
                 }
-
-
 
 
                 case 'join': {
 
 
-
-
                     this._addRemotePlayer(data.id, data.colorIndex);
-
-
 
 
                     break;
                 }
-
-
 
 
                 case 'leave': {
 
 
-
-
                     this._removeRemotePlayer(data.id);
-
-
 
 
                     break;
                 }
 
 
-
-
                 case 'state': {
 
 
-
-
                     // If we are host: relay to all other clients
-
-
 
 
                     if (this.isHost) {
@@ -5772,32 +4226,20 @@
                     }
 
 
-
-
                     let p = this.players.get(data.id);
-
-
 
 
                     if (!p) {
 
 
-
-
                         this._addRemotePlayer(data.id);
-
-
 
 
                         p = this.players.get(data.id);
                     }
 
 
-
-
                     if (p) {
-
-
 
 
                         p.targetPos.set(data.x, data.y - PLAYER_EYE_HEIGHT, data.z);
@@ -5807,18 +4249,12 @@
                         p.rig.drawBar(data.hp);
 
 
-
-
                         this._setRemoteWeapon(data.id, data.weapon);
                     }
 
 
-
-
                     break;
                 }
-
-
 
 
                 case 'kills': {
@@ -5830,11 +4266,7 @@
                 }
 
 
-
-
                 case 'shoot': {
-
-
 
 
                     if (this.isHost) {
@@ -5842,29 +4274,19 @@
                     }
 
 
-
-
                     spawnRemoteTracer(data);
-
-
 
 
                     break;
                 }
 
 
-
-
                 case 'chestOpen': {
-
-
 
 
                     if (this.isHost) {
                         this._broadcast(data, fromId);
                     }
-
-
 
 
                     const chest = chests.find(
@@ -5872,31 +4294,21 @@
                     );
 
 
-
-
                     if (chest && !chest.userData.opened) {
                         openChest(chest, true);
                     }
-
-
 
 
                     break;
                 }
 
 
-
-
                 case 'damage': {
-
-
 
 
                     // Host sends the damage to the correct player.
                     // If the host is hit, the host takes the damage directly.
                     if (this.isHost) {
-
-
 
 
                         if (data.targetId === this.myId) {
@@ -5906,8 +4318,6 @@
                             this.sendState();
                         } else {
                             const targetConn = this.connections.get(data.targetId);
-
-
 
 
                             if (targetConn) {
@@ -5923,12 +4333,8 @@
                         }
 
 
-
-
                         break;
                     }
-
-
 
 
                     // The client that was hit takes the damage locally.
@@ -5940,39 +4346,25 @@
                     }
 
 
-
-
                     break;
                 }
             }
         },
 
 
-
-
         sendState() {
-
-
 
 
             if (!this.enabled) return;
 
 
-
-
             const now = performance.now();
-
-
 
 
             if (now < this.nextStateSend) return;
 
 
-
-
             this.nextStateSend = now + 60; // ~16 times per second
-
-
 
 
             const msg = {
@@ -5988,21 +4380,13 @@
             };
 
 
-
-
             if (this.isHost) {
-
-
 
 
                 this._broadcast(msg, null);
 
 
-
-
             } else {
-
-
 
 
                 this._sendToHost(msg);
@@ -6010,79 +4394,50 @@
         },
 
 
-
-
         sendShoot(origin, dir) {
 
 
-
-
             if (!this.enabled) return;
-
-
 
 
             const msg = {
                 type: 'shoot',
                 id: this.myId,
                 ox: origin.x, oy: origin.y, oz: origin.z,
-                dx: dir.x, dy: dir.y, dz: dir.z,
-                weapon: currentWeapon
+                dx: dir.x, dy: dir.y, dz: dir.z
             };
-
-
 
 
             if (this.isHost) {
 
 
-
-
                 this._broadcast(msg, null);
-
-
 
 
             } else {
 
 
-
-
                 this._sendToHost(msg);
             }
         },
-
-
 
 
         sendChestOpen(index) {
 
 
-
-
             if (!this.enabled) return;
-
-
 
 
             const msg = { type: 'chestOpen', index };
 
 
-
-
             if (this.isHost) {
-
-
 
 
                 this._broadcast(msg, null);
 
 
-
-
             } else {
-
-
 
 
                 this._sendToHost(msg);
@@ -6090,16 +4445,10 @@
         },
 
 
-
-
         sendDamage(targetId, amount) {
 
 
-
-
             if (!this.enabled) return;
-
-
 
 
             const msg = {
@@ -6110,27 +4459,17 @@
             };
 
 
-
-
             if (this.isHost) {
 
 
-
-
                 if (targetId === this.myId) {
-
-
 
 
                     playerHP -= amount;
                     updateHealth();
 
 
-
-
                 } else {
-
-
 
 
                     const target = this.players.get(targetId);
@@ -6139,11 +4478,7 @@
                     }
 
 
-
-
                     this._sendToPlayer(targetId, msg);
-
-
 
 
                     if (target && target.hp <= 0) {
@@ -6166,11 +4501,7 @@
                 }
 
 
-
-
             } else {
-
-
 
 
                 this._sendToHost(msg);
@@ -6178,37 +4509,23 @@
         },
 
 
-
-
         updateRemotePlayers(delta) {
-
-
 
 
             if (this.players.size === 0) return;
 
 
-
-
             for (const p of this.players.values()) {
-
-
 
 
                 p.rig.group.position.lerp(p.targetPos, Math.min(1, delta * 10));
 
 
-
-
                 let yawDiff = p.targetYaw - p.rig.group.rotation.y;
-
-
 
 
                 while (yawDiff > Math.PI) yawDiff -= Math.PI * 2;
                 while (yawDiff < -Math.PI) yawDiff += Math.PI * 2;
-
-
 
 
                 p.rig.group.rotation.y += yawDiff * Math.min(1, delta * 10);
@@ -6217,21 +4534,13 @@
     };
 
 
-
-
     function hashCode(str) {
-
-
 
 
         let hash = 0;
 
 
-
-
         for (let i = 0; i < str.length; i++) {
-
-
 
 
             hash = (hash << 5) - hash + str.charCodeAt(i);
@@ -6239,72 +4548,27 @@
         }
 
 
-
-
         return hash;
     }
-
-
 
 
     function colorForId(id) {
 
 
-
-
         return remoteColors[Math.abs(hashCode(id)) % remoteColors.length];
     }
+
+
     function spawnRemoteTracer(data) {
-        if (data.weapon === 'RPG') {
-            const origin = new THREE.Vector3(data.ox, data.oy, data.oz);
-            const dir = new THREE.Vector3(data.dx, data.dy, data.dz).normalize();
-            const endPoint = origin.clone().add(dir.multiplyScalar(100));
-
-            const rocket = new THREE.Mesh(
-                new THREE.SphereGeometry(0.075, 8, 8),
-                new THREE.MeshBasicMaterial({ color: 0xff8a2c })
-            );
-            rocket.position.copy(origin);
-            scene.add(rocket);
-
-            const start = performance.now();
-            const duration = 220;
-
-            function animateRemoteRocket() {
-                const t = Math.min(1, (performance.now() - start) / duration);
-                rocket.position.lerpVectors(origin, endPoint, t);
-
-                if (t < 1) {
-                    requestAnimationFrame(animateRemoteRocket);
-                } else {
-                    scene.remove(rocket);
-                    rocket.geometry.dispose();
-                    rocket.material.dispose();
-                    createRPGExplosion(endPoint);
-                }
-            }
-
-            animateRemoteRocket();
-            return;
-        }
-
-
-
 
 
         const origin = new THREE.Vector3(data.ox, data.oy, data.oz);
 
 
-
-
         const dir = new THREE.Vector3(data.dx, data.dy, data.dz);
 
 
-
-
         const endPoint = origin.clone().add(dir.clone().multiplyScalar(100));
-
-
 
 
         const geometry = new THREE.BufferGeometry().setFromPoints([
@@ -6313,49 +4577,31 @@
         ]);
 
 
-
-
         const tracer = new THREE.Line(geometry, tracerMaterial);
-
-
 
 
         scene.add(tracer);
 
 
-
-
         setTimeout(() => {
-
-
 
 
             scene.remove(tracer);
             geometry.dispose();
 
 
-
-
         }, 35);
     }
 
 
-
-
     // ---------- CONTROLS ----------
-
-
 
 
     let cameraYAngle = 0;
     let cameraXAngle = 0;
 
 
-
-
     let isMouseLocked = false;
-
-
 
 
     const startOverlay =
@@ -6364,14 +4610,10 @@
         );
 
 
-
-
     const crosshair =
         document.getElementById(
             'crosshair'
         );
-
-
 
 
     const loading =
@@ -6380,14 +4622,10 @@
         );
 
 
-
-
     const interaction =
         document.getElementById(
             'interaction'
         );
-
-
 
 
     const interactionFill =
@@ -6396,14 +4634,10 @@
         );
 
 
-
-
     const healthBar =
         document.getElementById(
             'health-bar'
         );
-
-
 
 
     const healthLabel =
@@ -6412,30 +4646,20 @@
         );
 
 
-
-
     const weaponUI =
         document.getElementById(
             'weapon-ui'
         );
 
 
-
-
     loading.style.display = 'none';
-
-
 
 
     startOverlay.style.display =
         'flex';
 
 
-
-
     // ---------- MENU NAVIGATION ----------
-
-
 
 
     const modeSelectEl = document.getElementById('mode-select');
@@ -6445,14 +4669,10 @@
     const multiSubJoinEl = document.getElementById('multi-sub-join');
 
 
-
-
     const roomCodeDisplayEl = document.getElementById('room-code-display');
     const createStatusEl = document.getElementById('create-status');
     const createPlayerCountEl = document.getElementById('create-player-count');
     const btnStartHostedEl = document.getElementById('btn-start-hosted');
-
-
 
 
     const joinCodeInputEl = document.getElementById('join-code-input');
@@ -6461,11 +4681,7 @@
     const btnStartJoinedEl = document.getElementById('btn-start-joined');
 
 
-
-
     btnStartJoinedEl.addEventListener('click', () => {
-
-
 
 
         spawnPlayerRandomly();
@@ -6473,17 +4689,11 @@
     });
 
 
-
-
     function showPanel(panel) {
-
-
 
 
         modeSelectEl.style.display = panel === 'mode' ? 'flex' : 'none';
         multiPanelEl.style.display = panel === 'mode' ? 'none' : 'block';
-
-
 
 
         multiSubSelectEl.style.display = panel === 'multi-select' ? 'block' : 'none';
@@ -6492,16 +4702,10 @@
     }
 
 
-
-
     function findMultiplayerSpawnPosition() {
 
 
-
-
         for (let attempt = 0; attempt < 200; attempt++) {
-
-
 
 
             const x =
@@ -6509,13 +4713,9 @@
                 Math.random() * (MAP_BOUNDARY * 2 - 10);
 
 
-
-
             const z =
                 -MAP_BOUNDARY + 5 +
                 Math.random() * (MAP_BOUNDARY * 2 - 10);
-
-
 
 
             if (canMoveTo(x, z)) {
@@ -6524,22 +4724,14 @@
         }
 
 
-
-
         return { x: 0, z: 0 };
     }
-
-
 
 
     function spawnPlayerRandomly() {
 
 
-
-
         const spawn = findMultiplayerSpawnPosition();
-
-
 
 
         camera.position.set(spawn.x, 2, spawn.z);
@@ -6552,11 +4744,7 @@
     }
 
 
-
-
     function enterGame() {
-
-
 
 
         paused = false;
@@ -6565,16 +4753,10 @@
     }
 
 
-
-
     // Solo
 
 
-
-
     document.getElementById('btn-solo').addEventListener('click', () => {
-
-
 
 
         Net.enabled = false;
@@ -6585,38 +4767,24 @@
     });
 
 
-
-
     // In the multiplayer view
 
 
-
-
     document.getElementById('btn-multi').addEventListener('click', () => {
-
-
 
 
         showPanel('multi-select');
     });
 
 
-
-
     document.getElementById('btn-back-1').addEventListener('click', () => {
-
-
 
 
         showPanel('mode');
     });
 
 
-
-
     document.getElementById('btn-back-2').addEventListener('click', () => {
-
-
 
 
         Net.teardown();
@@ -6624,11 +4792,7 @@
     });
 
 
-
-
     document.getElementById('btn-back-3').addEventListener('click', () => {
-
-
 
 
         Net.teardown();
@@ -6638,16 +4802,10 @@
     });
 
 
-
-
     // Create party
 
 
-
-
     document.getElementById('btn-create').addEventListener('click', () => {
-
-
 
 
         showPanel('multi-create');
@@ -6655,11 +4813,7 @@
     });
 
 
-
-
     btnStartHostedEl.addEventListener('click', () => {
-
-
 
 
         Net.enabled = true;
@@ -6668,16 +4822,10 @@
     });
 
 
-
-
     // Join party
 
 
-
-
     document.getElementById('btn-join').addEventListener('click', () => {
-
-
 
 
         showPanel('multi-join');
@@ -6688,22 +4836,14 @@
     });
 
 
-
-
     joinCodeInputEl.addEventListener('input', () => {
-
-
 
 
         joinCodeInputEl.value = joinCodeInputEl.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
     });
 
 
-
-
     joinCodeInputEl.addEventListener('keydown', e => {
-
-
 
 
         if (e.code === 'Enter') {
@@ -6712,21 +4852,13 @@
     });
 
 
-
-
     btnJoinConfirmEl.addEventListener('click', () => {
-
-
 
 
         const code = joinCodeInputEl.value.trim();
 
 
-
-
         if (code.length < 4) {
-
-
 
 
             joinStatusEl.textContent = 'Enter a 4-character code.';
@@ -6735,24 +4867,16 @@
         }
 
 
-
-
         joinStatusEl.textContent = 'Connecting...';
         joinStatusEl.classList.remove('error');
-
-
 
 
         Net.joinParty(code);
     });
 
 
-
-
     let gameStarted = false;
     let paused = false;
-
-
 
 
     const pauseOverlay = document.getElementById('pause-overlay');
@@ -6760,20 +4884,14 @@
     const btnReturnLobby = document.getElementById('btn-return-lobby');
 
 
-
-
     document.addEventListener(
         'pointerlockchange',
         () => {
 
 
-
-
             isMouseLocked =
                 document.pointerLockElement ===
                 renderer.domElement;
-
-
 
 
             if (!isMouseLocked && gameStarted && !playerDead && !paused) {
@@ -6782,14 +4900,10 @@
             }
 
 
-
-
             startOverlay.style.display =
                 (isMouseLocked || playerDead || paused)
                     ? 'none'
                     : 'flex';
-
-
 
 
             crosshair.style.display =
@@ -6798,28 +4912,18 @@
                     : 'none';
 
 
-
-
             if (isMouseLocked && !gameStarted) {
 
 
-
-
                 gameStarted = true;
-
-
 
 
                 modeSelectEl.style.display = 'none';
                 multiPanelEl.style.display = 'none';
 
 
-
-
                 const briefingControlsEl =
                     document.querySelector('.briefing-controls');
-
-
 
 
                 if (briefingControlsEl) {
@@ -6827,13 +4931,9 @@
                 }
 
 
-
-
             }
         }
     );
-
-
 
 
     btnResume.addEventListener('click', () => {
@@ -6841,11 +4941,7 @@
     });
 
 
-
-
     btnReturnLobby.addEventListener('click', () => {
-
-
 
 
         paused = false;
@@ -6854,19 +4950,13 @@
         deathOverlay.style.display = 'none';
 
 
-
-
         Net.teardown();
         gameStarted = false;
-
-
 
 
         if (document.pointerLockElement) {
             document.exitPointerLock();
         }
-
-
 
 
         modeSelectEl.style.display = 'flex';
@@ -6876,12 +4966,8 @@
         multiSubJoinEl.style.display = 'none';
 
 
-
-
         const briefingControlsEl =
             document.querySelector('.briefing-controls');
-
-
 
 
         if (briefingControlsEl) {
@@ -6889,12 +4975,8 @@
         }
 
 
-
-
         startOverlay.style.display = 'flex';
     });
-
-
 
 
     document.addEventListener(
@@ -6902,19 +4984,13 @@
         e => {
 
 
-
-
             if (e.code === 'Escape' && gameStarted && !playerDead) {
                 e.preventDefault();
-
-
 
 
                 if (!paused) {
                     paused = true;
                     pauseOverlay.style.display = 'flex';
-
-
 
 
                     if (document.pointerLockElement) {
@@ -6926,13 +5002,9 @@
     );
 
 
-
-
     document.addEventListener(
         'mousemove',
         e => {
-
-
 
 
             if (!isMouseLocked) {
@@ -6940,18 +5012,12 @@
             }
 
 
-
-
             cameraYAngle -=
                 e.movementX * 0.002;
 
 
-
-
             cameraXAngle -=
                 e.movementY * 0.002;
-
-
 
 
             cameraXAngle =
@@ -6966,8 +5032,6 @@
     );
 
 
-
-
     const keys = {
         w: false,
         a: false,
@@ -6978,12 +5042,8 @@
     };
 
 
-
-
     let velocityY = 0;
     let isGrounded = true;
-
-
 
 
     // ---------- REALISTIC MOVEMENT ----------
@@ -6994,8 +5054,6 @@
     // for the different modes.
 
 
-
-
     const MAX_SPEED = 15;
     const GROUND_ACCEL = 85;
     const GROUND_FRICTION = 110;
@@ -7003,16 +5061,10 @@
     const AIR_FRICTION = 6;
 
 
-
-
     const moveVelocity = { x: 0, z: 0 };
 
 
-
-
     function moveToward(current, target, maxDelta) {
-
-
 
 
         if (Math.abs(target - current) <= maxDelta) {
@@ -7020,23 +5072,15 @@
         }
 
 
-
-
         return current + Math.sign(target - current) * maxDelta;
     }
-
-
 
 
     let lastTime =
         performance.now();
 
 
-
-
     // ---------- HP ----------
-
-
 
 
     let playerHP = 100;
@@ -7044,42 +5088,28 @@
     let playerDead = false;
 
 
-
-
     const deathOverlay = document.createElement('div');
     deathOverlay.className = 'death-overlay';
-
-
 
 
     const deathPanel = document.createElement('div');
     deathPanel.className = 'death-panel';
 
 
-
-
     const deathCornerTL = document.createElement('div');
     deathCornerTL.className = 'death-corner tl';
-
-
 
 
     const deathCornerTR = document.createElement('div');
     deathCornerTR.className = 'death-corner tr';
 
 
-
-
     const deathCornerBL = document.createElement('div');
     deathCornerBL.className = 'death-corner bl';
 
 
-
-
     const deathCornerBR = document.createElement('div');
     deathCornerBR.className = 'death-corner br';
-
-
 
 
     const deathEyebrow = document.createElement('div');
@@ -7087,13 +5117,9 @@
     deathEyebrow.textContent = 'SECTOR 7 · MISSION FAILED';
 
 
-
-
     const deathTitle = document.createElement('div');
     deathTitle.className = 'death-title';
     deathTitle.textContent = 'YOU DIED';
-
-
 
 
     const deathSubtitle = document.createElement('div');
@@ -7101,12 +5127,8 @@
     deathSubtitle.textContent = 'Warzone';
 
 
-
-
     const deathButtons = document.createElement('div');
     deathButtons.className = 'death-buttons';
-
-
 
 
     const playAgainButton = document.createElement('button');
@@ -7115,19 +5137,13 @@
     playAgainButton.textContent = 'PLAY AGAIN';
 
 
-
-
     const menuButton = document.createElement('button');
     menuButton.type = 'button';
     menuButton.className = 'death-btn secondary';
     menuButton.textContent = 'MENU';
 
 
-
-
     deathButtons.append(playAgainButton, menuButton);
-
-
 
 
     deathPanel.append(
@@ -7142,17 +5158,11 @@
     );
 
 
-
-
     deathOverlay.append(deathPanel);
     document.body.appendChild(deathOverlay);
 
 
-
-
     function updateHealth() {
-
-
 
 
         playerHP =
@@ -7165,18 +5175,12 @@
             );
 
 
-
-
         const percentage =
             playerHP / maxHP * 100;
 
 
-
-
         healthBar.style.width =
             percentage + '%';
-
-
 
 
         healthLabel.textContent =
@@ -7186,20 +5190,14 @@
             maxHP;
 
 
-
-
         if (playerHP <= 0 && !playerDead) {
             playerDead = true;
-
-
 
 
             if (Net.enabled) {
                 if (document.pointerLockElement) {
                     document.exitPointerLock();
                 }
-
-
 
 
                 setTimeout(() => {
@@ -7211,8 +5209,6 @@
                 deathOverlay.style.display = 'flex';
 
 
-
-
                 if (document.pointerLockElement) {
                     document.exitPointerLock();
                 }
@@ -7221,21 +5217,13 @@
     }
 
 
-
-
     updateHealth();
-
-
 
 
     function resetGame() {
 
 
-
-
         // HP and death status
-
-
 
 
         playerDead = false;
@@ -7243,16 +5231,10 @@
         updateHealth();
 
 
-
-
         deathOverlay.style.display = 'none';
 
 
-
-
         // Position and camera reset to start
-
-
 
 
         if (Net.enabled) {
@@ -7268,11 +5250,7 @@
         }
 
 
-
-
         // Weapons and inventory
-
-
 
 
         for (let i = 0; i < inventory.length; i++) {
@@ -7280,18 +5258,12 @@
         }
 
 
-
-
         selectedSlot = -1;
         renderInventory();
         setWeapon(null);
 
 
-
-
         // Remove remaining loot from the ground
-
-
 
 
         for (const item of groundItems) {
@@ -7301,31 +5273,19 @@
         }
 
 
-
-
         groundItems.length = 0;
-
-
 
 
         // Close the chests again so a new round has new loot to find
 
 
-
-
         for (const chest of chests) {
-
-
 
 
             chest.userData.opened = false;
 
 
-
-
             const lid = chest.userData.lid;
-
-
 
 
             lid.rotation.x = 0;
@@ -7333,16 +5293,10 @@
         }
 
 
-
-
         // Bots (singleplayer only)
 
 
-
-
         if (!Net.enabled) {
-
-
 
 
             for (const bot of bots) {
@@ -7350,29 +5304,19 @@
             }
 
 
-
-
             bots.length = 0;
-
-
 
 
             botsKilled = 0;
             updateBotsKilled();
 
 
-
-
             spawnBot();
         }
 
 
-
-
         enterGame();
     }
-
-
 
 
     playAgainButton.addEventListener('click', () => {
@@ -7380,18 +5324,12 @@
     });
 
 
-
-
     menuButton.addEventListener('click', () => {
         location.reload();
     });
 
 
-
-
     // ---------- SINGLEPLAYER BOTS ----------
-
-
 
 
     const bots = [];
@@ -7399,8 +5337,6 @@
     let kills = 0;
     const killsLabel =
         document.getElementById('kills-ui');
-
-
 
 
     function updateKills() {
@@ -7415,19 +5351,13 @@
     const BOT_ATTACK_COOLDOWN = 800;
 
 
-
-
     function updateBotsKilled() {
         botsKilledLabel.textContent =
             'Bots killed: ' + botsKilled;
     }
 
 
-
-
     // ---------- BOT PATHFINDING ----------
-
-
 
 
     const BOT_NAV_CELL_SIZE = 2.5;
@@ -7435,18 +5365,12 @@
     let botNavGrid = null;
 
 
-
-
     function buildBotNavGrid() {
         botNavGrid = new Array(BOT_NAV_SIZE);
 
 
-
-
         for (let gz = 0; gz < BOT_NAV_SIZE; gz++) {
             botNavGrid[gz] = new Array(BOT_NAV_SIZE);
-
-
 
 
             for (let gx = 0; gx < BOT_NAV_SIZE; gx++) {
@@ -7454,14 +5378,10 @@
                 const z = -MAP_BOUNDARY + (gz + 0.5) * BOT_NAV_CELL_SIZE;
 
 
-
-
                 botNavGrid[gz][gx] = canMoveTo(x, z);
             }
         }
     }
-
-
 
 
     function botWorldToGrid(x, z) {
@@ -7472,8 +5392,6 @@
     }
 
 
-
-
     function botGridToWorld(gx, gz) {
         return {
             x: -MAP_BOUNDARY + (gx + 0.5) * BOT_NAV_CELL_SIZE,
@@ -7482,27 +5400,19 @@
     }
 
 
-
-
     function findBotPath(startX, startZ, targetX, targetZ) {
         if (!botNavGrid) {
             buildBotNavGrid();
         }
 
 
-
-
         const start = botWorldToGrid(startX, startZ);
         const target = botWorldToGrid(targetX, targetZ);
-
-
 
 
         if (!botNavGrid[start.z][start.x]) {
             return [];
         }
-
-
 
 
         // If the target cell is blocked, find the closest walkable cell around it.
@@ -7511,26 +5421,18 @@
             let bestDist = Infinity;
 
 
-
-
             for (let radius = 1; radius <= 8 && !best; radius++) {
                 for (let dz = -radius; dz <= radius; dz++) {
                     for (let dx = -radius; dx <= radius; dx++) {
                         if (Math.max(Math.abs(dx), Math.abs(dz)) !== radius) continue;
 
 
-
-
                         const gx = target.x + dx;
                         const gz = target.z + dz;
 
 
-
-
                         if (gx < 0 || gx >= BOT_NAV_SIZE || gz < 0 || gz >= BOT_NAV_SIZE) continue;
                         if (!botNavGrid[gz][gx]) continue;
-
-
 
 
                         const d = dx * dx + dz * dz;
@@ -7543,14 +5445,10 @@
             }
 
 
-
-
             if (!best) return [];
             target.x = best.x;
             target.z = best.z;
         }
-
-
 
 
         const key = (x, z) => z * BOT_NAV_SIZE + x;
@@ -7560,15 +5458,11 @@
         const closed = new Set();
 
 
-
-
         const heuristic = (x, z) => Math.abs(x - target.x) + Math.abs(z - target.z);
         const directions = [
             [1, 0, 1], [-1, 0, 1], [0, 1, 1], [0, -1, 1],
             [1, 1, 1.414], [1, -1, 1.414], [-1, 1, 1.414], [-1, -1, 1.414]
         ];
-
-
 
 
         while (open.length) {
@@ -7578,25 +5472,17 @@
             }
 
 
-
-
             const current = open.splice(bestIndex, 1)[0];
             const currentKey = key(current.x, current.z);
-
-
 
 
             if (closed.has(currentKey)) continue;
             closed.add(currentKey);
 
 
-
-
             if (current.x === target.x && current.z === target.z) {
                 const path = [];
                 let cursorKey = currentKey;
-
-
 
 
                 while (cursorKey !== key(start.x, start.z)) {
@@ -7609,13 +5495,9 @@
                 }
 
 
-
-
                 path.reverse();
                 return path;
             }
-
-
 
 
             for (const [dx, dz, cost] of directions) {
@@ -7623,12 +5505,8 @@
                 const nz = current.z + dz;
 
 
-
-
                 if (nx < 0 || nx >= BOT_NAV_SIZE || nz < 0 || nz >= BOT_NAV_SIZE) continue;
                 if (!botNavGrid[nz][nx]) continue;
-
-
 
 
                 // Prevent diagonal corner-cutting through buildings.
@@ -7637,12 +5515,8 @@
                 }
 
 
-
-
                 const neighborKey = key(nx, nz);
                 if (closed.has(neighborKey)) continue;
-
-
 
 
                 const tentativeG = (gScore.get(currentKey) ?? Infinity) + cost;
@@ -7659,20 +5533,14 @@
         }
 
 
-
-
         return [];
     }
-
-
 
 
     function findBotSpawnPosition() {
         if (!botNavGrid) {
             buildBotNavGrid();
         }
-
-
 
 
         for (let attempt = 0; attempt < 100; attempt++) {
@@ -7684,12 +5552,8 @@
                 Math.random() * (MAP_BOUNDARY * 2 - 10);
 
 
-
-
             const dx = x - camera.position.x;
             const dz = z - camera.position.z;
-
-
 
 
             if (Math.hypot(dx, dz) < 15) {
@@ -7697,14 +5561,10 @@
             }
 
 
-
-
             if (canMoveTo(x, z)) {
                 return { x, z };
             }
         }
-
-
 
 
         return {
@@ -7714,12 +5574,8 @@
     }
 
 
-
-
     let zombieBotModel = null;
     let zombieBotModelLoad = null;
-
-
 
 
     zombieBotModelLoad = new Promise((resolve, reject) => {
@@ -7738,18 +5594,12 @@
     });
 
 
-
-
     function buildZombieBotMesh() {
         const group = zombieBotModel.clone(true);
 
 
-
-
         const body = group.getObjectByName('body');
         if (body) body.rotation.y = 0;
-
-
 
 
         const box = new THREE.Box3().setFromObject(group);
@@ -7762,18 +5612,12 @@
         }
 
 
-
-
         group.position.y -= box.min.y * group.scale.y;
-
-
 
 
         const barCanvas = document.createElement('canvas');
         barCanvas.width = 64;
         barCanvas.height = 10;
-
-
 
 
         const barTex = new THREE.CanvasTexture(barCanvas);
@@ -7785,14 +5629,10 @@
         );
 
 
-
-
         barSprite.scale.set(1.3, 0.2, 1);
         barSprite.position.y = 2.45;
         barSprite.renderOrder = 999;
         group.add(barSprite);
-
-
 
 
         function drawBar(hp) {
@@ -7802,8 +5642,6 @@
             ctx.fillRect(0, 0, 64, 10);
 
 
-
-
             const pct = Math.max(0, Math.min(1, hp / 100));
             ctx.fillStyle = pct > 0.4 ? '#39b54a' : '#c94c3d';
             ctx.fillRect(2, 2, (64 - 4) * pct, 6);
@@ -7811,17 +5649,11 @@
         }
 
 
-
-
         drawBar(100);
-
-
 
 
         return { group, drawBar };
     }
-
-
 
 
     function spawnBot() {
@@ -7831,12 +5663,8 @@
         }
 
 
-
-
         const spawn = findBotSpawnPosition();
         const rig = buildZombieBotMesh();
-
-
 
 
         rig.group.position.set(
@@ -7846,11 +5674,7 @@
         );
 
 
-
-
         scene.add(rig.group);
-
-
 
 
         bots.push({
@@ -7866,12 +5690,8 @@
     }
 
 
-
-
     function spawnBotsAfterKill() {
         const amount = botsKilled >= 5 ? 2 : 1;
-
-
 
 
         for (let i = 0; i < amount; i++) {
@@ -7880,20 +5700,14 @@
     }
 
 
-
-
     function killBot(bot) {
         scene.remove(bot.rig.group);
-
-
 
 
         const index = bots.indexOf(bot);
         if (index !== -1) {
             bots.splice(index, 1);
         }
-
-
 
 
         botsKilled++;
@@ -7904,19 +5718,13 @@
     }
 
 
-
-
     function updateBots(delta) {
         if (playerDead || Net.enabled || !isMouseLocked) {
             return;
         }
 
 
-
-
         const now = performance.now();
-
-
 
 
         for (const bot of bots) {
@@ -7926,13 +5734,9 @@
             const distance = Math.hypot(dx, dz);
 
 
-
-
             if (distance > 0.001) {
                 group.rotation.y = Math.atan2(dx, dz) - Math.PI / 2;
             }
-
-
 
 
             // Recalculate the route regularly so bots react to your movement.
@@ -7954,13 +5758,9 @@
             }
 
 
-
-
             if (distance > BOT_ATTACK_DISTANCE) {
                 let targetX = camera.position.x;
                 let targetZ = camera.position.z;
-
-
 
 
                 while (bot.pathIndex < bot.path.length) {
@@ -7971,14 +5771,10 @@
                     );
 
 
-
-
                     if (waypointDistance < 0.9) {
                         bot.pathIndex++;
                         continue;
                     }
-
-
 
 
                     targetX = waypoint.x;
@@ -7987,13 +5783,9 @@
                 }
 
 
-
-
                 const moveDX = targetX - group.position.x;
                 const moveDZ = targetZ - group.position.z;
                 const moveDistance = Math.hypot(moveDX, moveDZ);
-
-
 
 
                 if (moveDistance > 0.001) {
@@ -8002,12 +5794,8 @@
                     const moveZ = moveDZ / moveDistance * step;
 
 
-
-
                     const newX = group.position.x + moveX;
                     const newZ = group.position.z + moveZ;
-
-
 
 
                     if (canMoveTo(newX, group.position.z) &&
@@ -8016,16 +5804,12 @@
                     }
 
 
-
-
                     if (canMoveTo(group.position.x, newZ) &&
                         Math.hypot(group.position.x - camera.position.x, newZ - camera.position.z) > playerRadius) {
                         group.position.z = newZ;
                     }
                 }
             }
-
-
 
 
             if (distance <= BOT_ATTACK_DISTANCE && now >= bot.nextAttack) {
@@ -8037,22 +5821,14 @@
     }
 
 
-
-
     updateBotsKilled();
     updateKills();
-
-
 
 
     // ---------- WEAPONS ----------
 
 
-
-
     let currentWeapon = null;
-
-
 
 
     // Damage per weapon. The shotgun falls off with distance: strong up close,
@@ -8060,18 +5836,12 @@
     function getWeaponDamage(weaponType, distance) {
 
 
-
-
         if (weaponType === 'AR') {
             return 30;
         }
 
 
-
-
         if (weaponType === 'Shotgun') {
-
-
 
 
             const closeDamage = 65;
@@ -8079,18 +5849,12 @@
             const falloffRange = 20;
 
 
-
-
             const t =
                 Math.min(1, Math.max(0, distance / falloffRange));
 
 
-
-
             return closeDamage + (farDamage - closeDamage) * t;
         }
-
-
 
 
         // Pistol (default)
@@ -8098,11 +5862,7 @@
     }
 
 
-
-
     // ---------- WEAPON VIEWMODEL (visible in the right corner) ----------
-
-
 
 
     function buildViewmodelPistol() {
@@ -8116,13 +5876,9 @@
         const accent = new THREE.MeshStandardMaterial({ color: 0x5f6265, roughness: 0.28, metalness: 0.9 });
 
 
-
-
         const slide = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.075, 0.39), darkMetal);
         slide.position.set(0, 0.045, -0.15);
         group.add(slide);
-
-
 
 
         // Slide serrations.
@@ -8133,13 +5889,9 @@
         }
 
 
-
-
         const frame = new THREE.Mesh(new THREE.BoxGeometry(0.125, 0.085, 0.29), polymer);
         frame.position.set(0, -0.025, -0.08);
         group.add(frame);
-
-
 
 
         const triggerGuard = new THREE.Mesh(new THREE.TorusGeometry(0.038, 0.007, 6, 12, Math.PI), metal);
@@ -8148,22 +5900,16 @@
         group.add(triggerGuard);
 
 
-
-
         const trigger = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.045, 0.012), accent);
         trigger.position.set(0, -0.068, -0.01);
         trigger.rotation.x = -0.18;
         group.add(trigger);
 
 
-
-
         const grip = new THREE.Mesh(new THREE.BoxGeometry(0.112, 0.25, 0.105), gripMat);
         grip.position.set(0, -0.19, 0.085);
         grip.rotation.x = 0.22;
         group.add(grip);
-
-
 
 
         // Grip panels for a more finished, game-ready silhouette.
@@ -8175,13 +5921,9 @@
         }
 
 
-
-
         const magBase = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.035, 0.11), darkMetal);
         magBase.position.set(0, -0.318, 0.075);
         group.add(magBase);
-
-
 
 
         const frontSight = new THREE.Mesh(new THREE.BoxGeometry(0.022, 0.04, 0.025), sightMat);
@@ -8189,13 +5931,9 @@
         group.add(frontSight);
 
 
-
-
         const rearSight = new THREE.Mesh(new THREE.BoxGeometry(0.058, 0.032, 0.035), sightMat);
         rearSight.position.set(0, 0.095, 0.025);
         group.add(rearSight);
-
-
 
 
         const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.08, 10), accent);
@@ -8204,16 +5942,12 @@
         group.add(barrel);
 
 
-
-
         group.position.set(0.32, -0.32, -0.55);
         group.rotation.y = -0.12;
         group.userData.basePos = { x: group.position.x, y: group.position.y };
         group.visible = false;
         return group;
     }
-
-
 
 
     function buildViewmodelAR() {
@@ -8225,13 +5959,9 @@
         const accent = new THREE.MeshStandardMaterial({ color: 0x3b4145, roughness: 0.4, metalness: 0.7 });
 
 
-
-
         const stock = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.28), polymer);
         stock.position.set(0, 0, 0.35);
         group.add(stock);
-
-
 
 
         const stockPad = new THREE.Mesh(new THREE.BoxGeometry(0.155, 0.13, 0.035), darkMetal);
@@ -8239,13 +5969,9 @@
         group.add(stockPad);
 
 
-
-
         const receiver = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.17, 0.4), darkMetal);
         receiver.position.set(0, 0.01, -0.02);
         group.add(receiver);
-
-
 
 
         const upper = new THREE.Mesh(new THREE.BoxGeometry(0.145, 0.07, 0.42), metal);
@@ -8253,14 +5979,10 @@
         group.add(upper);
 
 
-
-
         const handguard = new THREE.Mesh(new THREE.CylinderGeometry(0.078, 0.078, 0.38, 10), polymer);
         handguard.rotation.x = Math.PI / 2;
         handguard.position.set(0, 0.01, -0.43);
         group.add(handguard);
-
-
 
 
         // Handguard rails.
@@ -8271,14 +5993,10 @@
         }
 
 
-
-
         const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.027, 0.027, 0.25, 10), metal);
         barrel.rotation.x = Math.PI / 2;
         barrel.position.set(0, 0.01, -0.75);
         group.add(barrel);
-
-
 
 
         const muzzle = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.08, 10), darkMetal);
@@ -8287,20 +6005,14 @@
         group.add(muzzle);
 
 
-
-
         const frontSight = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.1, 0.03), metal);
         frontSight.position.set(0, 0.105, -0.62);
         group.add(frontSight);
 
 
-
-
         const rearSight = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.075, 0.065), metal);
         rearSight.position.set(0, 0.115, -0.05);
         group.add(rearSight);
-
-
 
 
         const grip = new THREE.Mesh(new THREE.BoxGeometry(0.125, 0.28, 0.135), polymer);
@@ -8309,22 +6021,16 @@
         group.add(grip);
 
 
-
-
         const magazine = new THREE.Mesh(new THREE.BoxGeometry(0.105, 0.27, 0.115), darkMetal);
         magazine.position.set(0, -0.28, -0.15);
         magazine.rotation.x = -0.28;
         group.add(magazine);
 
 
-
-
         const magBase = new THREE.Mesh(new THREE.BoxGeometry(0.115, 0.025, 0.12), metal);
         magBase.position.set(0, -0.415, -0.19);
         magBase.rotation.x = -0.28;
         group.add(magBase);
-
-
 
 
         group.position.set(0.34, -0.34, -0.6);
@@ -8335,15 +6041,11 @@
     }
 
 
-
-
     function buildViewmodelBandage() {
         const group = new THREE.Group();
         const wrapMat = new THREE.MeshStandardMaterial({ color: 0xe7dcc6, roughness: 0.85 });
         const shadowMat = new THREE.MeshStandardMaterial({ color: 0xb9ab95, roughness: 0.95 });
         const redMat = new THREE.MeshStandardMaterial({ color: 0xd65b4b, roughness: 0.65 });
-
-
 
 
         const roll = new THREE.Mesh(new THREE.CylinderGeometry(0.115, 0.115, 0.30, 12), wrapMat);
@@ -8352,14 +6054,10 @@
         group.add(roll);
 
 
-
-
         const wrap = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.035, 12), shadowMat);
         wrap.rotation.z = Math.PI / 2;
         wrap.position.set(0.12, 0.02, -0.10);
         group.add(wrap);
-
-
 
 
         const cross1 = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.12, 0.018), redMat);
@@ -8367,21 +6065,15 @@
         group.add(cross1);
 
 
-
-
         const cross2 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.045, 0.018), redMat);
         cross2.position.set(-0.05, 0.02, -0.215);
         group.add(cross2);
-
-
 
 
         const flap = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.018, 0.10), wrapMat);
         flap.position.set(-0.22, 0.02, -0.06);
         flap.rotation.y = 0.2;
         group.add(flap);
-
-
 
 
         group.position.set(0.34, -0.34, -0.58);
@@ -8393,8 +6085,6 @@
     }
 
 
-
-
     function buildViewmodelShotgun() {
         // Detailed pump shotgun silhouette with a clean competitive-FPS presentation.
         const group = new THREE.Group();
@@ -8404,13 +6094,9 @@
         const wood = new THREE.MeshStandardMaterial({ color: 0x4b2e1b, roughness: 0.78 });
 
 
-
-
         const receiver = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.17, 0.33), darkMetal);
         receiver.position.set(0, 0.02, -0.06);
         group.add(receiver);
-
-
 
 
         const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.58, 10), metal);
@@ -8419,14 +6105,10 @@
         group.add(barrel);
 
 
-
-
         const muzzle = new THREE.Mesh(new THREE.CylinderGeometry(0.043, 0.038, 0.07, 10), darkMetal);
         muzzle.rotation.x = Math.PI / 2;
         muzzle.position.set(0, 0.045, -0.86);
         group.add(muzzle);
-
-
 
 
         const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.42, 10), metal);
@@ -8435,14 +6117,10 @@
         group.add(tube);
 
 
-
-
         const pump = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 0.24, 10), polymer);
         pump.rotation.x = Math.PI / 2;
         pump.position.set(0, -0.005, -0.37);
         group.add(pump);
-
-
 
 
         const stock = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.15, 0.33), wood);
@@ -8451,21 +6129,15 @@
         group.add(stock);
 
 
-
-
         const grip = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.26, 0.13), polymer);
         grip.position.set(0, -0.22, 0.0);
         grip.rotation.x = 0.24;
         group.add(grip);
 
 
-
-
         const bead = new THREE.Mesh(new THREE.SphereGeometry(0.018, 8, 8), metal);
         bead.position.set(0, 0.105, -0.82);
         group.add(bead);
-
-
 
 
         group.position.set(0.33, -0.33, -0.58);
@@ -8475,146 +6147,66 @@
         return group;
     }
 
-    function buildViewmodelRPG() {
-        const group = new THREE.Group();
-        const darkMetal = new THREE.MeshStandardMaterial({ color: 0x121416, roughness: 0.3, metalness: 0.84 });
-        const metal = new THREE.MeshStandardMaterial({ color: 0x303438, roughness: 0.34, metalness: 0.82 });
-        const polymer = new THREE.MeshStandardMaterial({ color: 0x17191b, roughness: 0.88 });
-        const wood = new THREE.MeshStandardMaterial({ color: 0x4b2e1b, roughness: 0.78 });
-
-        const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 0.85, 12), darkMetal);
-        tube.rotation.x = Math.PI / 2;
-        tube.position.set(0, 0.03, -0.45);
-        group.add(tube);
-
-        const muzzle = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.075, 0.13, 12), metal);
-        muzzle.rotation.x = Math.PI / 2;
-        muzzle.position.set(0, 0.03, -0.91);
-        group.add(muzzle);
-
-        const grip = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.28, 0.14), polymer);
-        grip.position.set(0, -0.18, -0.02);
-        grip.rotation.x = 0.2;
-        group.add(grip);
-
-        const stock = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.14, 0.34), wood);
-        stock.position.set(0, 0.01, 0.24);
-        group.add(stock);
-
-        const sight = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.16), metal);
-        sight.position.set(0, 0.13, -0.38);
-        group.add(sight);
-
-        group.position.set(0.34, -0.34, -0.58);
-        group.rotation.y = -0.1;
-        group.userData.basePos = { x: group.position.x, y: group.position.y };
-        group.visible = false;
-        return group;
-    }
-
-
-
-
-
 
     const viewmodelPistol =
         buildViewmodelPistol();
-
-
 
 
     const viewmodelAR =
         buildViewmodelAR();
 
 
-
-
     const viewmodelShotgun =
         buildViewmodelShotgun();
-
-
 
 
     const viewmodelBandage =
         buildViewmodelBandage();
 
 
-
-
-    
-    const viewmodelRPG =
-        buildViewmodelRPG();
-camera.add(viewmodelPistol);
+    camera.add(viewmodelPistol);
     camera.add(viewmodelAR);
     camera.add(viewmodelShotgun);
     camera.add(viewmodelBandage);
 
 
-
-
-        camera.add(viewmodelRPG);
-scene.add(camera);
-
-
+    scene.add(camera);
 
 
     let viewmodelBobT = 0;
 
 
-
-
     function setWeapon(type) {
 
 
-
-
         currentWeapon = type;
-
-
 
 
         viewmodelPistol.visible =
             type === 'Pistol';
 
 
-
-
         viewmodelAR.visible =
             type === 'AR';
-
-
 
 
         viewmodelShotgun.visible =
             type === 'Shotgun';
 
 
-
-
         viewmodelBandage.visible =
             type === 'Bandage';
 
-        viewmodelRPG.visible =
-            type === 'RPG';
-
-
-
 
         if (!type) {
-
-
 
 
             weaponUI.textContent =
                 'Weapon: Hands';
 
 
-
-
             return;
         }
-
-
 
 
         weaponUI.textContent =
@@ -8625,16 +6217,10 @@ scene.add(camera);
                   ' · LEFT CLICK / F';
 
 
-
-
     }
 
 
-
-
     // ---------- INVENTORY ----------
-
-
 
 
     const inventory = [
@@ -8646,11 +6232,7 @@ scene.add(camera);
     ];
 
 
-
-
     let selectedSlot = -1;
-
-
 
 
     const invSlotElements =
@@ -8659,8 +6241,6 @@ scene.add(camera);
                 '.inv-slot'
             )
         );
-
-
 
 
     function getInventoryIcon(item) {
@@ -8673,8 +6253,6 @@ scene.add(camera);
         }
 
 
-
-
         if (item.name === 'Pistol') {
             return `
                 <svg viewBox="0 0 48 48" aria-hidden="true">
@@ -8682,8 +6260,6 @@ scene.add(camera);
                     <rect x="27" y="17" width="8" height="5" rx="1" fill="currentColor"/>
                 </svg>`;
         }
-
-
 
 
         if (item.name === 'AR') {
@@ -8696,8 +6272,6 @@ scene.add(camera);
         }
 
 
-
-
         if (item.name === 'Shotgun') {
             return `
                 <svg viewBox="0 0 48 48" aria-hidden="true">
@@ -8705,36 +6279,21 @@ scene.add(camera);
                     <rect x="30" y="16" width="13" height="4" rx="1" fill="currentColor"/>
                 </svg>`;
         }
-        if (item.name === 'RPG') {
-            return `
-                <svg viewBox="0 0 48 48" aria-hidden="true">
-                    <rect x="5" y="19" width="31" height="8" rx="2" fill="currentColor"/>
-                    <path d="M35 17h7l4 6-4 6h-7z" fill="currentColor"/>
-                    <path d="M14 27l-3 10h7l3-10z" fill="currentColor"/>
-                </svg>`;
-        }
+
 
         return '';
     }
 
 
-
-
     function renderInventory() {
-
-
 
 
         invSlotElements.forEach(
             (el, i) => {
 
 
-
-
                 const item =
                     inventory[i];
-
-
 
 
                 const iconEl =
@@ -8743,14 +6302,10 @@ scene.add(camera);
                     );
 
 
-
-
                 iconEl.innerHTML =
                     item
                         ? getInventoryIcon(item)
                         : '';
-
-
 
 
                 el.classList.toggle(
@@ -8762,11 +6317,7 @@ scene.add(camera);
     }
 
 
-
-
     function findEmptySlot() {
-
-
 
 
         return inventory.indexOf(
@@ -8775,17 +6326,11 @@ scene.add(camera);
     }
 
 
-
-
     function addToInventory(item) {
-
-
 
 
         const slot =
             findEmptySlot();
-
-
 
 
         if (slot === -1) {
@@ -8793,28 +6338,18 @@ scene.add(camera);
         }
 
 
-
-
         inventory[slot] = item;
 
 
-
-
         renderInventory();
-
-
 
 
         return slot;
     }
 
 
-
-
     function useBandage(index) {
         if (index < 0 || index >= inventory.length) return;
-
-
 
 
         const item = inventory[index];
@@ -8822,13 +6357,9 @@ scene.add(camera);
         if (playerHP >= maxHP) return;
 
 
-
-
         playerHP = Math.min(maxHP, playerHP + 35);
         updateHealth();
         inventory[index] = null;
-
-
 
 
         if (selectedSlot === index) {
@@ -8837,23 +6368,15 @@ scene.add(camera);
         }
 
 
-
-
         renderInventory();
     }
-
-
 
 
     function useSlot(index) {
 
 
-
-
         const item =
             inventory[index];
-
-
 
 
         if (!item) {
@@ -8861,16 +6384,10 @@ scene.add(camera);
         }
 
 
-
-
         if (item.type === 'weapon') {
 
 
-
-
             selectedSlot = index;
-
-
 
 
             setWeapon(
@@ -8878,17 +6395,11 @@ scene.add(camera);
             );
 
 
-
-
             renderInventory();
-
-
 
 
             return;
         }
-
-
 
 
         if (item.type === 'bandage') {
@@ -8899,28 +6410,18 @@ scene.add(camera);
     }
 
 
-
-
     const dropDirection = new THREE.Vector3();
-
-
 
 
     function dropSelectedItem() {
         if (selectedSlot < 0) return;
 
 
-
-
         const item = inventory[selectedSlot];
         if (!item) return;
 
 
-
-
         let groundItem;
-
-
 
 
         if (item.type === 'bandage') {
@@ -8931,9 +6432,7 @@ scene.add(camera);
                 groundItem = createAR();
             } else if (item.name === 'Shotgun') {
                 groundItem = createShotgun();
-                        } else if (item.name === 'RPG') {
-                groundItem = createRPG();
-} else {
+            } else {
                 groundItem = createPistol();
             }
             groundItem.userData.pickupType = item.name;
@@ -8943,13 +6442,9 @@ scene.add(camera);
         }
 
 
-
-
         camera.getWorldDirection(dropDirection);
         dropDirection.y = 0;
         dropDirection.normalize();
-
-
 
 
         groundItem.position.set(
@@ -8959,12 +6454,8 @@ scene.add(camera);
         );
 
 
-
-
         groundItems.push(groundItem);
         scene.add(groundItem);
-
-
 
 
         inventory[selectedSlot] = null;
@@ -8976,11 +6467,7 @@ scene.add(camera);
     }
 
 
-
-
     // ---------- E INTERACTION ----------
-
-
 
 
     let nearbyChest = null;
@@ -8988,22 +6475,14 @@ scene.add(camera);
     let chestOpenedThisHold = false;
 
 
-
-
     function findNearbyChest() {
-
-
 
 
         let closest = null;
         let closestDistance = 4;
 
 
-
-
         for (const chest of chests) {
-
-
 
 
             if (
@@ -9013,20 +6492,14 @@ scene.add(camera);
             }
 
 
-
-
             const dx =
                 camera.position.x -
                 chest.position.x;
 
 
-
-
             const dz =
                 camera.position.z -
                 chest.position.z;
-
-
 
 
             const distance =
@@ -9036,20 +6509,14 @@ scene.add(camera);
                 );
 
 
-
-
             if (
                 distance <
                 closestDistance
             ) {
 
 
-
-
                 closest =
                     chest;
-
-
 
 
                 closestDistance =
@@ -9058,17 +6525,11 @@ scene.add(camera);
         }
 
 
-
-
         return closest;
     }
 
 
-
-
     function openChest(chest, fromNetwork) {
-
-
 
 
         if (
@@ -9079,87 +6540,57 @@ scene.add(camera);
         }
 
 
-
-
         chest.userData.opened =
             true;
-
-
 
 
         const lid =
             chest.userData.lid;
 
 
-
-
         lid.rotation.x =
             -Math.PI / 2.4;
-
-
 
 
         lid.position.z =
             -0.35;
 
 
-
-
         spawnChestLoot(chest);
 
 
-
-
         if (!fromNetwork) {
-
-
 
 
             Net.sendChestOpen(chest.userData.netIndex);
         }
 
 
-
-
         interaction.style.display =
             'none';
-
-
 
 
         interactionFill.style.width =
             '0%';
 
 
-
-
         nearbyChest = null;
     }
-
-
 
 
     // ---------- PICKUPS ----------
 
 
-
-
     function pickUpNearbyItem() {
-
-
 
 
         let closest = null;
         let closestDistance = 2.4;
 
 
-
-
         for (
             const item of groundItems
         ) {
-
-
 
 
             if (
@@ -9169,20 +6600,14 @@ scene.add(camera);
             }
 
 
-
-
             const dx =
                 camera.position.x -
                 item.position.x;
 
 
-
-
             const dz =
                 camera.position.z -
                 item.position.z;
-
-
 
 
             const distance =
@@ -9192,20 +6617,14 @@ scene.add(camera);
                 );
 
 
-
-
             if (
                 distance <
                 closestDistance
             ) {
 
 
-
-
                 closest =
                     item;
-
-
 
 
                 closestDistance =
@@ -9214,13 +6633,9 @@ scene.add(camera);
         }
 
 
-
-
         if (!closest) {
             return;
         }
-
-
 
 
         if (
@@ -9231,14 +6646,10 @@ scene.add(camera);
         }
 
 
-
-
         if (
             closest.userData.pickupType ===
             'Bandage'
         ) {
-
-
 
 
             addToInventory({
@@ -9247,27 +6658,19 @@ scene.add(camera);
             });
 
 
-
-
             scene.remove(
                 closest
             );
-
-
 
 
             return;
         }
 
 
-
-
         if (
             closest.userData.pickupType ===
             'Pistol'
         ) {
-
-
 
 
             const slot =
@@ -9278,11 +6681,7 @@ scene.add(camera);
                 });
 
 
-
-
             selectedSlot = slot;
-
-
 
 
             setWeapon(
@@ -9290,11 +6689,7 @@ scene.add(camera);
             );
 
 
-
-
             renderInventory();
-
-
 
 
             scene.remove(
@@ -9302,20 +6697,14 @@ scene.add(camera);
             );
 
 
-
-
             return;
         }
-
-
 
 
         if (
             closest.userData.pickupType ===
             'AR'
         ) {
-
-
 
 
             const slot =
@@ -9326,11 +6715,7 @@ scene.add(camera);
                 });
 
 
-
-
             selectedSlot = slot;
-
-
 
 
             setWeapon(
@@ -9338,11 +6723,7 @@ scene.add(camera);
             );
 
 
-
-
             renderInventory();
-
-
 
 
             scene.remove(
@@ -9350,20 +6731,14 @@ scene.add(camera);
             );
 
 
-
-
             return;
         }
-
-
 
 
         if (
             closest.userData.pickupType ===
             'Shotgun'
         ) {
-
-
 
 
             const slot =
@@ -9374,11 +6749,7 @@ scene.add(camera);
                 });
 
 
-
-
             selectedSlot = slot;
-
-
 
 
             setWeapon(
@@ -9386,11 +6757,7 @@ scene.add(camera);
             );
 
 
-
-
             renderInventory();
-
-
 
 
             scene.remove(
@@ -9399,50 +6766,16 @@ scene.add(camera);
         }
     }
 
-        if (
-            closest.userData.pickupType ===
-            'RPG'
-        ) {
-            const slot =
-                addToInventory({
-                    type: 'weapon',
-                    name: 'RPG',
-                    icon: 'RPG'
-                });
-
-            selectedSlot = slot;
-
-            setWeapon(
-                'RPG'
-            );
-
-            renderInventory();
-
-            scene.remove(
-                closest
-            );
-        }
-
-
-
-
-
 
     // ---------- SHOOTING ----------
-
-
 
 
     const raycaster =
         new THREE.Raycaster();
 
 
-
-
     const shootDirection =
         new THREE.Vector3();
-
-
 
 
     const tracerMaterial =
@@ -9452,195 +6785,14 @@ scene.add(camera);
             opacity: 0.9
         });
 
-    function createRPGExplosion(position) {
-        const group = new THREE.Group();
-
-        const flash = new THREE.Mesh(
-            new THREE.SphereGeometry(0.35, 12, 12),
-            new THREE.MeshBasicMaterial({
-                color: 0xffb52e,
-                transparent: true,
-                opacity: 0.95
-            })
-        );
-        group.add(flash);
-
-        const ring = new THREE.Mesh(
-            new THREE.RingGeometry(0.45, 0.72, 24),
-            new THREE.MeshBasicMaterial({
-                color: 0xff6a2c,
-                transparent: true,
-                opacity: 0.85,
-                side: THREE.DoubleSide
-            })
-        );
-        ring.rotation.x = -Math.PI / 2;
-        group.add(ring);
-
-        group.position.copy(position);
-        scene.add(group);
-
-        const start = performance.now();
-        const duration = 260;
-
-        function animateExplosion() {
-            const t = Math.min(1, (performance.now() - start) / duration);
-            const scale = 1 + t * 2.8;
-            group.scale.setScalar(scale);
-            flash.material.opacity = 0.95 * (1 - t);
-            ring.material.opacity = 0.85 * (1 - t);
-
-            if (t < 1) {
-                requestAnimationFrame(animateExplosion);
-            } else {
-                scene.remove(group);
-                flash.geometry.dispose();
-                flash.material.dispose();
-                ring.geometry.dispose();
-                ring.material.dispose();
-            }
-        }
-
-        animateExplosion();
-    }
-
-    function shootRPG() {
-        if (playerDead || !isMouseLocked) return;
-
-        camera.getWorldDirection(shootDirection);
-        raycaster.set(camera.position, shootDirection);
-
-        const maxRange = 100;
-        const maxPoint = camera.position.clone().add(
-            shootDirection.clone().multiplyScalar(maxRange)
-        );
-
-        let hitPoint = maxPoint.clone();
-        let hitType = null;
-        let hitTarget = null;
-        let hitDistance = maxRange;
-
-        if (Net.enabled && Net.players.size > 0) {
-            const meshToId = new Map();
-            const hitBoxes = [];
-
-            for (const [pid, p] of Net.players.entries()) {
-                p.rig.group.traverse(child => {
-                    if (child.isMesh) {
-                        meshToId.set(child, pid);
-                        hitBoxes.push(child);
-                    }
-                });
-            }
-
-            const playerHits = raycaster.intersectObjects(hitBoxes, false);
-            const wallHits = raycaster.intersectObjects(shootBlockers, true);
-            const playerHit = playerHits.length ? playerHits[0] : null;
-            const wallHit = wallHits.length ? wallHits[0] : null;
-
-            if (playerHit && (!wallHit || playerHit.distance <= wallHit.distance) && playerHit.distance < maxRange) {
-                hitDistance = playerHit.distance;
-                hitPoint = playerHit.point.clone();
-                hitType = 'player';
-                hitTarget = meshToId.get(playerHit.object);
-            } else if (wallHit && wallHit.distance < maxRange) {
-                hitDistance = wallHit.distance;
-                hitPoint = wallHit.point.clone();
-                hitType = 'wall';
-            }
-        }
-
-        if (!Net.enabled && bots.length > 0) {
-            const botToObject = new Map();
-            const botHitBoxes = [];
-
-            for (const bot of bots) {
-                bot.rig.group.traverse(child => {
-                    if (child.isMesh) {
-                        botToObject.set(child, bot);
-                        botHitBoxes.push(child);
-                    }
-                });
-            }
-
-            const botHits = raycaster.intersectObjects(botHitBoxes, false);
-            const wallHits = raycaster.intersectObjects(shootBlockers, true);
-            const botHit = botHits.length ? botHits[0] : null;
-            const wallHit = wallHits.length ? wallHits[0] : null;
-
-            if (botHit && (!wallHit || botHit.distance <= wallHit.distance) && botHit.distance < hitDistance) {
-                hitDistance = botHit.distance;
-                hitPoint = botHit.point.clone();
-                hitType = 'bot';
-                hitTarget = botToObject.get(botHit.object);
-            } else if (!hitType && wallHit && wallHit.distance < maxRange) {
-                hitDistance = wallHit.distance;
-                hitPoint = wallHit.point.clone();
-                hitType = 'wall';
-            }
-        }
-
-        Net.sendShoot(camera.position, shootDirection);
-
-        const rocket = new THREE.Mesh(
-            new THREE.SphereGeometry(0.075, 8, 8),
-            new THREE.MeshBasicMaterial({ color: 0xff8a2c })
-        );
-        rocket.position.copy(camera.position);
-        scene.add(rocket);
-
-        const start = performance.now();
-        const duration = Math.min(220, Math.max(70, hitDistance * 2.5));
-
-        function animateRocket() {
-            const t = Math.min(1, (performance.now() - start) / duration);
-            rocket.position.lerpVectors(camera.position, hitPoint, t);
-
-            if (t < 1) {
-                requestAnimationFrame(animateRocket);
-            } else {
-                scene.remove(rocket);
-                rocket.geometry.dispose();
-                rocket.material.dispose();
-                createRPGExplosion(hitPoint);
-            }
-        }
-
-        animateRocket();
-
-        if (hitType === 'player' && hitTarget) {
-            Net.sendDamage(hitTarget, 70);
-        } else if (hitType === 'bot' && hitTarget) {
-            hitTarget.hp -= 70;
-            hitTarget.rig.drawBar(hitTarget.hp);
-
-            if (hitTarget.hp <= 0) {
-                killBot(hitTarget);
-            }
-        }
-
-        nextShotTime = performance.now() + 1000;
-    }
-
-
-
-
-
 
     function shoot() {
-                if (currentWeapon === 'RPG') {
-            shootRPG();
-            return;
-        }
-
         if (currentWeapon === 'Bandage') {
             if (selectedSlot >= 0) {
                 useBandage(selectedSlot);
             }
             return;
         }
-
-
 
 
         if (
@@ -9652,13 +6804,9 @@ scene.add(camera);
         }
 
 
-
-
         camera.getWorldDirection(
             shootDirection
         );
-
-
 
 
         raycaster.set(
@@ -9667,11 +6815,7 @@ scene.add(camera);
         );
 
 
-
-
         // The shot itself
-
-
 
 
         const endPoint =
@@ -9680,22 +6824,16 @@ scene.add(camera);
             );
 
 
-
-
         const points = [
             camera.position.clone(),
             endPoint
         ];
 
 
-
-
         const geometry =
             new THREE.BufferGeometry().setFromPoints(
                 points
             );
-
-
 
 
         const tracer =
@@ -9705,22 +6843,14 @@ scene.add(camera);
             );
 
 
-
-
         scene.add(tracer);
-
-
 
 
         // Remove tracers quickly so it does not lag
 
 
-
-
         setTimeout(
             () => {
-
-
 
 
                 scene.remove(
@@ -9728,11 +6858,7 @@ scene.add(camera);
                 );
 
 
-
-
                 geometry.dispose();
-
-
 
 
             },
@@ -9740,27 +6866,17 @@ scene.add(camera);
         );
 
 
-
-
         Net.sendShoot(camera.position, shootDirection);
-
-
 
 
         // Hit detection against other players (multiplayer)
 
 
-
-
         if (Net.enabled && Net.players.size > 0) {
-
-
 
 
             const meshToId = new Map();
             const hitBoxes = [];
-
-
 
 
             for (const [pid, p] of Net.players.entries()) {
@@ -9773,18 +6889,12 @@ scene.add(camera);
             }
 
 
-
-
             const intersections =
                 raycaster.intersectObjects(hitBoxes, false);
 
 
-
-
             const wallIntersections =
                 raycaster.intersectObjects(shootBlockers, true);
-
-
 
 
             const playerHitDistance =
@@ -9793,34 +6903,22 @@ scene.add(camera);
                     : Infinity;
 
 
-
-
             const wallBlocksShot =
                 wallIntersections.length > 0 &&
                 wallIntersections[0].distance < playerHitDistance;
 
 
-
-
             if (!wallBlocksShot && intersections.length > 0 && intersections[0].distance < 80) {
-
-
 
 
                 const hitId = meshToId.get(intersections[0].object);
 
 
-
-
                 if (hitId) {
-
-
 
 
                     const damage =
                         getWeaponDamage(currentWeapon, intersections[0].distance);
-
-
 
 
                     Net.sendDamage(hitId, Math.round(damage));
@@ -9829,22 +6927,14 @@ scene.add(camera);
         }
 
 
-
-
         // Hit detection against bots in singleplayer
-
-
 
 
         if (!Net.enabled && bots.length > 0) {
 
 
-
-
             const botToObject = new Map();
             const botHitBoxes = [];
-
-
 
 
             for (const bot of bots) {
@@ -9857,18 +6947,12 @@ scene.add(camera);
             }
 
 
-
-
             const botIntersections =
                 raycaster.intersectObjects(botHitBoxes, false);
 
 
-
-
             if (botIntersections.length > 0 && botIntersections[0].distance < 80) {
                 const bot = botToObject.get(botIntersections[0].object);
-
-
 
 
                 if (bot) {
@@ -9876,12 +6960,8 @@ scene.add(camera);
                     const hitDistance = botIntersections[0].distance;
 
 
-
-
                     const rayX = shootDirection.x;
                     const rayZ = shootDirection.z;
-
-
 
 
                     for (const c of buildingColliders) {
@@ -9892,20 +6972,14 @@ scene.add(camera);
                         const sin = Math.sin(angle);
 
 
-
-
                         const localOriginX = dx * cos - dz * sin;
                         const localOriginZ = dx * sin + dz * cos;
                         const localDirX = rayX * cos - rayZ * sin;
                         const localDirZ = rayX * sin + rayZ * cos;
 
 
-
-
                         let tMin = 0;
                         let tMax = hitDistance;
-
-
 
 
                         if (Math.abs(localDirX) < 0.000001) {
@@ -9918,8 +6992,6 @@ scene.add(camera);
                         }
 
 
-
-
                         if (Math.abs(localDirZ) < 0.000001) {
                             if (Math.abs(localOriginZ) > c.halfD) continue;
                         } else {
@@ -9930,8 +7002,6 @@ scene.add(camera);
                         }
 
 
-
-
                         if (tMax >= tMin && tMax >= 0 && tMin <= hitDistance) {
                             blockedByBuilding = true;
                             break;
@@ -9939,19 +7009,13 @@ scene.add(camera);
                     }
 
 
-
-
                     if (!blockedByBuilding) {
                         const damage =
                             getWeaponDamage(currentWeapon, hitDistance);
 
 
-
-
                         bot.hp -= damage;
                         bot.rig.drawBar(bot.hp);
-
-
 
 
                         if (bot.hp <= 0) {
@@ -9963,11 +7027,7 @@ scene.add(camera);
         }
 
 
-
-
         // Different fire rates
-
-
 
 
         if (
@@ -9976,13 +7036,9 @@ scene.add(camera);
         ) {
 
 
-
-
             nextShotTime =
                 performance.now() +
                 150;
-
-
 
 
         } else if (
@@ -9991,13 +7047,9 @@ scene.add(camera);
         ) {
 
 
-
-
             nextShotTime =
                 performance.now() +
                 110;
-
-
 
 
         } else if (
@@ -10006,29 +7058,19 @@ scene.add(camera);
         ) {
 
 
-
-
             nextShotTime =
                 performance.now() +
                 650;
-        } else if (currentWeapon === 'RPG') {
-            nextShotTime = performance.now() + 1000;
         }
     }
-
-
 
 
     let nextShotTime = 0;
 
 
-
-
     document.addEventListener(
         'mousedown',
         e => {
-
-
 
 
             if (
@@ -10038,19 +7080,13 @@ scene.add(camera);
             ) {
 
 
-
-
                 shoot();
             }
         }
     );
 
 
-
-
     // ---------- KEY BINDINGS ----------
-
-
 
 
     document.addEventListener(
@@ -10058,46 +7094,30 @@ scene.add(camera);
         e => {
 
 
-
-
             if (e.code === 'KeyW')
                 keys.w = true;
-
-
 
 
             if (e.code === 'KeyA')
                 keys.a = true;
 
 
-
-
             if (e.code === 'KeyS')
                 keys.s = true;
-
-
 
 
             if (e.code === 'KeyD')
                 keys.d = true;
 
 
-
-
             if (e.code === 'Space')
                 keys.space = true;
-
-
 
 
             if (e.code === 'KeyE') {
 
 
-
-
                 keys.e = true;
-
-
 
 
                 if (
@@ -10105,12 +7125,8 @@ scene.add(camera);
                 ) {
 
 
-
-
                     chestHoldStart =
                         performance.now();
-
-
 
 
                     chestOpenedThisHold =
@@ -10119,12 +7135,8 @@ scene.add(camera);
             }
 
 
-
-
             // Alternative shoot button — so the game can be played on a laptop
             // without a mouse (e.g. using a trackpad) and still shoot.
-
-
 
 
             if (
@@ -10134,12 +7146,8 @@ scene.add(camera);
             ) {
 
 
-
-
                 shoot();
             }
-
-
 
 
             if ((e.code === 'KeyQ' || e.key === 'q' || e.key === 'Q') && !e.repeat) {
@@ -10149,13 +7157,9 @@ scene.add(camera);
             }
 
 
-
-
             if (
                 e.code === 'Digit1'
             ) useSlot(0);
-
-
 
 
             if (
@@ -10163,20 +7167,14 @@ scene.add(camera);
             ) useSlot(1);
 
 
-
-
             if (
                 e.code === 'Digit3'
             ) useSlot(2);
 
 
-
-
             if (
                 e.code === 'Digit4'
             ) useSlot(3);
-
-
 
 
             if (
@@ -10186,65 +7184,43 @@ scene.add(camera);
     );
 
 
-
-
     document.addEventListener(
         'keyup',
         e => {
-
-
 
 
             if (e.code === 'KeyW')
                 keys.w = false;
 
 
-
-
             if (e.code === 'KeyA')
                 keys.a = false;
-
-
 
 
             if (e.code === 'KeyS')
                 keys.s = false;
 
 
-
-
             if (e.code === 'KeyD')
                 keys.d = false;
-
-
 
 
             if (e.code === 'Space')
                 keys.space = false;
 
 
-
-
             if (e.code === 'KeyE') {
 
 
-
-
                 keys.e = false;
-
-
 
 
                 chestHoldStart =
                     0;
 
 
-
-
                 chestOpenedThisHold =
                     false;
-
-
 
 
                 interactionFill.style.width =
@@ -10254,11 +7230,7 @@ scene.add(camera);
     );
 
 
-
-
     // ---------- MINIMAP ----------
-
-
 
 
     const minimap =
@@ -10267,14 +7239,10 @@ scene.add(camera);
         );
 
 
-
-
     const minimapCtx =
         minimap.getContext(
             '2d'
         );
-
-
 
 
     const minimapSize =
@@ -10282,11 +7250,7 @@ scene.add(camera);
     let lastMinimapDraw = 0;
 
 
-
-
     function worldToMinimapX(x) {
-
-
 
 
         return (
@@ -10297,11 +7261,7 @@ scene.add(camera);
     }
 
 
-
-
     function worldToMinimapZ(z) {
-
-
 
 
         return (
@@ -10312,16 +7272,10 @@ scene.add(camera);
     }
 
 
-
-
     function drawMinimap(force = false) {
         const now = performance.now();
         if (!force && now - lastMinimapDraw < 50) return;
         lastMinimapDraw = now;
-
-
-
-
 
 
 
@@ -10334,17 +7288,11 @@ scene.add(camera);
         );
 
 
-
-
         // Sand
-
-
 
 
         minimapCtx.fillStyle =
             '#b99a68';
-
-
 
 
         minimapCtx.fillRect(
@@ -10355,22 +7303,14 @@ scene.add(camera);
         );
 
 
-
-
         // Grid
-
-
 
 
         minimapCtx.strokeStyle =
             'rgba(70,55,35,0.18)';
 
 
-
-
         minimapCtx.lineWidth = 1;
-
-
 
 
         for (
@@ -10380,19 +7320,13 @@ scene.add(camera);
         ) {
 
 
-
-
             const p =
                 i *
                 minimapSize /
                 10;
 
 
-
-
             minimapCtx.beginPath();
-
-
 
 
             minimapCtx.moveTo(
@@ -10401,24 +7335,16 @@ scene.add(camera);
             );
 
 
-
-
             minimapCtx.lineTo(
                 p,
                 minimapSize
             );
 
 
-
-
             minimapCtx.stroke();
 
 
-
-
             minimapCtx.beginPath();
-
-
 
 
             minimapCtx.moveTo(
@@ -10427,38 +7353,26 @@ scene.add(camera);
             );
 
 
-
-
             minimapCtx.lineTo(
                 minimapSize,
                 p
             );
 
 
-
-
             minimapCtx.stroke();
         }
 
 
-
-
         // All buildings
-
-
 
 
         minimapCtx.fillStyle =
             '#40372d';
 
 
-
-
         for (
             const c of buildingColliders
         ) {
-
-
 
 
             const px =
@@ -10467,14 +7381,10 @@ scene.add(camera);
                 );
 
 
-
-
             const pz =
                 worldToMinimapZ(
                     c.z
                 );
-
-
 
 
             const width =
@@ -10486,8 +7396,6 @@ scene.add(camera);
                 );
 
 
-
-
             const depth =
                 Math.max(
                     2,
@@ -10495,8 +7403,6 @@ scene.add(camera);
                     (MAP_BOUNDARY * 2) *
                     minimapSize
                 );
-
-
 
 
             minimapCtx.fillRect(
@@ -10508,18 +7414,12 @@ scene.add(camera);
         }
 
 
-
-
         // Chests
-
-
 
 
         for (
             const chest of chests
         ) {
-
-
 
 
             if (
@@ -10529,14 +7429,10 @@ scene.add(camera);
             }
 
 
-
-
             const px =
                 worldToMinimapX(
                     chest.position.x
                 );
-
-
 
 
             const pz =
@@ -10545,12 +7441,8 @@ scene.add(camera);
                 );
 
 
-
-
             minimapCtx.fillStyle =
                 '#d39b35';
-
-
 
 
             minimapCtx.fillRect(
@@ -10562,22 +7454,14 @@ scene.add(camera);
         }
 
 
-
-
         // Other players (multiplayer)
-
-
 
 
         for (const p of Net.players.values()) {
 
 
-
-
             const rx = worldToMinimapX(p.rig.group.position.x);
             const rz = worldToMinimapZ(p.rig.group.position.z);
-
-
 
 
             minimapCtx.beginPath();
@@ -10590,19 +7474,13 @@ scene.add(camera);
         }
 
 
-
-
         // Bots (solo player)
-
-
 
 
         if (!Net.enabled) {
             for (const bot of bots) {
                 const bx = worldToMinimapX(bot.rig.group.position.x);
                 const bz = worldToMinimapZ(bot.rig.group.position.z);
-
-
 
 
                 minimapCtx.beginPath();
@@ -10616,11 +7494,7 @@ scene.add(camera);
         }
 
 
-
-
         // Player
-
-
 
 
         const playerX =
@@ -10629,19 +7503,13 @@ scene.add(camera);
             );
 
 
-
-
         const playerZ =
             worldToMinimapZ(
                 camera.position.z
             );
 
 
-
-
         minimapCtx.beginPath();
-
-
 
 
         minimapCtx.arc(
@@ -10653,44 +7521,28 @@ scene.add(camera);
         );
 
 
-
-
         minimapCtx.fillStyle =
             '#e53935';
 
 
-
-
         minimapCtx.fill();
-
-
 
 
         minimapCtx.strokeStyle =
             '#ffffff';
 
 
-
-
         minimapCtx.lineWidth = 2;
-
-
 
 
         minimapCtx.stroke();
 
 
-
-
         // Playerns riktning
-
-
 
 
         const directionLength =
             10;
-
-
 
 
         const directionX =
@@ -10700,8 +7552,6 @@ scene.add(camera);
             directionLength;
 
 
-
-
         const directionZ =
             Math.cos(
                 cameraYAngle
@@ -10709,11 +7559,7 @@ scene.add(camera);
             directionLength;
 
 
-
-
         minimapCtx.beginPath();
-
-
 
 
         minimapCtx.moveTo(
@@ -10722,46 +7568,30 @@ scene.add(camera);
         );
 
 
-
-
         minimapCtx.lineTo(
             playerX + directionX,
             playerZ + directionZ
         );
 
 
-
-
         minimapCtx.strokeStyle =
             '#ffffff';
-
-
 
 
         minimapCtx.lineWidth = 2;
 
 
-
-
         minimapCtx.stroke();
 
 
-
-
         // Clear border
-
-
 
 
         minimapCtx.strokeStyle =
             '#fff0c7';
 
 
-
-
         minimapCtx.lineWidth = 2;
-
-
 
 
         minimapCtx.strokeRect(
@@ -10773,16 +7603,10 @@ scene.add(camera);
     }
 
 
-
-
     // ---------- ANIMATION LOOP ----------
 
 
-
-
     function animate() {
-
-
 
 
         requestAnimationFrame(
@@ -10790,12 +7614,8 @@ scene.add(camera);
         );
 
 
-
-
         const timeNow =
             performance.now();
-
-
 
 
         const delta =
@@ -10806,28 +7626,18 @@ scene.add(camera);
             );
 
 
-
-
         lastTime =
             timeNow;
 
 
-
-
         if (isMouseLocked) {
-
-
 
 
             let inputX = 0;
             let inputZ = 0;
 
 
-
-
             if (keys.w) {
-
-
 
 
                 inputX +=
@@ -10836,28 +7646,20 @@ scene.add(camera);
                     );
 
 
-
-
                 inputZ +=
                     Math.cos(
                         cameraYAngle
                     );
             }
-
-
 
 
             if (keys.s) {
 
 
-
-
                 inputX -=
                     Math.sin(
                         cameraYAngle
                     );
-
-
 
 
                 inputZ -=
@@ -10867,11 +7669,7 @@ scene.add(camera);
             }
 
 
-
-
             if (keys.a) {
-
-
 
 
                 inputX +=
@@ -10880,8 +7678,6 @@ scene.add(camera);
                     );
 
 
-
-
                 inputZ -=
                     Math.sin(
                         cameraYAngle
@@ -10889,11 +7685,7 @@ scene.add(camera);
             }
 
 
-
-
             if (keys.d) {
-
-
 
 
                 inputX -=
@@ -10902,26 +7694,18 @@ scene.add(camera);
                     );
 
 
-
-
                 inputZ +=
                     Math.sin(
                         cameraYAngle
                     );
             }
-
-
 
 
             const inputLen =
                 Math.hypot(inputX, inputZ);
 
 
-
-
             if (inputLen > 0) {
-
-
 
 
                 inputX /= inputLen;
@@ -10929,23 +7713,15 @@ scene.add(camera);
             }
 
 
-
-
             const hasInput = inputLen > 0;
-
-
 
 
             const targetVX = inputX * MAX_SPEED;
             const targetVZ = inputZ * MAX_SPEED;
 
 
-
-
             // Acceleration/deceleration: faster on the ground, slower
             // (more "turning") in the air — just like in most FPS games.
-
-
 
 
             const rate = hasInput
@@ -10953,23 +7729,15 @@ scene.add(camera);
                 : (isGrounded ? GROUND_FRICTION : AIR_FRICTION);
 
 
-
-
             const maxDelta = rate * delta;
-
-
 
 
             moveVelocity.x =
                 moveToward(moveVelocity.x, targetVX, maxDelta);
 
 
-
-
             moveVelocity.z =
                 moveToward(moveVelocity.z, targetVZ, maxDelta);
-
-
 
 
             const newX =
@@ -10977,19 +7745,13 @@ scene.add(camera);
                 moveVelocity.x * delta;
 
 
-
-
             const newZ =
                 camera.position.z +
                 moveVelocity.z * delta;
 
 
-
-
             // Collision check separately
             // for X and Z so the player does not get stuck
-
-
 
 
             if (
@@ -11000,23 +7762,15 @@ scene.add(camera);
             ) {
 
 
-
-
                 camera.position.x =
                     newX;
-
-
 
 
             } else {
 
 
-
-
                 moveVelocity.x = 0;
             }
-
-
 
 
             if (
@@ -11027,35 +7781,23 @@ scene.add(camera);
             ) {
 
 
-
-
                 camera.position.z =
                     newZ;
 
 
-
-
             } else {
-
-
 
 
                 moveVelocity.z = 0;
             }
 
 
-
-
             velocityY -=
                 28 * delta;
 
 
-
-
             camera.position.y +=
                 velocityY * delta;
-
-
 
 
             if (
@@ -11064,20 +7806,14 @@ scene.add(camera);
             ) {
 
 
-
-
                 velocityY = 11;
                 isGrounded = false;
             }
 
 
-
-
             if (
                 camera.position.y < 2
             ) {
-
-
 
 
                 camera.position.y = 2;
@@ -11086,11 +7822,7 @@ scene.add(camera);
             }
 
 
-
-
             // Small "bob" movement on the weapon being held
-
-
 
 
             const activeViewmodel =
@@ -11100,16 +7832,10 @@ scene.add(camera);
                     ? viewmodelAR
                     : currentWeapon === 'Shotgun'
                     ? viewmodelShotgun
-                    : currentWeapon === 'RPG'
-                    ? viewmodelRPG
                     : null;
 
 
-
-
             if (activeViewmodel) {
-
-
 
 
                 const walking =
@@ -11120,13 +7846,9 @@ scene.add(camera);
                     isGrounded;
 
 
-
-
                 viewmodelBobT +=
                     delta *
                     (walking ? 9 : 2);
-
-
 
 
                 const bobAmount =
@@ -11135,12 +7857,8 @@ scene.add(camera);
                         : 0.006;
 
 
-
-
                 const base =
                     activeViewmodel.userData.basePos;
-
-
 
 
                 activeViewmodel.position.y =
@@ -11149,8 +7867,6 @@ scene.add(camera);
                         viewmodelBobT
                     ) *
                     bobAmount;
-
-
 
 
                 activeViewmodel.position.x =
@@ -11163,17 +7879,11 @@ scene.add(camera);
         }
 
 
-
-
         // ---------- CHEST E ----------
-
-
 
 
         nearbyChest =
             findNearbyChest();
-
-
 
 
         if (
@@ -11183,17 +7893,11 @@ scene.add(camera);
         ) {
 
 
-
-
             interaction.style.display =
                 'block';
 
 
-
-
             if (!chestHoldStart) {
-
-
 
 
                 chestHoldStart =
@@ -11201,13 +7905,9 @@ scene.add(camera);
             }
 
 
-
-
             const heldFor =
                 performance.now() -
                 chestHoldStart;
-
-
 
 
             const progress =
@@ -11217,12 +7917,8 @@ scene.add(camera);
                 );
 
 
-
-
             interactionFill.style.width =
                 progress + '%';
-
-
 
 
             if (
@@ -11231,12 +7927,8 @@ scene.add(camera);
             ) {
 
 
-
-
                 chestOpenedThisHold =
                     true;
-
-
 
 
                 openChest(
@@ -11245,46 +7937,30 @@ scene.add(camera);
             }
 
 
-
-
         } else if (!nearbyChest) {
-
-
 
 
             interaction.style.display =
                 'none';
 
 
-
-
             interactionFill.style.width =
                 '0%';
-
-
 
 
             chestHoldStart =
                 0;
 
 
-
-
         } else if (!keys.e) {
-
-
 
 
             interaction.style.display =
                 'block';
 
 
-
-
             interactionFill.style.width =
                 '0%';
-
-
 
 
             chestHoldStart =
@@ -11292,27 +7968,17 @@ scene.add(camera);
         }
 
 
-
-
         // ---------- ITEM PICKUP ----------
-
-
 
 
         pickUpNearbyItem();
 
 
-
-
         // ---------- DAMM ----------
-
-
 
 
         const pos =
             dustGeo.attributes.position;
-
-
 
 
         for (
@@ -11322,14 +7988,10 @@ scene.add(camera);
         ) {
 
 
-
-
             pos.array[i * 3] +=
                 0.15 *
                 delta *
                 10;
-
-
 
 
             pos.array[i * 3 + 1] -=
@@ -11338,21 +8000,15 @@ scene.add(camera);
                 10;
 
 
-
-
             if (
                 pos.array[i * 3 + 1] <
                 0
             ) {
 
 
-
-
                 pos.array[i * 3 + 1] =
                     18;
             }
-
-
 
 
             if (
@@ -11362,8 +8018,6 @@ scene.add(camera);
             ) {
 
 
-
-
                 pos.array[i * 3] =
                     camera.position.x -
                     100;
@@ -11371,22 +8025,14 @@ scene.add(camera);
         }
 
 
-
-
         pos.needsUpdate = true;
-
-
 
 
         // ---------- CAMERA ----------
 
 
-
-
         const target =
             lookTarget;
-
-
 
 
         target.x =
@@ -11399,8 +8045,6 @@ scene.add(camera);
             );
 
 
-
-
         target.z =
             camera.position.z +
             Math.cos(
@@ -11411,8 +8055,6 @@ scene.add(camera);
             );
 
 
-
-
         target.y =
             camera.position.y +
             Math.sin(
@@ -11420,44 +8062,28 @@ scene.add(camera);
             );
 
 
-
-
         camera.lookAt(
             target
         );
 
 
-
-
         // ---------- SINGLEPLAYER BOTS ----------
-
-
 
 
         updateBots(delta);
 
 
-
-
         // ---------- MULTIPLAYER ----------
-
-
 
 
         Net.updateRemotePlayers(delta);
         Net.sendState();
 
 
-
-
         // ---------- MINIMAP ----------
 
 
-
-
         drawMinimap();
-
-
 
 
         renderer.render(
@@ -11467,13 +8093,9 @@ scene.add(camera);
     }
 
 
-
-
     window.addEventListener(
         'resize',
         () => {
-
-
 
 
             camera.aspect =
@@ -11481,11 +8103,7 @@ scene.add(camera);
                 window.innerHeight;
 
 
-
-
             camera.updateProjectionMatrix();
-
-
 
 
             renderer.setSize(
@@ -11496,12 +8114,9 @@ scene.add(camera);
     );
 
 
-
-
     animate();
-
-
 
 
 </script>
 </body> </html>
+
