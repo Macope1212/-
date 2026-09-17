@@ -4567,6 +4567,9 @@
     function buildZombieBotMesh() {
         const group = zombieBotModel.clone(true);
 
+        const body = group.getObjectByName('body');
+        if (body) body.rotation.y = Math.PI;
+
         const box = new THREE.Box3().setFromObject(group);
         const size = new THREE.Vector3();
         box.getSize(size);
