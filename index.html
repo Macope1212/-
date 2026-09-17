@@ -861,6 +861,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js" defer></script>
 
 <script>
@@ -4545,9 +4546,49 @@
         };
     }
 
+    let zombieBotModel = null;
+    let zombieBotModelLoad = null;
+
+    zombieBotModelLoad = new Promise((resolve, reject) => {
+        new THREE.GLTFLoader().load(
+            'zombie (1)(2).gltf',
+            gltf => {
+                zombieBotModel = gltf.scene;
+                resolve();
+            },
+            undefined,
+            error => {
+                console.error('Failed to load zombie bot model:', error);
+                reject(error);
+            }
+        );
+    });
+
+    function buildZombieBotMesh() {
+        const group = zombieBotModel.clone(true);
+
+        const box = new THREE.Box3().setFromObject(group);
+        const size = new THREE.Vector3();
+        box.getSize(size);
+        const targetHeight = 2.0;
+        if (size.y > 0) {
+            const scale = targetHeight / size.y;
+            group.scale.setScalar(scale);
+        }
+
+        group.position.y -= box.min.y * group.scale.y;
+
+        return { group };
+    }
+
     function spawnBot() {
+        if (!zombieBotModel) {
+            zombieBotModelLoad.then(() => spawnBot()).catch(() => {});
+            return;
+        }
+
         const spawn = findBotSpawnPosition();
-        const rig = buildRemotePlayerMesh(0x39b54a);
+        const rig = buildZombieBotMesh();
 
         rig.group.position.set(
             spawn.x,
@@ -6507,4 +6548,3 @@
 
 </script>
 </body> </html>
-
